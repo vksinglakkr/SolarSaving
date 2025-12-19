@@ -49,7 +49,7 @@
   <div class="container d-flex align-items-center justify-content-between flex-wrap">
     
     <div class="d-flex align-items-center">
-      <img src="https://haryana.gov.in/assets/images/logo.png"
+      <img src="assets/haryana-logo.jpg"
            alt="Government of Haryana"
            style="height:65px; margin-right:15px;">
       <div>
@@ -204,7 +204,7 @@
     </div>
     <div class="text-end">
       <strong>Last Updated:</strong>
-      <span id="lastModified"></span>
+      <span id="lastModified">Loading...</span>
     </div>
   </div>
 </footer>
@@ -247,14 +247,19 @@ async function submitData(){
   result.innerHTML = html;
 }
 
-// Always visible Last Updated
-const lm = new Date(document.lastModified);
-document.getElementById("lastModified").innerText =
-  lm.toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric"
-  });
+</script>
+<script>
+window.addEventListener("DOMContentLoaded", function () {
+  const el = document.getElementById("lastModified");
+  if (el) {
+    const lm = new Date(document.lastModified);
+    el.innerText = lm.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric"
+    });
+  }
+});
 </script>
 
 </body>
