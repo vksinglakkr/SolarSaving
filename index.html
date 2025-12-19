@@ -270,6 +270,32 @@ async function submitData(){
     alert("Please enter either Meter Number or Account Number.");
     return;
   }
+  if (!billFrom.value || !billTo.value) {
+  alert("Please enter both Bill From and Bill To dates.");
+  return;
+}
+
+const fromDate = new Date(billFrom.value);
+const toDate = new Date(billTo.value);
+
+if (toDate <= fromDate) {
+  alert("Bill To Date must be later than Bill From Date.");
+  return;
+}
+
+// Optional: calculate billing days
+const billingDays = Math.round(
+  (toDate - fromDate) / (1000 * 60 * 60 * 24)
+);
+
+// Soft warning (do NOT block)
+if (billingDays < 15 || billingDays > 60) {
+  alert(
+    "Note: Billing period is " + billingDays +
+    " days. Please ensure dates are correct."
+  );
+}
+
   const data = {
     mode: mode,
     meter: meter.value,
