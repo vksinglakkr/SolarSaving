@@ -372,7 +372,7 @@ const saveOption = document.querySelector(
     editReason: editReason.value
   };
 
-  const res = await fetch("YOUR_N8N_WEBHOOK_URL",{
+  const res = await fetch("https://n8n-workflow-test.duckdns.org/webhook/solar-saving",{
     method:"POST",
     headers:{ "Content-Type":"application/json"},
     body: JSON.stringify(data)
