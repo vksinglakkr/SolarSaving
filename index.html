@@ -130,32 +130,33 @@
 
 </div>
 
-  <!-- IDENTIFICATION -->
-  <div class="card p-3 mb-3">
-    <h5>🔍 Consumer Identification</h5>
+<div class="card p-3 mb-3">
+  <h5>🔍 Consumer Identification</h5>
 
-    <div class="row">
-      <div class="col-md-6">
-        <label>Meter Number</label>
-        <input class="form-control" id="meter">
-      </div>
-      <div class="col-md-6">
-        <label>Account Number</label>
-        <input class="form-control" id="account">
-      </div>
+  <div class="row">
+    <div class="col-md-6">
+      <label>Bill Number <span class="text-danger">*</span></label>
+      <input class="form-control" id="billNumber" placeholder="As printed on bill">
     </div>
-
-    <div class="row mt-2">
-      <div class="col-md-6">
-        <label>Bill Number</label>
-        <input class="form-control" id="billNumber">
-      </div>
-      <div class="col-md-6">
-        <label>Circle / Sub Division</label>
-        <input class="form-control" id="circle">
-      </div>
+    <div class="col-md-6">
+      <label>Meter Number</label>
+      <input class="form-control" id="meter" placeholder="Optional if Account No is provided">
     </div>
   </div>
+
+  <div class="row mt-2">
+    <div class="col-md-6">
+      <label>Account Number</label>
+      <input class="form-control" id="account" placeholder="Optional if Meter No is provided">
+    </div>
+    <div class="col-md-6 d-flex align-items-end">
+      <small class="text-muted">
+        * Either Meter Number or Account Number is required
+      </small>
+    </div>
+  </div>
+</div>
+
 
   <!-- BILL PERIOD -->
   <div class="card p-3 mb-3">
@@ -260,6 +261,15 @@ function selectMode(selected) {
 }
 
 async function submitData(){
+    if (!billNumber.value.trim()) {
+    alert("Please enter Bill Number.");
+    return;
+  }
+
+  if (!meter.value.trim() && !account.value.trim()) {
+    alert("Please enter either Meter Number or Account Number.");
+    return;
+  }
   const data = {
     mode: mode,
     meter: meter.value,
