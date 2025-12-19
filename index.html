@@ -352,12 +352,11 @@ const saveOption = document.querySelector(
   'input[name="saveOption"]:checked'
 ).value;
 
-
  const data = {
   mode: mode,
+  billNumber: billNumber.value,
   meter: meter.value,
   account: account.value,
-  billNumber: billNumber.value,
   billFrom: billFrom.value,
   billTo: billTo.value,
   gross: gross.value,
@@ -366,11 +365,10 @@ const saveOption = document.querySelector(
   fixed: fixed.value,
   totalBill: totalBill.value,
   arrears: arrears.value,
-  isEdit: isEdit.checked ? "yes" : "no",
   saveOption: saveOption,
+  isEdit: isEdit.checked ? "yes" : "no",
   editReason: editReason.value
 };
-
 
   const res = await fetch("https://n8n-workflow-test.duckdns.org/webhook/solar-saving",{
     method:"POST",
