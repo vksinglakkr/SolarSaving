@@ -39,6 +39,20 @@
     padding:15px 0;
     font-size:14px;
   }
+  .mode-card {
+  cursor: pointer;
+  border: 2px solid #dee2e6;
+  transition: all 0.3s ease;
+}
+.mode-card:hover {
+  border-color: #0b5ed7;
+  box-shadow: 0 0 12px rgba(11,94,215,0.2);
+}
+.mode-card.active {
+  border-color: #0b5ed7;
+  background: #e7f1ff;
+}
+
 </style>
 </head>
 
@@ -88,13 +102,33 @@
   </div>
 
   <!-- MODE -->
-  <div class="card p-3 mb-3">
-    <label class="fw-bold">How do you want to enter bill data?</label>
-    <select id="mode" class="form-select mt-2" onchange="toggleMode()">
-      <option value="manual">✍️ Enter Bill Details Manually</option>
-      <option value="scan">📷 Scan Electricity Bill (OCR)</option>
-    </select>
+  <div class="row mb-4">
+
+  <div class="col-md-6">
+    <div class="card mode-card active" onclick="selectMode('manual')" id="manualCard">
+      <div class="card-body text-center">
+        <div style="font-size:40px;">✍️</div>
+        <h5 class="mt-2">Enter Bill Details</h5>
+        <p class="text-muted mb-0">
+          Manually enter values from your electricity bill
+        </p>
+      </div>
+    </div>
   </div>
+
+  <div class="col-md-6">
+    <div class="card mode-card" onclick="selectMode('scan')" id="scanCard">
+      <div class="card-body text-center">
+        <div style="font-size:40px;">📷</div>
+        <h5 class="mt-2">Scan Electricity Bill</h5>
+        <p class="text-muted mb-0">
+          Upload bill image (OCR – coming soon)
+        </p>
+      </div>
+    </div>
+  </div>
+
+</div>
 
   <!-- IDENTIFICATION -->
   <div class="card p-3 mb-3">
@@ -211,15 +245,23 @@
 
 <!-- ================= SCRIPT ================= -->
 <script>
-function toggleMode(){
-  const m = mode.value;
-  manualSection.classList.toggle("d-none", m==="scan");
-  scanSection.classList.toggle("d-none", m==="manual");
+let mode = "manual"; // default
+
+function selectMode(selected) {
+  mode = selected;
+
+  // Toggle cards
+  document.getElementById("manualCard").classList.toggle("active", selected === "manual");
+  document.getElementById("scanCard").classList.toggle("active", selected === "scan");
+
+  // Toggle sections
+  manualSection.classList.toggle("d-none", selected === "scan");
+  scanSection.classList.toggle("d-none", selected === "manual");
 }
 
 async function submitData(){
   const data = {
-    mode: mode.value,
+    mode: mode,
     meter: meter.value,
     account: account.value,
     billNumber: billNumber.value,
