@@ -304,9 +304,10 @@ function selectMode(selected) {
   document.getElementById("scanCard").classList.toggle("active", selected === "scan");
 
   // Toggle sections
-  manualSection.classList.toggle("d-none", selected === "scan");
-  scanSection.classList.toggle("d-none", selected === "manual");
-}
+document.getElementById("manualSection")
+  .classList.toggle("d-none", selected === "scan");
+document.getElementById("scanSection")
+  .classList.toggle("d-none", selected === "manual");}
 function toggleEditReason() {
   document.getElementById("editReasonBox")
     .classList.toggle("d-none", !isEdit.checked);
