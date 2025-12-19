@@ -253,14 +253,19 @@ window.addEventListener("DOMContentLoaded", function () {
   const el = document.getElementById("lastModified");
   if (el) {
     const lm = new Date(document.lastModified);
-    el.innerText = lm.toLocaleDateString("en-IN", {
+    el.innerText = lm.toLocaleString("en-IN", {
       day: "2-digit",
       month: "long",
-      year: "numeric"
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: true
     });
   }
 });
 </script>
+
 
 </body>
 </html>
