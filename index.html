@@ -240,6 +240,35 @@
   </div>
 </div>
 
+<div class="card p-3 mb-3">
+  <h5>📁 Record Preference</h5>
+
+  <div class="form-check mt-2">
+    <input class="form-check-input" type="radio"
+           name="saveOption" id="saveNo" value="no" checked>
+    <label class="form-check-label fw-semibold" for="saveNo">
+      Get result for this bill only (do not save record)
+    </label>
+    <div class="text-muted small">
+      Recommended for quick check or shared computers
+    </div>
+  </div>
+
+  <div class="form-check mt-3">
+    <input class="form-check-input" type="radio"
+           name="saveOption" id="saveYes" value="yes">
+    <label class="form-check-label fw-semibold" for="saveYes">
+      Save this bill for future reference
+    </label>
+    <div class="text-muted small">
+      Enables cycle-wise solar saving history
+    </div>
+  </div>
+</div>
+<div class="text-muted small text-center mt-2">
+  No personal data is stored without user consent.
+</div>
+
 
   <button class="btn btn-primary w-100 btn-lg" onclick="submitData()">
     💰 Calculate My Solar Saving
@@ -319,6 +348,10 @@ if (billingDays < 15 || billingDays > 60) {
     " days. Please ensure dates are correct."
   );
 }
+const saveOption = document.querySelector(
+  'input[name="saveOption"]:checked'
+).value;
+
 
   const data = {
     mode: mode,
@@ -335,6 +368,7 @@ if (billingDays < 15 || billingDays > 60) {
     totalBill: totalBill.value,
     arrears: arrears.value,
     isEdit: isEdit.checked ? "yes":"no",
+    saveOption: saveOption,
     editReason: editReason.value
   };
 
