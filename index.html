@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SolarSaving – Solar Bill Saving Calculator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f9;
+  }
+  .container {
+    max-width: 820px;
+    margin: auto;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 6px;
+  }
+  h2 {
+    text-align: center;
+    color: #0b5ed7;
+  }
+  label {
+    font-weight: 600;
+    display: block;
+    margin-top: 12px;
+  }
+  input, select, textarea, button {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+  }
+  button {
+    background: #0b5ed7;
+    color: #fff;
+    border: none;
+    font-size: 16px;
+    margin-top: 20px;
+    cursor: pointer;
+  }
+  button:hover {
+    background: #084298;
+  }
+  .hidden {
+    display: none;
+  }
+  .note {
+    font-size: 13px;
+    color: #555;
+    margin-top: 5px;
+  }
+  #result {
+    background: #eef3ff;
+    padding: 15px;
+    margin-top: 20px;
+    border-radius: 4px;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>SolarSaving – Check Your Solar Benefit</h2>
+
+<!-- MODE -->
+<label>Entry Mode</label>
+<select id="mode" onchange="toggleMode()">
+  <option value="manual">Enter Bill Data Manually</option>
+  <option value="scan">Scan Electricity Bill (OCR)</option>
+</select>
+
+<!-- IDENTIFICATION -->
+<label>Meter Number</label>
+<input id="meter" placeholder="Meter Number">
+
+<label>Account Number</label>
+<input id="account" placeholder="Account Number">
+
+<label>Bill Number</label>
+<input id="billNumber" placeholder="Bill Number (as printed on bill)">
+
+<label>Circle / Sub Division</label>
+<input id="circle" placeholder="Circle / Sub Division">
+
+<!-- BILL PERIOD -->
+<label>Bill Period From</label>
+<input type="date" id="billFrom">
+
+<label>Bill Period To</label>
+<input type="date" id="billTo">
+
+<!-- MANUAL ENTRY -->
+<div id="manualSection">
+
+  <label>Total Consumption (Gross Units)</label>
+  <input type="number" id="gross">
+
+  <label>Import Units (Grid)</label>
+  <input type="number" id="import">
+
+  <label>Export Units (Solar)</label>
+  <input type="number" id="export">
+
+  <label>Fixed Charges (₹)</label>
+  <input type="number" id="fixed">
+
+  <label>Total Bill Amount (₹)</label>
+  <input type="number" id="totalBill">
+
+  <label>Previous Dues / Arrears (₹)</label>
+  <input type="number" id="arrears" value="0">
+
+  <label>Late Payment Surcharge (₹)</label>
+  <input type="number" id="lateFee" value="0">
+
+</div>
+
+<!-- SCAN OPTION -->
+<div id="scanSection" class="hidden">
+  <label>Upload Electricity Bill Image</label>
+  <input type="file" id="billImage" accept="image/*">
+  <div class="note">
+    Bill details will be extracted automatically. You can verify before submission.
+  </div>
+</div>
+
+<!-- EDIT / CORRECTION -->
+<label>
+  <input type="checkbox" id="isEdit"> This is a correction / revised entry
+</label>
+
+<label>Edit Reason (if correction)</label>
+<textarea id="editReason" placeholder="Typing mistake / OCR error / Revised bill"></textarea>
+
+<button onclick="submitData()">Calculate Solar Saving</button>
+
+<div id="result" class="hidden"></div>
+
+</div>
+
+<script>
+function toggleMode() {
+  const mode = document.getElementById("mode").value;
+  document.getElementById("manualSection").classList.toggle("hidden", mode === "scan");
+  document.getElementById("scanSection").classList.toggle("hidden", mode === "manual");
+}
+
+async function submitData() {
+
+  const data = {
+    mode: mode.value,
+
+    meter: meter.value,
+    account: account.value,
+    billNumber: billNumber.value,
+    circle: circle.value,
+
+    billFrom: billFrom.value,
+    billTo: billTo.value,
+
+    gross: gross.value,
+    import: import.value,
+    export: export.value,
+    fixed: fixed.value,
+    totalBill: totalBill.value,
+
+    arrears: arrears.value,
+    lateFee: lateFee.value,
+
+    isEdit: isEdit.checked ? "yes" : "no",
+    editReason: editReason.value
+  };
+
+  const response = await fetch("YOUR_N8N_WEBHOOK_URL", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
+
+  const output = await response.text();
+  document.getElementById("result").classList.remove("hidden");
+  document.getElementById("result").innerHTML = output;
+}
+</script>
+
+</body>
+</html>
