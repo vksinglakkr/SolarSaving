@@ -278,6 +278,11 @@ function selectMode(selected) {
   manualSection.classList.toggle("d-none", selected === "scan");
   scanSection.classList.toggle("d-none", selected === "manual");
 }
+function toggleEditReason() {
+  document.getElementById("editReasonBox")
+    .classList.toggle("d-none", !isEdit.checked);
+}
+
 
 async function submitData(){
     if (!billNumber.value.trim()) {
