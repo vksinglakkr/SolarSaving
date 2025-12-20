@@ -148,7 +148,7 @@ footer {
 
 <!-- ================= MODE SELECTION ================= -->
 <div class="row mb-4">
-  <div class="col-md-6">
+  <div class="col-md-6 col-12">
     <div class="card mode-card active" id="manualCard" onclick="selectMode('manual')">
       <div class="card-body text-center">
         <div style="font-size:40px;">✍️</div>
@@ -157,7 +157,7 @@ footer {
       </div>
     </div>
   </div>
-  <div class="col-md-6">
+  <div class="col-md-6 col-12">
     <div class="card mode-card" id="scanCard" onclick="selectMode('scan')">
       <div class="card-body text-center">
         <div style="font-size:40px;">📷</div>
@@ -394,7 +394,10 @@ function calculateLocally(){
     <hr>
     <p><b>Bill With Solar:</b> ₹${currentBill.toFixed(0)}</p>
     <p><b>Bill Without Solar:</b> ₹${billWithoutSolar.toFixed(0)}</p>
-    <h3 class="text-success">Saving: ₹${saving.toFixed(0)}</h3>
+  <h3 class="text-success mt-3">
+  💰 Saving: ₹${saving}
+</h3>
+
     <small class="text-muted">Calculated locally. No data saved.</small>
   `;
 }
