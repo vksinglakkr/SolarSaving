@@ -267,7 +267,40 @@ function selectMode(m){
   manualCard.classList.toggle("active", m==="manual");
   scanCard.classList.toggle("active", m==="scan");
 }
+  
+function calculateLocally() {
 
+  const grossU = Number(gross.value);
+  const importU = Number(import.value);
+  const exportU = Number(export.value);
+  const fixedC = Number(fixed.value);
+  const totalB = Number(totalBill.value);
+  const arrearsA = Number(arrears.value || 0);
+
+  if (importU <= exportU) {
+    alert("Import units must be greater than export units.");
+    return;
+  }
+
+  const netUnits = importU - exportU;
+  const currentBill = totalB - arrearsA;
+  const unitRate = (currentBill - fixedC) / netUnits;
+
+  const billWithoutSolar = (grossU * unitRate) + fixedC;
+  const saving = billWithoutSolar - currentBill;
+
+  result.classList.remove("d-none");
+  result.innerHTML = `
+    <h4>☀️ Solar Saving Result (One-time)</h4>
+    <hr>
+    <p><b>Bill With Solar:</b> ₹${currentBill.toFixed(0)}</p>
+    <p><b>Bill Without Solar:</b> ₹${billWithoutSolar.toFixed(0)}</p>
+    <h3 class="text-success">Saving: ₹${saving.toFixed(0)}</h3>
+    <small class="text-muted">
+      This calculation was done locally. No data has been stored.
+    </small>
+  `;
+}
 function toggleIdentitySection(){
   const saveOption = document.querySelector(
     'input[name="saveOption"]:checked'
@@ -282,10 +315,15 @@ function toggleEditReason(){
 
 async function submitData(){
 
-  const saveOption = document.querySelector(
+ const saveOption = document.querySelector(
     'input[name="saveOption"]:checked'
   ).value;
 
+  // 🔹 ONE-TIME RESULT → FRONTEND ONLY
+  if (saveOption === "no") {
+    calculateLocally();
+    return;
+  }
   if(saveOption === "yes"){
     if(!billNumber.value.trim()){
       alert("Bill Number is required to save record.");
