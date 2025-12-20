@@ -2,65 +2,61 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>SolarSanchay – Haryana | Solar Savings Estimation Portal</title>
+<title>SolarSanchay – Haryana | Solar Saving Calculator</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
-  body {
-    background:#f5f7fb;
-  }
-  .header {
-    background:#ffffff;
-    border-bottom:4px solid #0b5ed7;
-    padding:12px 0;
-  }
-  .hero {
-    background: linear-gradient(135deg,#0b5ed7,#084298);
-    color:#fff;
-    padding:25px;
-    border-radius:10px;
-    margin-bottom:25px;
-  }
-  .card {
-    border-radius:10px;
-  }
-  .result-box {
-    background:#e7f1ff;
-    border-left:5px solid #0b5ed7;
-    padding:20px;
-    border-radius:8px;
-  }
-  footer {
-    background:#ffffff;
-    border-top:2px solid #dee2e6;
-    margin-top:40px;
-    padding:15px 0;
-    font-size:14px;
-  }
-  .mode-card {
-  cursor: pointer;
-  border: 2px solid #dee2e6;
-  transition: all 0.3s ease;
+body { background:#f4f6fb; }
+
+.header {
+  background:#fff;
+  border-bottom:4px solid #0b5ed7;
+  padding:14px 0;
+}
+
+.hero {
+  background:linear-gradient(135deg,#0b5ed7,#084298);
+  color:#fff;
+  padding:26px;
+  border-radius:12px;
+  margin-bottom:28px;
+}
+
+.card { border-radius:12px; }
+
+.mode-card {
+  cursor:pointer;
+  border:2px solid #dee2e6;
+  transition:0.3s;
 }
 .mode-card:hover {
-  border-color: #0b5ed7;
-  box-shadow: 0 0 12px rgba(11,94,215,0.2);
+  border-color:#0b5ed7;
+  box-shadow:0 0 14px rgba(11,94,215,0.2);
 }
 .mode-card.active {
-  border-color: #0b5ed7;
-  background: #e7f1ff;
-}
-.form-check-input {
-  transform: scale(1.3);
-  cursor: pointer;
-}
-.border-warning {
-  border-left: 5px solid #ffc107 !important;
+  border-color:#0b5ed7;
+  background:#e7f1ff;
 }
 
+.result-box {
+  background:#ffffff;
+  border-left:6px solid #0b5ed7;
+  padding:22px;
+  border-radius:10px;
+  box-shadow:0 4px 14px rgba(0,0,0,0.05);
+}
 
+footer {
+  background:#fff;
+  border-top:2px solid #dee2e6;
+  margin-top:50px;
+  padding:18px 0;
+  font-size:14px;
+}
+
+.form-check-input { transform:scale(1.3); }
 </style>
 </head>
 
@@ -68,339 +64,293 @@
 
 <!-- ================= HEADER ================= -->
 <div class="header">
-  <div class="container d-flex align-items-center justify-content-between flex-wrap">
-    
+  <div class="container d-flex justify-content-between align-items-center flex-wrap">
     <div class="d-flex align-items-center">
-      <img src="assests/haryana-logo.jpg"
-           alt="Government of Haryana"
-           style="height:65px; margin-right:15px;">
+      <img src="assets/haryana-logo.jpg" style="height:64px;margin-right:14px;">
       <div>
         <h4 class="mb-0 fw-bold">SolarSanchay – Haryana</h4>
-        <small class="text-muted">
-          Solar Savings Estimation Portal
-        </small>
+        <small class="text-muted">Solar Savings Estimation Portal</small>
       </div>
     </div>
-
-    <div class="text-end mt-2 mt-md-0">
-      <small class="text-muted d-block">
-        Government of Haryana
-      </small>
-      <small class="text-muted">
-        Powered by NIC, Kurukshetra
-      </small>
+    <div class="text-end">
+      <small class="text-muted d-block">Government of Haryana</small>
+      <small class="text-muted">National Informatics Centre, Kurukshetra</small>
     </div>
-
   </div>
 </div>
 
-<!-- ================= BODY ================= -->
 <div class="container my-4">
 
-  <!-- HERO -->
-  <div class="hero">
-    <h3>☀️ SolarSanchay</h3>
-    <p class="mb-1">
-      Know how much money you have saved using your solar system,
-      based on your actual electricity bill.
-    </p>
-    <small>
-      Transparent • Audit-safe • Citizen-friendly
-    </small>
-  </div>
+<!-- ================= HERO ================= -->
+<div class="hero">
+  <h3>☀️ Know Your Solar Savings</h3>
+  <p class="mb-0">
+    Calculate how much money you saved using your solar system,
+    based on actual electricity bill values.
+  </p>
+</div>
 
-  <!-- MODE -->
-  <div class="row mb-4">
-
+<!-- ================= MODE SELECTION ================= -->
+<div class="row mb-4">
   <div class="col-md-6">
-    <div class="card mode-card active" onclick="selectMode('manual')" id="manualCard">
+    <div class="card mode-card active" id="manualCard" onclick="selectMode('manual')">
       <div class="card-body text-center">
         <div style="font-size:40px;">✍️</div>
         <h5 class="mt-2">Enter Bill Details</h5>
-        <p class="text-muted mb-0">
-          Manually enter values from your electricity bill
-        </p>
+        <p class="text-muted mb-0">Manual entry from electricity bill</p>
       </div>
     </div>
   </div>
-
   <div class="col-md-6">
-    <div class="card mode-card" onclick="selectMode('scan')" id="scanCard">
+    <div class="card mode-card" id="scanCard" onclick="selectMode('scan')">
       <div class="card-body text-center">
         <div style="font-size:40px;">📷</div>
         <h5 class="mt-2">Scan Electricity Bill</h5>
-        <p class="text-muted mb-0">
-          Upload bill image (OCR – coming soon)
-        </p>
+        <p class="text-muted mb-0">OCR – Coming Soon</p>
       </div>
     </div>
   </div>
-
 </div>
 
+<!-- ================= RECORD PREFERENCE ================= -->
 <div class="card p-3 mb-3">
+  <h5>📁 What do you want to do?</h5>
+
+  <div class="form-check mt-2">
+    <input class="form-check-input" type="radio"
+           name="saveOption" value="no" checked
+           onchange="toggleIdentitySection()">
+    <label class="form-check-label fw-semibold">
+      Just check saving for this bill (no data saved)
+    </label>
+    <div class="text-muted small">
+      Recommended for quick check and privacy
+    </div>
+  </div>
+
+  <div class="form-check mt-3">
+    <input class="form-check-input" type="radio"
+           name="saveOption" value="yes"
+           onchange="toggleIdentitySection()">
+    <label class="form-check-label fw-semibold">
+      Save this bill for future reference
+    </label>
+    <div class="text-muted small">
+      Enables cycle-wise history and long-term analysis
+    </div>
+  </div>
+</div>
+
+<!-- ================= CONSUMER IDENTIFICATION (HIDDEN BY DEFAULT) ================= -->
+<div class="card p-3 mb-3 d-none" id="identitySection">
   <h5>🔍 Consumer Identification</h5>
 
   <div class="row">
     <div class="col-md-6">
       <label>Bill Number <span class="text-danger">*</span></label>
-      <input class="form-control" id="billNumber" placeholder="As printed on bill">
+      <input class="form-control" id="billNumber">
     </div>
     <div class="col-md-6">
       <label>Meter Number</label>
-      <input class="form-control" id="meter" placeholder="Optional if Account No is provided">
+      <input class="form-control" id="meter">
     </div>
   </div>
 
   <div class="row mt-2">
     <div class="col-md-6">
       <label>Account Number</label>
-      <input class="form-control" id="account" placeholder="Optional if Meter No is provided">
+      <input class="form-control" id="account">
     </div>
     <div class="col-md-6 d-flex align-items-end">
       <small class="text-muted">
-        * Either Meter Number or Account Number is required
+        * Either Meter Number or Account Number required
       </small>
     </div>
   </div>
 </div>
 
+<!-- ================= BILL PERIOD ================= -->
+<div class="card p-3 mb-3">
+  <h5>📅 Bill Period</h5>
+  <div class="row">
+    <div class="col-md-6">
+      <label>From</label>
+      <input type="date" class="form-control" id="billFrom">
+    </div>
+    <div class="col-md-6">
+      <label>To</label>
+      <input type="date" class="form-control" id="billTo">
+    </div>
+  </div>
+</div>
 
-  <!-- BILL PERIOD -->
-  <div class="card p-3 mb-3">
-    <h5>📅 Bill Period</h5>
-    <div class="row">
-      <div class="col-md-6">
-        <label>From</label>
-        <input type="date" class="form-control" id="billFrom">
-      </div>
-      <div class="col-md-6">
-        <label>To</label>
-        <input type="date" class="form-control" id="billTo">
-      </div>
+<!-- ================= CONSUMPTION ================= -->
+<div class="card p-3 mb-3">
+  <h5>⚡ Consumption & Charges</h5>
+  <div class="row">
+    <div class="col-md-4">
+      <label>Gross Units</label>
+      <input class="form-control" id="gross">
+    </div>
+    <div class="col-md-4">
+      <label>Import Units</label>
+      <input class="form-control" id="import">
+    </div>
+    <div class="col-md-4">
+      <label>Export Units</label>
+      <input class="form-control" id="export">
     </div>
   </div>
 
-  <!-- MANUAL ENTRY -->
-  <div class="card p-3 mb-3" id="manualSection">
-    <h5>⚡ Consumption Details</h5>
-
-    <div class="row">
-      <div class="col-md-4">
-        <label>Gross Units</label>
-        <input type="number" class="form-control" id="gross">
-      </div>
-      <div class="col-md-4">
-        <label>Import Units (Grid)</label>
-        <input type="number" class="form-control" id="import">
-      </div>
-      <div class="col-md-4">
-        <label>Export Units (Solar)</label>
-        <input type="number" class="form-control" id="export">
-      </div>
+  <div class="row mt-2">
+    <div class="col-md-4">
+      <label>Fixed Charges (₹)</label>
+      <input class="form-control" id="fixed">
     </div>
-
-    <div class="row mt-2">
-      <div class="col-md-4">
-        <label>Fixed Charges (₹)</label>
-        <input type="number" class="form-control" id="fixed">
-      </div>
-      <div class="col-md-4">
-        <label>Total Bill Amount (₹)</label>
-        <input type="number" class="form-control" id="totalBill">
-      </div>
-      <div class="col-md-4">
-        <label>Arrears + Late Fee (₹)</label>
-        <input type="number" class="form-control" id="arrears" value="0">
-      </div>
+    <div class="col-md-4">
+      <label>Total Bill Amount (₹)</label>
+      <input class="form-control" id="totalBill">
+    </div>
+    <div class="col-md-4">
+      <label>Arrears / Late Fee (₹)</label>
+      <input class="form-control" id="arrears" value="0">
     </div>
   </div>
+</div>
 
-  <!-- SCAN (FUTURE) -->
-  <div class="card p-3 mb-3 d-none" id="scanSection">
-    <h5>📷 Upload Electricity Bill</h5>
-    <input type="file" class="form-control">
-  </div>
-
-  <!-- EDIT -->
+<!-- ================= REVISED ENTRY ================= -->
 <div class="card p-3 mb-3 border-warning">
   <div class="form-check form-switch">
-    <input class="form-check-input" type="checkbox" id="isEdit" onchange="toggleEditReason()">
-    <label class="form-check-label fw-bold" for="isEdit">
-      This is a Corrected / Revised Bill Entry
+    <input class="form-check-input" type="checkbox"
+           id="isEdit" onchange="toggleEditReason()">
+    <label class="form-check-label fw-bold">
+      This is a corrected / revised entry
     </label>
   </div>
 
-  <div id="editReasonBox" class="mt-3 d-none">
-    <label class="fw-semibold">Reason for Correction</label>
+  <div id="editReasonBox" class="mt-2 d-none">
     <textarea class="form-control"
-              id="editReason"
-              rows="2"
-              placeholder="e.g. Typing mistake / OCR error / Revised bill issued by DISCOM"></textarea>
+      id="editReason"
+      placeholder="Reason for correction (if any)"></textarea>
   </div>
 </div>
 
-<div class="card p-3 mb-3">
-  <h5>📁 Record Preference</h5>
+<button class="btn btn-primary btn-lg w-100"
+        onclick="submitData()">
+  💰 Calculate My Solar Saving
+</button>
 
-  <div class="form-check mt-2">
-    <input class="form-check-input" type="radio"
-           name="saveOption" id="saveNo" value="no" checked>
-    <label class="form-check-label fw-semibold" for="saveNo">
-      Get result for this bill only (do not save record)
-    </label>
-    <div class="text-muted small">
-      Recommended for quick check or shared computers
-    </div>
-  </div>
-
-  <div class="form-check mt-3">
-    <input class="form-check-input" type="radio"
-           name="saveOption" id="saveYes" value="yes">
-    <label class="form-check-label fw-semibold" for="saveYes">
-      Save this bill for future reference
-    </label>
-    <div class="text-muted small">
-      Enables cycle-wise solar saving history
-    </div>
-  </div>
-</div>
-<div class="text-muted small text-center mt-2">
-  No personal data is stored without user consent.
-</div>
-
-
-  <button class="btn btn-primary w-100 btn-lg" onclick="submitData()">
-    💰 Calculate My Solar Saving
-  </button>
-
-  <div id="result" class="result-box mt-4 d-none"></div>
+<div id="result" class="result-box mt-4 d-none"></div>
 
 </div>
 
 <!-- ================= FOOTER ================= -->
 <footer>
-  <div class="container d-flex justify-content-between align-items-center flex-wrap">
+  <div class="container d-flex justify-content-between flex-wrap">
     <div>
       <strong>Developed & Maintained by:</strong><br>
       National Informatics Centre (NIC), Kurukshetra
     </div>
-    <div class="text-end">
+    <div>
       <strong>Last Updated:</strong>
-      <span id="lastModified">Loading...</span>
+      <span id="lastModified"></span>
     </div>
   </div>
 </footer>
 
 <!-- ================= SCRIPT ================= -->
 <script>
-let mode = "manual"; // default
+let mode = "manual";
 
-function selectMode(selected) {
-  mode = selected;
-}
-  // Toggle cards
-  document.getElementById("manualCard").classList.toggle("active", selected === "manual");
-  document.getElementById("scanCard").classList.toggle("active", selected === "scan");
-
-  // Toggle sections
-document.getElementById("manualSection")
-  .classList.toggle("d-none", selected === "scan");
-document.getElementById("scanSection")
-  .classList.toggle("d-none", selected === "manual");}
-function toggleEditReason() {
-  document.getElementById("editReasonBox")
-    .classList.toggle("d-none", !isEdit.checked);
+function selectMode(m){
+  mode = m;
+  manualCard.classList.toggle("active", m==="manual");
+  scanCard.classList.toggle("active", m==="scan");
 }
 
+function toggleIdentitySection(){
+  const saveOption = document.querySelector(
+    'input[name="saveOption"]:checked'
+  ).value;
+
+  identitySection.classList.toggle("d-none", saveOption !== "yes");
+}
+
+function toggleEditReason(){
+  editReasonBox.classList.toggle("d-none", !isEdit.checked);
+}
 
 async function submitData(){
-    if (!billNumber.value.trim()) {
-    alert("Please enter Bill Number.");
+
+  const saveOption = document.querySelector(
+    'input[name="saveOption"]:checked'
+  ).value;
+
+  if(saveOption === "yes"){
+    if(!billNumber.value.trim()){
+      alert("Bill Number is required to save record.");
+      return;
+    }
+    if(!meter.value.trim() && !account.value.trim()){
+      alert("Enter Meter or Account Number.");
+      return;
+    }
+  }
+
+  if(!billFrom.value || !billTo.value){
+    alert("Please enter Bill From and To dates.");
     return;
   }
 
-  if (!meter.value.trim() && !account.value.trim()) {
-    alert("Please enter either Meter Number or Account Number.");
-    return;
-  }
-  if (!billFrom.value || !billTo.value) {
-  alert("Please enter both Bill From and Bill To dates.");
-  return;
-}
+  const data = {
+    mode: mode,
+    billNumber: billNumber.value,
+    meter: meter.value,
+    account: account.value,
+    billFrom: billFrom.value,
+    billTo: billTo.value,
+    gross: gross.value,
+    import: import.value,
+    export: export.value,
+    fixed: fixed.value,
+    totalBill: totalBill.value,
+    arrears: arrears.value,
+    saveOption: saveOption,
+    isEdit: isEdit.checked ? "yes" : "no",
+    editReason: editReason.value
+  };
 
-const fromDate = new Date(billFrom.value);
-const toDate = new Date(billTo.value);
-
-if (toDate <= fromDate) {
-  alert("Bill To Date must be later than Bill From Date.");
-  return;
-}
-
-// Optional: calculate billing days
-const billingDays = Math.round(
-  (toDate - fromDate) / (1000 * 60 * 60 * 24)
-);
-
-// Soft warning (do NOT block)
-if (billingDays < 15 || billingDays > 60) {
-  alert(
-    "Note: Billing period is " + billingDays +
-    " days. Please ensure dates are correct."
+  const res = await fetch(
+    "https://n8n-workflow-test.duckdns.org/webhook/solar-saving",
+    {
+      method:"POST",
+      headers:{ "Content-Type":"application/json"},
+      body: JSON.stringify(data)
+    }
   );
-}
-const saveOption = document.querySelector(
-  'input[name="saveOption"]:checked'
-).value;
-
- const data = {
-  mode: mode,
-  billNumber: billNumber.value,
-  meter: meter.value,
-  account: account.value,
-  billFrom: billFrom.value,
-  billTo: billTo.value,
-  gross: gross.value,
-  import: import.value,
-  export: export.value,
-  fixed: fixed.value,
-  totalBill: totalBill.value,
-  arrears: arrears.value,
-  saveOption: saveOption,
-  isEdit: isEdit.checked ? "yes" : "no",
-  editReason: editReason.value
-};
-
-  const res = await fetch("https://n8n-workflow-test.duckdns.org/webhook/solar-saving",{
-    method:"POST",
-    headers:{ "Content-Type":"application/json"},
-    body: JSON.stringify(data)
-  });
 
   const html = await res.text();
   result.classList.remove("d-none");
   result.innerHTML = html;
 }
 
-</script>
-<script>
-window.addEventListener("DOMContentLoaded", function () {
-  const el = document.getElementById("lastModified");
-  if (el) {
-    const lm = new Date(document.lastModified);
-    el.innerText = lm.toLocaleString("en-IN", {
-      day: "2-digit",
-      month: "long",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: true
-    });
-  }
+window.addEventListener("DOMContentLoaded",()=>{
+  toggleIdentitySection();
+  const lm = new Date(document.lastModified);
+  lastModified.innerText = lm.toLocaleString(
+    "en-IN",
+    {
+      day:"2-digit",
+      month:"long",
+      year:"numeric",
+      hour:"2-digit",
+      minute:"2-digit",
+      second:"2-digit",
+      hour12:true
+    }
+  );
 });
 </script>
-
 
 </body>
 </html>
