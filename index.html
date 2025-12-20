@@ -111,6 +111,17 @@ footer {
     gap: 10px;
   }
 }
+@media (max-width: 768px) {
+  .hero {
+    padding: 16px;
+    font-size: 0.95rem;
+  }
+
+  .hero h3 {
+    font-size: 1.2rem;
+    margin-bottom: 6px;
+  }
+}
 
   
 </style>
@@ -147,25 +158,67 @@ footer {
 </div>
 
 <!-- ================= MODE SELECTION ================= -->
-<div class="row mb-4">
-  <div class="col-md-6 col-12">
-    <div class="card mode-card active" id="manualCard" onclick="selectMode('manual')">
-      <div class="card-body text-center">
-        <div style="font-size:40px;">✍️</div>
-        <h5 class="mt-2">Enter Bill Details</h5>
-        <p class="text-muted mb-0">Manual entry from electricity bill</p>
+<div class="accordion mb-4" id="modeAccordion">
+
+  <!-- Manual Entry -->
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#manualCollapse"
+              aria-expanded="true">
+        ✍️ Enter Bill Details
+      </button>
+    </h2>
+
+    <div id="manualCollapse"
+         class="accordion-collapse collapse show"
+         data-bs-parent="#modeAccordion">
+      <div class="accordion-body">
+        <div class="card mode-card active"
+             id="manualCard"
+             onclick="selectMode('manual'); collapseOther('scanCollapse')">
+          <div class="card-body text-center">
+            <div style="font-size:36px;">✍️</div>
+            <p class="mb-0 text-muted">
+              Manual entry from electricity bill
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-  <div class="col-md-6 col-12">
-    <div class="card mode-card" id="scanCard" onclick="selectMode('scan')">
-      <div class="card-body text-center">
-        <div style="font-size:40px;">📷</div>
-        <h5 class="mt-2">Scan Electricity Bill</h5>
-        <p class="text-muted mb-0">OCR – Coming Soon</p>
+
+  <!-- Scan Entry -->
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#scanCollapse">
+        📷 Scan Electricity Bill
+      </button>
+    </h2>
+
+    <div id="scanCollapse"
+         class="accordion-collapse collapse"
+         data-bs-parent="#modeAccordion">
+      <div class="accordion-body">
+        <div class="card mode-card"
+             id="scanCard"
+             onclick="selectMode('scan'); collapseOther('manualCollapse')">
+          <div class="card-body text-center">
+            <div style="font-size:36px;">📷</div>
+            <p class="mb-0 text-muted">
+              OCR – Coming Soon
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
+
 </div>
 
 <!-- ================= RECORD PREFERENCE ================= -->
@@ -340,7 +393,12 @@ const editReason= document.getElementById("editReason");
 const editReasonBox = document.getElementById("editReasonBox");
 
 let mode = "manual";
-
+function collapseOther(id) {
+  const other = document.getElementById(id);
+  if (other && other.classList.contains("show")) {
+    bootstrap.Collapse.getInstance(other)?.hide();
+  }
+}
 /* ================= MODE ================= */
 function selectMode(m){
   mode = m;
