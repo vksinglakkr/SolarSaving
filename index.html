@@ -258,148 +258,125 @@ footer {
   </div>
 </footer>
 
-<!-- ================= SCRIPT ================= -->
 <script>
+/* ================= DOM REFERENCES ================= */
+const manualCard     = document.getElementById("manualCard");
+const scanCard       = document.getElementById("scanCard");
+const identitySection= document.getElementById("identitySection");
+const revisedSection = document.getElementById("revisedSection");
+const result         = document.getElementById("result");
+
+const billNumber = document.getElementById("billNumber");
+const meter      = document.getElementById("meter");
+const account    = document.getElementById("account");
+const billFrom   = document.getElementById("billFrom");
+const billTo     = document.getElementById("billTo");
+
+const gross      = document.getElementById("gross");
+const importU    = document.getElementById("import");
+const exportU    = document.getElementById("export");
+const fixed      = document.getElementById("fixed");
+const totalBill = document.getElementById("totalBill");
+const arrears   = document.getElementById("arrears");
+
+const isEdit    = document.getElementById("isEdit");
+const editReason= document.getElementById("editReason");
+const editReasonBox = document.getElementById("editReasonBox");
+
 let mode = "manual";
 
+/* ================= MODE ================= */
 function selectMode(m){
   mode = m;
-  manualCard.classList.toggle("active", m==="manual");
-  scanCard.classList.toggle("active", m==="scan");
+  manualCard.classList.toggle("active", m === "manual");
+  scanCard.classList.toggle("active", m === "scan");
 }
-  
-function calculateLocally() {
 
-  const grossU = Number(gross.value);
-  const importU = Number(import.value);
-  const exportU = Number(export.value);
-  const fixedC = Number(fixed.value);
-  const totalB = Number(totalBill.value);
-  const arrearsA = Number(arrears.value || 0);
-
-  if (importU <= exportU) {
-    alert("Import units must be greater than export units.");
-    return;
-  }
-
- const netUnits = importU - exportU;
-const directSolar = grossU - importU;
-  const currentBill = totalB - arrearsA;
-  const unitRate = (currentBill - fixedC) / netUnits;
-
-  const billWithoutSolar = (grossU * unitRate) + fixedC;
-  const saving = billWithoutSolar - currentBill;
-
-  result.classList.remove("d-none");
-result.innerHTML = `
-  <h4>☀️ Solar Saving Result</h4>
-  <hr>
-
-  <p><b>Total Consumption (Gross):</b> ${grossU} units</p>
-  <p><b>Imported from Grid:</b> ${importU} units</p>
-  <p><b>Exported to Grid:</b> ${exportU} units</p>
-
-  <div class="mt-2 p-2 rounded" style="background:#e8f5e9;">
-    <b>Direct Solar Used:</b> ${directSolar} units
-    <br>
-    <small class="text-muted">
-      (Electricity used directly from solar, without going through meter)
-    </small>
-  </div>
-
-  <hr>
-  <p><b>Bill With Solar:</b> ₹${currentBill.toFixed(0)}</p>
-  <p><b>Bill Without Solar:</b> ₹${billWithoutSolar.toFixed(0)}</p>
-
-  <h3 class="text-success">Saving: ₹${saving.toFixed(0)}</h3>
-
-  <small class="text-muted">
-    This calculation was done locally. No data has been stored.
-  </small>
-`;
-}
+/* ================= TOGGLES ================= */
 function toggleIdentitySection(){
   const saveOption = document.querySelector(
     'input[name="saveOption"]:checked'
   ).value;
 
-  // Consumer identity
   identitySection.classList.toggle("d-none", saveOption !== "yes");
-
-  // Revised entry option
   revisedSection.classList.toggle("d-none", saveOption !== "yes");
 }
+
 function toggleEditReason(){
   editReasonBox.classList.toggle("d-none", !isEdit.checked);
 }
 
-async function submitData(){
+/* ================= LOCAL CALC ================= */
+function calculateLocally(){
+  const g = Number(gross.value);
+  const i = Number(importU.value);
+  const e = Number(exportU.value);
+  const f = Number(fixed.value);
+  const t = Number(totalBill.value);
+  const a = Number(arrears.value || 0);
 
- const saveOption = document.querySelector(
+  if (e > i || i > g) {
+    alert("Please check Gross / Import / Export units.");
+    return;
+  }
+
+  const net = i - e;
+  const directSolar = g - i;
+  const currentBill = t - a;
+  const unitRate = (currentBill - f) / net;
+  const billWithoutSolar = (g * unitRate) + f;
+  const saving = billWithoutSolar - currentBill;
+
+  result.classList.remove("d-none");
+  result.innerHTML = `
+    <h4>☀️ Solar Saving Result</h4>
+    <hr>
+    <p><b>Gross:</b> ${g} units</p>
+    <p><b>Imported:</b> ${i} units</p>
+    <p><b>Exported:</b> ${e} units</p>
+    <p><b>Direct Solar Used:</b> ${directSolar} units</p>
+    <hr>
+    <p><b>Bill With Solar:</b> ₹${currentBill.toFixed(0)}</p>
+    <p><b>Bill Without Solar:</b> ₹${billWithoutSolar.toFixed(0)}</p>
+    <h3 class="text-success">Saving: ₹${saving.toFixed(0)}</h3>
+    <small class="text-muted">Calculated locally. No data saved.</small>
+  `;
+}
+
+/* ================= SUBMIT ================= */
+async function submitData(){
+  const saveOption = document.querySelector(
     'input[name="saveOption"]:checked'
   ).value;
-const grossU  = Number(gross.value);
-const importU = Number(import.value);
-const exportU = Number(export.value);
 
-// Basic numeric validation
-if (grossU <= 0 || importU < 0 || exportU < 0) {
-  alert("Units must be non-negative numbers.");
-  return;
-}
-
-// Logical validations
-if (exportU > importU) {
-  alert("Export units cannot be greater than Import units.");
-  return;
-}
-
-if (importU > grossU) {
-  alert("Import units cannot be greater than Gross units.");
-  return;
-}
-
-const netUnits = importU - exportU;
-if (netUnits <= 0) {
-  alert("Net units must be greater than zero.");
-  return;
-}
-
-  // 🔹 ONE-TIME RESULT → FRONTEND ONLY
   if (saveOption === "no") {
     calculateLocally();
     return;
   }
-  if(saveOption === "yes"){
-    if(!billNumber.value.trim()){
-      alert("Bill Number is required to save record.");
-      return;
-    }
-    if(!meter.value.trim() && !account.value.trim()){
-      alert("Enter Meter or Account Number.");
-      return;
-    }
-  }
 
-  if(!billFrom.value || !billTo.value){
-    alert("Please enter Bill From and To dates.");
+  if (!billNumber.value.trim()) {
+    alert("Bill Number required to save record.");
     return;
   }
 
-  const data = {
-    mode: mode,
+  if (!meter.value.trim() && !account.value.trim()) {
+    alert("Meter or Account Number required.");
+    return;
+  }
+
+  const payload = {
+    mode,
     billNumber: billNumber.value,
     meter: meter.value,
     account: account.value,
     billFrom: billFrom.value,
     billTo: billTo.value,
     gross: gross.value,
-    import: import.value,
-    export: export.value,
+    import: importU.value,
+    export: exportU.value,
     fixed: fixed.value,
     totalBill: totalBill.value,
     arrears: arrears.value,
-    saveOption: saveOption,
     isEdit: isEdit.checked ? "yes" : "no",
     editReason: editReason.value
   };
@@ -407,36 +384,33 @@ if (netUnits <= 0) {
   const res = await fetch(
     "https://n8n-workflow-test.duckdns.org/webhook/solar-saving",
     {
-      method:"POST",
-      headers:{ "Content-Type":"application/json"},
-      body: JSON.stringify(data)
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
     }
   );
 
-  const html = await res.text();
   result.classList.remove("d-none");
-  result.innerHTML = html;
+  result.innerHTML = await res.text();
 }
-window.addEventListener("DOMContentLoaded",()=>{
+
+/* ================= LAST MODIFIED ================= */
+window.addEventListener("DOMContentLoaded", () => {
   toggleIdentitySection();
-const lm = new Date(document.lastModified);
-const lmEl = document.getElementById("lastModified");
 
-if (lmEl) {
-  lmEl.innerText = lm.toLocaleString(
-    "en-IN",
-    {
-      day:"2-digit",
-      month:"long",
-      year:"numeric",
-      hour:"2-digit",
-      minute:"2-digit",
-      second:"2-digit",
-      hour12:true
-    }
-  );
-}
-
+  const lmEl = document.getElementById("lastModified");
+  if (lmEl) {
+    lmEl.innerText = new Date(document.lastModified)
+      .toLocaleString("en-IN", {
+        day:"2-digit",
+        month:"long",
+        year:"numeric",
+        hour:"2-digit",
+        minute:"2-digit",
+        second:"2-digit",
+        hour12:true
+      });
+  }
 });
 </script>
 
