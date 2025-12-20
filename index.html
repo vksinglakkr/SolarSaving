@@ -57,6 +57,62 @@ footer {
 }
 
 .form-check-input { transform:scale(1.3); }
+/* ================= MOBILE FIXES ================= */
+@media (max-width: 768px) {
+
+  /* Header stacking */
+  .header .container {
+    flex-direction: column;
+    align-items: center !important;
+    text-align: center;
+  }
+
+  .header img {
+    margin-bottom: 10px;
+  }
+
+  /* Hero spacing */
+  .hero {
+    padding: 18px;
+  }
+
+  .hero h3 {
+    font-size: 1.3rem;
+  }
+
+  /* Mode cards stack */
+  .mode-card {
+    margin-bottom: 15px;
+  }
+
+  /* Cards padding reduction */
+  .card {
+    padding: 15px !important;
+  }
+
+  /* Form spacing */
+  .form-control {
+    margin-bottom: 10px;
+  }
+
+  /* Result readability */
+  .result-box h3 {
+    font-size: 1.4rem;
+  }
+
+  .result-box p {
+    font-size: 0.95rem;
+  }
+
+  /* Footer stacking */
+  footer .container {
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+  }
+}
+
+  
 </style>
 </head>
 
