@@ -8,25 +8,52 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
-body{background:#f4f6fb}
+body { background:#f4f6fb; }
 
 /* Header */
-.header{background:#fff;border-bottom:3px solid #0b5ed7;padding:10px}
-.header-title{font-weight:700}
+.header {
+  background:#fff;
+  border-bottom:3px solid #0b5ed7;
+  padding:12px;
+}
+.header-title { font-weight:700; }
 
-/* Intro */
-.intro{background:#e8f0fb;padding:12px;border-radius:10px;margin:12px 0}
+/* Intent cards */
+.intent-card {
+  border:2px solid #ddd;
+  border-radius:12px;
+  padding:16px;
+  cursor:pointer;
+  transition:0.2s;
+  background:#fff;
+}
+.intent-card:hover { border-color:#0b5ed7; }
+.intent-card.active {
+  border-color:#0b5ed7;
+  background:#eef4ff;
+}
+.intent-card h6 { font-weight:700; }
+
+/* Forms */
+label { font-weight:600; }
+input::placeholder { color:#aaa; }
 
 /* Result */
-.result-section{background:#fff;padding:16px;border-radius:10px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.05)}
+.result-box {
+  background:#fff;
+  border-radius:12px;
+  padding:16px;
+  margin-bottom:14px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.06);
+}
 
 /* Validation */
-.is-invalid{border-color:#dc3545}
-.invalid-feedback{display:block}
+.is-invalid { border-color:#dc3545; }
+.invalid-feedback { display:block; }
 
 /* Mobile */
-@media(max-width:768px){
-  .govt-text{display:none}
+@media (max-width:768px){
+  .govt-text { display:none; }
 }
 </style>
 </head>
@@ -37,10 +64,10 @@ body{background:#f4f6fb}
 <div class="header">
   <div class="container d-flex align-items-center justify-content-between">
     <div class="d-flex align-items-center">
-      <img src="assests/haryana-logo.jpg" style="height:55px;margin-right:12px">
+      <img src="assets/haryana-logo.jpg" style="height:55px;margin-right:12px">
       <div>
         <div class="header-title">SolarSanchay – Haryana</div>
-        <small class="text-muted">Solar Saving Estimation Tool</small>
+        <small class="text-muted">Solar Savings Estimation Tool</small>
       </div>
     </div>
     <div class="govt-text text-muted">NIC, Kurukshetra</div>
@@ -49,91 +76,68 @@ body{background:#f4f6fb}
 
 <div class="container my-3">
 
-<!-- STEP 1 : INTENT -->
-<div id="intentAccordion" class="accordion mb-3">
+<!-- INTENT SELECTION -->
+<div id="intentSection">
+  <h6 class="mb-2">What do you want to do?</h6>
 
-  <div class="accordion-item">
-    <h2 class="accordion-header">
-      <button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#intentA">
-        Just check saving for this bill
-      </button>
-    </h2>
-    <div id="intentA" class="accordion-collapse collapse show">
-      <div class="accordion-body">
-        <input type="radio" name="saveOption" value="no" checked
-               onchange="selectIntent('no')">
-        <span class="ms-2">One-time calculation (no data saved)</span>
-      </div>
-    </div>
+  <div class="intent-card mb-2 active" id="intentOne"
+       onclick="selectIntent('one')">
+    <h6>⚡ One-time Saving Check</h6>
+    <small class="text-muted">Quick calculation, no data saved</small>
   </div>
 
-  <div class="accordion-item">
-    <h2 class="accordion-header">
-      <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#intentB">
-        Save this bill for future reference
-      </button>
-    </h2>
-    <div id="intentB" class="accordion-collapse collapse">
-      <div class="accordion-body">
-        <input type="radio" name="saveOption" value="yes"
-               onchange="selectIntent('yes')">
-        <span class="ms-2">Maintain history & analysis</span>
-      </div>
-    </div>
+  <div class="intent-card" id="intentSave"
+       onclick="selectIntent('save')">
+    <h6>💾 Save for Future Reference</h6>
+    <small class="text-muted">Maintain bill history & analysis</small>
   </div>
-
 </div>
 
-<!-- Intent Summary -->
+<!-- INTENT SUMMARY -->
 <div id="intentSummary" class="alert alert-info d-none">
   <span id="intentText"></span>
   <button class="btn btn-sm btn-link" onclick="resetIntent()">Change</button>
 </div>
 
-<!-- INTRO -->
-<div class="intro">
-  Calculate how much money you saved using solar, compared with an estimated bill without solar.
-</div>
-
 <!-- IDENTITY -->
 <div class="card p-3 mb-3 d-none" id="identitySection">
   <h6>Consumer Identification</h6>
-  <label class="form-label">Bill Number</label>
-  <input id="billNumber" class="form-control mb-2" placeholder="e.g. 123456">
-  <label class="form-label">Meter / Account Number</label>
-  <input id="meter" class="form-control" placeholder="e.g. 24600455">
+  <label>Bill Number (e.g. 123456)</label>
+  <input id="billNumber" class="form-control mb-2" placeholder="Enter bill number">
+  <label>Meter / Account Number (e.g. 24600455)</label>
+  <input id="meter" class="form-control" placeholder="Enter meter or account no">
 </div>
 
 <!-- BILL PERIOD -->
 <div class="card p-3 mb-3 d-none" id="billPeriodSection">
   <h6>Bill Period</h6>
-  <label class="form-label">From</label>
+  <label>From</label>
   <input type="date" id="billFrom" class="form-control mb-2">
-  <label class="form-label">To</label>
+  <label>To</label>
   <input type="date" id="billTo" class="form-control">
 </div>
 
 <!-- CONSUMPTION -->
-<div class="card p-3 mb-3" id="consumptionSection">
+<div class="card p-3 mb-3">
   <h6>Consumption & Charges</h6>
 
-  <label class="form-label">Gross Units</label>
-  <input id="gross" class="form-control mb-2" placeholder="e.g. 1354" onblur="validateUnits()">
+  <label>Gross Units (e.g. 1354)</label>
+  <input id="gross" class="form-control mb-2" placeholder="Enter value" onblur="validateUnits()">
 
-  <label class="form-label">Import Units</label>
-  <input id="importU" class="form-control mb-2" placeholder="e.g. 1114" onblur="validateUnits()">
+  <label>Import Units (e.g. 1114)</label>
+  <input id="importU" class="form-control mb-2" placeholder="Enter value" onblur="validateUnits()">
 
-  <label class="form-label">Export Units</label>
-  <input id="exportU" class="form-control mb-2" placeholder="e.g. 240" onblur="validateUnits()">
+  <label>Export Units (e.g. 240)</label>
+  <input id="exportU" class="form-control mb-2" placeholder="Enter value" onblur="validateUnits()">
 
-  <label class="form-label">Fixed Charges (₹)</label>
-  <input id="fixed" class="form-control mb-2" placeholder="e.g. 1605">
+  <label>Fixed Charges ₹ (e.g. 1605)</label>
+  <input id="fixed" class="form-control mb-2" placeholder="Enter amount">
 
-  <label class="form-label">Total Bill Amount (₹)</label>
-  <input id="totalBill" class="form-control mb-2" placeholder="e.g. 2700">
+  <label>Total Bill Amount ₹ (e.g. 2700)</label>
+  <input id="totalBill" class="form-control mb-2" placeholder="Enter amount">
 
   <div id="arrearsRow" class="d-none">
-    <label class="form-label">Arrears (₹)</label>
+    <label>Arrears ₹ (if any)</label>
     <input id="arrears" class="form-control" value="0">
   </div>
 </div>
@@ -148,21 +152,30 @@ body{background:#f4f6fb}
   Last Updated: <span id="lastModified"></span>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
 <script>
-const identitySection=document.getElementById("identitySection");
-const billPeriodSection=document.getElementById("billPeriodSection");
-const arrearsRow=document.getElementById("arrearsRow");
-const result=document.getElementById("result");
+const identitySection = document.getElementById("identitySection");
+const billPeriodSection = document.getElementById("billPeriodSection");
+const arrearsRow = document.getElementById("arrearsRow");
+const result = document.getElementById("result");
 
-function selectIntent(choice){
-  document.getElementById("intentAccordion").classList.add("d-none");
+let mode = "one";
+
+/* Intent */
+function selectIntent(type){
+  mode = type;
+
+  document.getElementById("intentOne").classList.toggle("active", type==="one");
+  document.getElementById("intentSave").classList.toggle("active", type==="save");
+
+  document.getElementById("intentSection").classList.add("d-none");
   document.getElementById("intentSummary").classList.remove("d-none");
-  document.getElementById("intentText").innerText =
-    choice==="no" ? "Mode: One-time calculation" : "Mode: Save for future reference";
 
-  if(choice==="yes"){
+  document.getElementById("intentText").innerText =
+    type==="one"
+      ? "Mode: One-time saving check"
+      : "Mode: Save for future reference";
+
+  if(type==="save"){
     identitySection.classList.remove("d-none");
     billPeriodSection.classList.remove("d-none");
     arrearsRow.classList.remove("d-none");
@@ -170,16 +183,18 @@ function selectIntent(choice){
 }
 
 function resetIntent(){
-  document.getElementById("intentAccordion").classList.remove("d-none");
+  document.getElementById("intentSection").classList.remove("d-none");
   document.getElementById("intentSummary").classList.add("d-none");
   identitySection.classList.add("d-none");
   billPeriodSection.classList.add("d-none");
   arrearsRow.classList.add("d-none");
 }
 
+/* Validation */
 function validateUnits(){
   document.querySelectorAll(".invalid-feedback").forEach(e=>e.remove());
   document.querySelectorAll(".is-invalid").forEach(e=>e.classList.remove("is-invalid"));
+
   const g=+gross.value,i=+importU.value,e=+exportU.value;
   if(i>g) markError(importU,"Import cannot exceed Gross");
   if(e>i) markError(exportU,"Export cannot exceed Import");
@@ -193,10 +208,15 @@ function markError(el,msg){
   el.parentNode.appendChild(d);
 }
 
+/* Calculation */
 function calculate(){
-  if(document.querySelector(".is-invalid")){alert("Please correct highlighted fields");return;}
+  if(document.querySelector(".is-invalid")){
+    alert("Please correct highlighted fields");
+    return;
+  }
 
-  const g=+gross.value,i=+importU.value,e=+exportU.value,f=+fixed.value,t=+totalBill.value;
+  const g=+gross.value,i=+importU.value,e=+exportU.value;
+  const f=+fixed.value,t=+totalBill.value;
   const net=i-e;
   const direct=g-i;
   const unitRate=(t-f)/net;
@@ -208,40 +228,42 @@ function calculate(){
   }
 
   result.innerHTML=`
-  <div class="result-section">
-    <b>Input Summary</b><br>
-    Gross: ${g}, Import: ${i}, Export: ${e}, Direct Solar: ${direct}<br>
-    Fixed: ₹${f}, Bill: ₹${t}
-  </div>
-
-  <div class="result-section row text-center">
-    <div class="col-6">
-      <b>Without Solar</b><br>
-      ₹${without.toFixed(0)}<br>
-      ${days?`₹${(without/days).toFixed(0)} / day`:"Per-day not calculated"}
+    <div class="result-box">
+      <b>Input Summary</b><br>
+      Gross: ${g} | Import: ${i} | Export: ${e}<br>
+      Direct Solar Used: ${direct} units<br>
+      Fixed Charges: ₹${f} | Bill Amount: ₹${t}
     </div>
-    <div class="col-6">
-      <b>With Solar</b><br>
-      ₹${t}<br>
-      ${days?`₹${(t/days).toFixed(0)} / day`:"Per-day not calculated"}
-    </div>
-  </div>
 
-  <div class="result-section text-center">
-    <h4 class="text-success">Saving: ₹${(without-t).toFixed(0)}</h4>
-    <button class="btn btn-success mt-2" onclick="shareWhatsApp(${without},${t})">
-      Share on WhatsApp
-    </button>
-  </div>`;
+    <div class="result-box row text-center">
+      <div class="col-6">
+        <b>Without Solar</b><br>
+        ₹${without.toFixed(0)}<br>
+        ${days?`₹${(without/days).toFixed(0)} / day`:""}
+      </div>
+      <div class="col-6">
+        <b>With Solar</b><br>
+        ₹${t}<br>
+        ${days?`₹${(t/days).toFixed(0)} / day`:""}
+      </div>
+    </div>
+
+    <div class="result-box text-center">
+      <h4 class="text-success">Saving: ₹${(without-t).toFixed(0)}</h4>
+      <button class="btn btn-success mt-2"
+        onclick="shareWhatsApp(${without},${t})">
+        Share on WhatsApp
+      </button>
+    </div>
+  `;
 }
 
 function shareWhatsApp(w,t){
   const msg=encodeURIComponent(
-    `Solar Saving Result:
+`Solar Saving Result
 Estimated bill without solar: ₹${w}
 Actual bill with solar: ₹${t}
-Saving: ₹${w-t}`
-  );
+Saving: ₹${w-t}`);
   window.open(`https://wa.me/?text=${msg}`);
 }
 
