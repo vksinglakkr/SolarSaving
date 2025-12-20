@@ -80,7 +80,7 @@ input::placeholder { color:#aaa; }
 <div id="intentSection">
   <h6 class="mb-2">What do you want to do?</h6>
 
-  <div class="intent-card mb-2 active" id="intentOne"
+  <div class="intent-card mb-2" id="intentOne"
        onclick="selectIntent('one')">
     <h6>⚡ One-time Saving Check</h6>
     <small class="text-muted">Quick calculation, no data saved</small>
@@ -118,7 +118,7 @@ input::placeholder { color:#aaa; }
 </div>
 
 <!-- CONSUMPTION -->
-<div class="card p-3 mb-3">
+<div class="card p-3 mb-3 d-none" id="consumptionSection">
   <h6>Consumption & Charges</h6>
 
   <label>Gross Units (e.g. 1354)</label>
@@ -164,22 +164,32 @@ let mode = "one";
 function selectIntent(type){
   mode = type;
 
-  document.getElementById("intentOne").classList.toggle("active", type==="one");
-  document.getElementById("intentSave").classList.toggle("active", type==="save");
+document.getElementById("intentOne").classList.toggle("active", type === "one");
+document.getElementById("intentSave").classList.toggle("active", type === "save");
 
-  document.getElementById("intentSection").classList.add("d-none");
-  document.getElementById("intentSummary").classList.remove("d-none");
+// Hide intent selection
+document.getElementById("intentSection").classList.add("d-none");
 
+// Always show main consumption inputs
+document.getElementById("consumptionSection").classList.remove("d-none");
+
+// Show intent summary
+document.getElementById("intentSummary").classList.remove("d-none");
+
+// Conditional sections
+if (type === "save") {
+  identitySection.classList.remove("d-none");
+  billPeriodSection.classList.remove("d-none");
+  arrearsRow.classList.remove("d-none");
+} else {
+  identitySection.classList.add("d-none");
+  billPeriodSection.classList.add("d-none");
+  arrearsRow.classList.add("d-none");
+}
   document.getElementById("intentText").innerText =
     type==="one"
       ? "Mode: One-time saving check"
       : "Mode: Save for future reference";
-
-  if(type==="save"){
-    identitySection.classList.remove("d-none");
-    billPeriodSection.classList.remove("d-none");
-    arrearsRow.classList.remove("d-none");
-  }
 }
 
 function resetIntent(){
@@ -248,22 +258,36 @@ function calculate(){
       </div>
     </div>
 
-    <div class="result-box text-center">
-      <h4 class="text-success">Saving: ₹${(without-t).toFixed(0)}</h4>
-      <button class="btn btn-success mt-2"
-        onclick="shareWhatsApp(${without},${t})">
-        Share on WhatsApp
-      </button>
-    </div>
+ <button class="btn btn-success mt-2"
+ onclick='shareWhatsApp({
+   gross:${g},
+   importU:${i},
+   exportU:${e},
+   direct:${direct},
+   withSolar:${t},
+   withoutSolar:${without.toFixed(0)},
+   saving:${(without-t).toFixed(0)}
+ })'>
+ Share on WhatsApp
+</button>
+
   `;
 }
 
-function shareWhatsApp(w,t){
-  const msg=encodeURIComponent(
-`Solar Saving Result
-Estimated bill without solar: ₹${w}
-Actual bill with solar: ₹${t}
-Saving: ₹${w-t}`);
+function shareWhatsApp(data){
+  const msg = encodeURIComponent(
+`☀️ SolarSanchay – Solar Saving Result
+
+Gross Units: ${data.gross}
+Import Units: ${data.importU}
+Export Units: ${data.exportU}
+Direct Solar Used: ${data.direct} units
+
+Bill With Solar: ₹${data.withSolar}
+Estimated Bill Without Solar: ₹${data.withoutSolar}
+
+💰 Saving: ₹${data.saving}`
+  );
   window.open(`https://wa.me/?text=${msg}`);
 }
 
