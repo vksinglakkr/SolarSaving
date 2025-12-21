@@ -141,6 +141,13 @@ input::placeholder { color:#aaa; }
   <input id="arrears" type="number" inputmode="numeric" pattern="[0-9]*" min="0" step="1" value="0" class="form-control mb-2" placeholder="Enter amount" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
   </div>
 </div>
+<div class="form-check mb-2">
+  <input class="form-check-input" type="checkbox"
+         id="wantPerDay" onchange="toggleBillPeriod()">
+  <label class="form-check-label">
+    Show per-day calculation (requires bill period)
+  </label>
+</div>
 
 <button class="btn btn-primary w-100" onclick="calculate()">Calculate</button>
 
@@ -160,6 +167,17 @@ const result = document.getElementById("result");
 
 let mode = "one";
 
+function toggleBillPeriod(){
+  if(document.getElementById("wantPerDay").checked){
+    billPeriodSection.classList.remove("d-none");
+  } else {
+    billPeriodSection.classList.add("d-none");
+    billFrom.value = "";
+    billTo.value = "";
+  }
+}
+
+  
 /* Intent */
 function selectIntent(type){
   mode = type;
@@ -232,10 +250,15 @@ function calculate(){
   const unitRate=(t-f)/net;
   const without=(g*unitRate)+f;
 
-  let days=null;
-  if(billFrom.value && billTo.value){
-    days=Math.max(1,(new Date(billTo.value)-new Date(billFrom.value))/86400000);
-  }
+let showPerDay = document.getElementById("wantPerDay").checked;
+let days = null;
+
+if(showPerDay && billFrom.value && billTo.value){
+  days = Math.max(
+    1,
+    (new Date(billTo.value) - new Date(billFrom.value)) / 86400000
+  );
+}
 
   result.innerHTML=`
     <div class="result-box">
