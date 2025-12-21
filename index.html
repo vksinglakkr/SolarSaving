@@ -295,7 +295,12 @@ oninput="handleNumericInput(this)"
 
 </div>
 
-<footer class="text-center text-muted py-3">
+<footer class="mt-5 py-3 text-center"
+        style="background:#f8f9fa;border-top:1px solid #dee2e6;">
+  <small class="text-muted">
+    Developed by <b>National Informatics Centre (NIC), Kurukshetra</b><br>
+    for <b>District Administration, Kurukshetra</b><br><br>
+  </small>
   Last Updated: <span id="lastModified"></span>
 </footer>
 
@@ -309,7 +314,9 @@ let entryMode = "one"; // "one" or "save"
 
 function appendPlus(id){
   if (entryMode === "save") {
-    alert("Multiple values (+) are not allowed when saving a bill for future reference.");
+    alert(
+      "Multiple entries (+) are not allowed when saving a bill for future reference."
+    );
     return;
   }
 
@@ -319,12 +326,13 @@ function appendPlus(id){
     el.focus();
   }
 }
+
 function handleNumericInput(el){
   if (entryMode === "save") {
-    // Only digits allowed
+    // silently restrict to digits only
     el.value = el.value.replace(/[^0-9]/g,'');
   } else {
-    // Digits + plus allowed
+    // allow + only in one-time mode
     el.value = el.value.replace(/[^0-9+ ]/g,'');
   }
 }
