@@ -129,19 +129,45 @@ input::placeholder { color:#aaa; }
   <input type="date" id="billTo" class="form-control">
 </div>
   <label>Gross Units (e.g. 1354)</label>
-  <input id="gross" type="number" inputmode="numeric" pattern="[0-9]*" min="0" step="1" class="form-control mb-2" placeholder="Enter value" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+  <input id="gross"
+  type="text"
+  inputmode="numeric"
+  class="form-control mb-2"
+  placeholder="Enter value"
+  oninput="this.value=this.value.replace(/[^0-9+ ]/g,'')">
 
   <label>Import Units (e.g. 1114)</label>
-  <input id="importU" type="number" inputmode="numeric" pattern="[0-9]*" min="0" step="1" class="form-control mb-2" placeholder="Enter value" oninput="this.value=this.value.replace(/[^0-9]/g,'')" onblur="validateUnits()">
+<input id="importU"
+  type="text"
+  inputmode="numeric"
+  class="form-control mb-2"
+  placeholder="Enter value"
+  oninput="this.value=this.value.replace(/[^0-9+ ]/g,'')"
+  onblur="validateUnits()">
 
   <label>Export Units (e.g. 944)</label>
-  <input id="exportU" type="number" inputmode="numeric" pattern="[0-9]*" min="0" step="1" class="form-control mb-2" placeholder="Enter value" oninput="this.value=this.value.replace(/[^0-9]/g,'')" onblur="validateUnits()">
-
+<input id="exportU"
+  type="text"
+  inputmode="numeric"
+  class="form-control mb-2"
+  placeholder="Enter value"
+  oninput="this.value=this.value.replace(/[^0-9+ ]/g,'')"
+  onblur="validateUnits()">
   <label>Fixed Charges ₹ (e.g. 1605)</label>
-  <input id="fixed" type="number" inputmode="numeric" pattern="[0-9]*" min="0" step="1" class="form-control mb-2" placeholder="Enter amount" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+  <input id="fixed"
+  type="text"
+  inputmode="numeric"
+  class="form-control mb-2"
+  placeholder="Enter amount"
+  oninput="this.value=this.value.replace(/[^0-9+ ]/g,'')">
 
   <label>Total Bill Amount ₹ (e.g. 2700)</label>
-  <input id="totalBill" type="number" inputmode="numeric" pattern="[0-9]*" min="0" step="1" class="form-control mb-2" placeholder="Enter amount" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+  <input id="totalBill"
+  type="text"
+  inputmode="numeric"
+  class="form-control mb-2"
+  placeholder="Enter amount"
+  oninput="this.value=this.value.replace(/[^0-9+ ]/g,'')">
 
   <div id="arrearsRow" class="d-none">
     <label>Arrears ₹ (if any)</label>
@@ -245,22 +271,28 @@ function resetIntent(){
 
 /* Validation */
 function validateUnits(){
-  document.querySelectorAll(".invalid-feedback").forEach(e=>e.remove());
-  document.querySelectorAll(".is-invalid").forEach(e=>e.classList.remove("is-invalid"));
+  clearErrors();
 
- let g, i, e, f, t;
+  let g, i, e;
 
-try {
-  g = parsePlusExpression(gross.value, "Gross Units");
-  i = parsePlusExpression(importU.value, "Import Units");
-  e = parsePlusExpression(exportU.value, "Export Units");
-} catch (err) {
-  alert(err.message);
-  return;
+  try {
+    g = parsePlusExpression(gross.value, "Gross Units");
+    i = parsePlusExpression(importU.value, "Import Units");
+    e = parsePlusExpression(exportU.value, "Export Units");
+  } catch(err) {
+    // Don't block typing; show error only on Calculate
+    return;
+  }
+
+  if (i > g) {
+    markError(importU, "Import cannot exceed Gross");
+  }
+
+  if (e > i) {
+    markError(exportU, "Export cannot exceed Import");
+  }
 }
-  if(i>g) markError(importU,"Import cannot exceed Gross");
-  if(e>i) markError(exportU,"Export cannot exceed Import");
-}
+
 
 function markError(el,msg){
   el.classList.add("is-invalid");
