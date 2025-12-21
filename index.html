@@ -441,7 +441,7 @@ function selectIntent(type){
   if (intentSummary && intentText) {
     intentSummary.classList.remove("d-none");
     intentText.innerHTML =
-      type === "one"
+      entryMode === "one"
         ? "✔ <b>One-time Analysis:</b> No data will be saved"
         : "✔ <b>Save for Future:</b> Bill details will be stored";
   }
@@ -450,7 +450,7 @@ function selectIntent(type){
   consumption.classList.remove("d-none");
 
   /* 4️⃣ Mode-specific sections */
-  if (type === "save") {
+  if (entryMode === "save") {
     identity.classList.remove("d-none");
     billPeriod.classList.remove("d-none");
     actionBtn.innerText = "💾 Save & Submit";
