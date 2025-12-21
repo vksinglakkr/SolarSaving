@@ -412,51 +412,58 @@ function handleNumericInput(el){
   
 /* Intent */
 function selectIntent(type){
-  entryMode = type;   // 🔴 IMPORTANT LINE
-const intentText = document.getElementById("intentText");
-const intentSummary = document.getElementById("intentSummary");
 
-if (type === "one") {
-intentText.innerHTML =
-  "✔ <b>One-time Analysis:</b> Just checking solar savings for this bill";
-} else if (type === "save") {
-intentText.innerHTML =
-  "✔ <b>Save for Future:</b> Bill details will be stored for comparison";
-}
+  entryMode = type;
 
-intentSummary.classList.remove("d-none");
+  // Cards
+  const helper = document.getElementById("helperCards");
+  const intentSummary = document.getElementById("intentSummary");
+  const intentText = document.getElementById("intentText");
 
-
-  const one = document.getElementById("intentOne");
-  const save = document.getElementById("intentSave");
-  const intentSection = document.getElementById("intentSection");
+  // Sections
   const consumption = document.getElementById("consumptionSection");
-  const summary = document.getElementById("intentSummary");
   const identity = document.getElementById("identitySection");
   const billPeriod = document.getElementById("billPeriodSection");
 
-  one.classList.toggle("active", type === "one");
-  save.classList.toggle("active", type === "save");
+  // Button
+  const actionBtn = document.getElementById("actionBtn");
 
-  intentSection.classList.add("d-none");
+  // SAFETY CHECK
+  if (!consumption || !actionBtn) {
+    console.error("Critical UI elements missing");
+    return;
+  }
+
+  /* 1️⃣ Hide helper cards */
+  if (helper) helper.classList.add("d-none");
+
+  /* 2️⃣ Show intent summary */
+  if (intentSummary && intentText) {
+    intentSummary.classList.remove("d-none");
+    intentText.innerHTML =
+      type === "one"
+        ? "✔ <b>One-time Analysis:</b> No data will be saved"
+        : "✔ <b>Save for Future:</b> Bill details will be stored";
+  }
+
+  /* 3️⃣ Show main section */
   consumption.classList.remove("d-none");
-  summary.classList.remove("d-none");
 
-  // 🔹 MODE-SPECIFIC VISIBILITY
-  const btn = document.getElementById("actionBtn");
+  /* 4️⃣ Mode-specific sections */
   if (type === "save") {
     identity.classList.remove("d-none");
     billPeriod.classList.remove("d-none");
-    btn.innerText = "💾 Save & Submit";
+    actionBtn.innerText = "💾 Save & Submit";
   } else {
     identity.classList.add("d-none");
     billPeriod.classList.add("d-none");
-    btn.innerText = "🔍 Calculate Saving";
+    actionBtn.innerText = "🔍 Calculate Saving";
   }
-document.getElementById("calculateBtn").classList.remove("d-none");
-document.getElementById("helperCards").classList.add("d-none");
-btn.classList.remove("d-none");
+
+  /* 5️⃣ Show action button */
+  actionBtn.classList.remove("d-none");
 }
+
 function clearErrors(){
   document
     .querySelectorAll(".invalid-feedback")
@@ -495,14 +502,18 @@ function parsePlusExpression(input, fieldName) {
 
 
 function resetIntent(){
-  document.getElementById("intentSection").classList.remove("d-none");
-  document.getElementById("intentSummary").classList.add("d-none");
- document.getElementById("calculateBtn").classList.add("d-none");
-document.getElementById("helperCards").classList.remove("d-none");
- identitySection.classList.add("d-none");
-  billPeriodSection.classList.add("d-none");
-  arrearsRow.classList.add("d-none");
+
+  entryMode = "one";
+
+  document.getElementById("helperCards")?.classList.remove("d-none");
+  document.getElementById("intentSummary")?.classList.add("d-none");
+  document.getElementById("consumptionSection")?.classList.add("d-none");
+  document.getElementById("identitySection")?.classList.add("d-none");
+  document.getElementById("billPeriodSection")?.classList.add("d-none");
+
+  document.getElementById("actionBtn")?.classList.add("d-none");
 }
+
 
 /* Validation */
 function validateUnits(){
