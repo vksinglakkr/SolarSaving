@@ -386,14 +386,17 @@ const billFromEl = document.getElementById("billFrom1st");
 const billToEl   = document.getElementById("billTo1st");
 
 let days = null;
+let from = null;
+let to = null;
 
 if (billFromEl && billToEl && billFromEl.value && billToEl.value) {
-  const from = new Date(billFromEl.value);
-  const to = new Date(billToEl.value);
+  from = new Date(billFromEl.value);
+  to = new Date(billToEl.value);
 
   const diffMs = to - from;
- console.log("From:", billFromEl.value);
-console.log("To:", billToEl.value);
+
+  console.log("From:", billFromEl.value);
+  console.log("To:", billToEl.value);
 
   if (diffMs > 0) {
     days = Math.round(diffMs / (1000 * 60 * 60 * 24));
@@ -404,7 +407,13 @@ result.innerHTML = `
   <!-- INPUT SUMMARY -->
   <div class="result-box">
     <h6>📥 Input Summary</h6>
-    <b>Bill From:</b>${from} <b>To:</b>${to}  <b>Total days:</b>${days}
+   <b>Bill Period:</b>
+${from ? from.toLocaleDateString("en-IN") : "—"}
+&nbsp; to &nbsp;
+${to ? to.toLocaleDateString("en-IN") : "—"}
+<br>
+<b>Total Days:</b> ${days ?? "—"}
+
     <b>Gross Units:</b> ${g} <br>
     <b>Import Units:</b> ${i} &nbsp; | &nbsp;
     <b>Export Units:</b> ${e} <br>
