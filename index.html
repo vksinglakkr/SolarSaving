@@ -93,8 +93,15 @@ input::placeholder { color:#aaa; }
   </div>
 </div>
 <!-- HELPFUL LINKS -->
-<div class="row g-3 mt-3">
+<!-- SUPPORTING INFO (NOT PART OF FORM) -->
+<div class="mt-4 p-3 rounded"
+     style="background:#f8f9fa;border:1px dashed #ced4da;">
 
+  <div class="mb-2 text-muted small">
+    Need help before entering bill details?
+  </div>
+
+  <div class="row g-3"><div class="row g-3 mt-3">
   <!-- DOWNLOAD BILL -->
   <div class="col-md-4">
     <div class="card h-100 shadow-sm">
@@ -145,6 +152,10 @@ input::placeholder { color:#aaa; }
   </div>
 
 </div>
+  </div>
+
+</div>
+    
 
 <!-- INTENT SUMMARY -->
 <div id="intentSummary" class="alert alert-info d-none">
@@ -277,7 +288,11 @@ oninput="handleNumericInput(this)"
 </div>
 
 </div>
-<button class="btn btn-primary w-100" onclick="calculate()">Calculate</button>
+<button id="calculateBtn"
+        class="btn btn-primary w-100 d-none"
+        onclick="calculate()">
+  Calculate Solar Saving
+</button>
 
 <div id="result" class="mt-4"></div>
 
@@ -359,6 +374,8 @@ intentSummary.classList.remove("d-none");
     identity.classList.add("d-none");
     billPeriod.classList.add("d-none");
   }
+document.getElementById("calculateBtn").classList.remove("d-none");
+
 }
 function clearErrors(){
   document
@@ -400,7 +417,8 @@ function parsePlusExpression(input, fieldName) {
 function resetIntent(){
   document.getElementById("intentSection").classList.remove("d-none");
   document.getElementById("intentSummary").classList.add("d-none");
-  identitySection.classList.add("d-none");
+ document.getElementById("calculateBtn").classList.add("d-none");
+ identitySection.classList.add("d-none");
   billPeriodSection.classList.add("d-none");
   arrearsRow.classList.add("d-none");
 }
