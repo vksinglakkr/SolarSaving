@@ -392,48 +392,87 @@ if (billFrom.value && billTo.value) {
     days = Math.round(diffMs / (1000 * 60 * 60 * 24));
   }
 }
-  result.innerHTML=`
-    <div class="result-box">
-      <b>Input Summary</b><br>
-      Gross: ${g} | Import: ${i} | Export: ${e}<br>
-      Direct Solar Used: ${direct} units<br>
-      (Gross Units - Import Units i.e. units consumed directly from Solar in day time) <br>     
-      Fixed Charges: ₹${f} | Bill Amount: ₹${t} | Per Unit rate: ₹${(unitRate).toFixed(2)} (Total Bill Amount - Fixed Charges)/(Import Unit - Export Units))
+result.innerHTML = `
+  <!-- INPUT SUMMARY -->
+  <div class="result-box">
+    <h6>📥 Input Summary</h6>
+    <b>Gross Units:</b> ${g} <br>
+    <b>Import Units:</b> ${i} &nbsp; | &nbsp;
+    <b>Export Units:</b> ${e} <br>
+
+    <b>Direct Solar Used:</b> ${direct} units  
+    <i class="text-muted">
+      (Gross − Import → electricity used directly from solar during daytime)
+    </i>
+    <hr>
+
+    <b>Fixed Charges:</b> ₹${f} <br>
+    <b>Total Bill Amount:</b> ₹${t} <br>
+
+    <b>Per-Unit Rate:</b> ₹${unitRate.toFixed(2)}  
+    <i class="text-muted">
+      = (Total Bill − Fixed Charges) ÷ (Import − Export)
+    </i>
+  </div>
+
+  <!-- COMPARISON -->
+  <div class="result-box row text-center">
+    <div class="col-6 border-end">
+      <h6>❌ Without Solar</h6>
+      <b class="fs-5">₹${without.toFixed(0)}</b><br>
+
+      <i class="text-muted">
+        (${g} × ₹${unitRate.toFixed(2)}) + ₹${f}
+      </i><br>
+
+      ${days
+        ? `<b>Per Day:</b> ₹${(without/days).toFixed(0)} / day`
+        : `<span class="text-muted">Per-day not calculated</span>`
+      }
     </div>
 
-    <div class="result-box row text-center">
-      <div class="col-6">
-        <b>Without Solar</b><br>
-        ₹${without.toFixed(0)}<br>
-        (Gross Units * Per Unit Rate)+Fixed Charges i.e. (${g} * ₹${(unitRate).toFixed(2)}) + ₹${f}<br>
-        Per day: ${days?`₹${(without/days).toFixed(0)} / day`:""}
-      </div>
-      <div class="col-6">
-        <b>With Solar</b><br>
-        ₹${t}<br>
-        (Total Bill Amount)<br>
-        Per day: ${days?`₹${(t/days).toFixed(0)} / day`:""}
-      </div>
-    </div>
-    <div class="result-box">
-      <b>Total Savings: </b>  ₹${without.toFixed(0)} - ${t}
-      <b>Savings (per day): </b>  (₹${without.toFixed(0)} - ${t}) /${days}
-    </div>
+    <div class="col-6">
+      <h6>☀️ With Solar</h6>
+      <b class="fs-5">₹${t}</b><br>
 
- <button class="btn btn-success mt-2"
- onclick='shareWhatsApp({
-   gross:${g},
-   importU:${i},
-   exportU:${e},
-   direct:${direct},
-   withSolar:${t},
-   withoutSolar:${without.toFixed(0)},
-   saving:${(without-t).toFixed(0)}
- })'>
- Share on WhatsApp
-</button>
+      <i class="text-muted">(Actual bill amount)</i><br>
 
-  `;
+      ${days
+        ? `<b>Per Day:</b> ₹${(t/days).toFixed(0)} / day`
+        : `<span class="text-muted">Per-day not calculated</span>`
+      }
+    </div>
+  </div>
+
+  <!-- SAVINGS -->
+  <div class="result-box text-center">
+    <h5 class="text-success">
+      💰 Total Saving: ₹${(without - t).toFixed(0)}
+    </h5>
+
+    ${days
+      ? `<i class="text-muted">
+           = (₹${without.toFixed(0)} − ₹${t}) ÷ ${days} days
+         </i>`
+      : ``
+    }
+  </div>
+
+  <!-- WHATSAPP -->
+  <button class="btn btn-success w-100 mt-2"
+    onclick='shareWhatsApp({
+      gross:${g},
+      importU:${i},
+      exportU:${e},
+      direct:${direct},
+      withSolar:${t},
+      withoutSolar:${without.toFixed(0)},
+      saving:${(without-t).toFixed(0)}
+    })'>
+    📤 Share Result on WhatsApp
+  </button>
+`;
+
 }
 
 function shareWhatsApp(data){
