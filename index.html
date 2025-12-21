@@ -124,9 +124,9 @@ input::placeholder { color:#aaa; }
 <div class="card p-3 mb-3" id="billPeriodSection">
   <h6>Bill Period</h6>
   <label>From</label>
-  <input type="date" id="billFrom" class="form-control mb-2">
+  <input type="date" id="billFrom1st" class="form-control mb-2">
   <label>To</label>
-  <input type="date" id="billTo" class="form-control">
+  <input type="date" id="billTo1st" class="form-control">
 </div>
   <label>Gross Units (e.g. 1354)</label>
  <div class="input-group mb-2">
@@ -382,8 +382,8 @@ try {
   const unitRate=(t-f)/net;
   const without=(g*unitRate)+f;
 
-const billFromEl = document.getElementById("billFrom");
-const billToEl   = document.getElementById("billTo");
+const billFromEl = document.getElementById("billFrom1st");
+const billToEl   = document.getElementById("billTo1st");
 
 let days = null;
 
@@ -404,6 +404,7 @@ result.innerHTML = `
   <!-- INPUT SUMMARY -->
   <div class="result-box">
     <h6>📥 Input Summary</h6>
+    <b>Bill From:</b>${from} <b>To:</b>${to}  <b>Total days:</b>${days}
     <b>Gross Units:</b> ${g} <br>
     <b>Import Units:</b> ${i} &nbsp; | &nbsp;
     <b>Export Units:</b> ${e} <br>
