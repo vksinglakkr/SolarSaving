@@ -454,7 +454,7 @@ ${to ? to.toLocaleDateString("en-IN") : "—"}  |  <b>Total Days:</b> ${days ?? 
       <i class="text-muted">(Actual bill amount)</i><br>
 
       ${days ? `<b>Per Day:</b> ₹${(t/days).toFixed(0)} / day` : `<span class="text-muted">Per-day not calculated</span>`}<br>
-      ${days ? `<b>365 Day:</b> ₹${((t/days)*365).toFixed(0)}` : `<span class="text-muted">Per-day not calculated</span>`}
+      ${days ? `<b>365 Day Approx.:</b> ₹${((t/days)*365).toFixed(0)}` : `<span class="text-muted">Per-day not calculated</span>`}
     </div>
   </div>
 
