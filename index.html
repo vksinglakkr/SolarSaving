@@ -388,8 +388,8 @@ let days = null;
       <b>Input Summary</b><br>
       Gross: ${g} | Import: ${i} | Export: ${e}<br>
       Direct Solar Used: ${direct} units<br>
-      (Gross Units - Import Units i.e. units consumed directly from Solar in day time)      
-      Fixed Charges: ₹${f} | Bill Amount: ₹${t} | Per Unit rate: ₹${unitRate} (Total Bill Amount - Fixed Charges)/(Import Unit - Export Units))
+      (Gross Units - Import Units i.e. units consumed directly from Solar in day time) <br>     
+      Fixed Charges: ₹${f} | Bill Amount: ₹${t} | Per Unit rate: ₹${(unitRate).toFixed(2)} (Total Bill Amount - Fixed Charges)/(Import Unit - Export Units))
     </div>
 
     <div class="result-box row text-center">
