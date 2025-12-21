@@ -388,7 +388,7 @@ if (billFrom.value && billTo.value) {
   const to = new Date(billTo.value);
 
   const diffMs = to - from;
-  console.log diffMs;
+  console.log(diffMs);
   if (diffMs > 0) {
     days = Math.round(diffMs / (1000 * 60 * 60 * 24));
   }
