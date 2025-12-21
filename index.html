@@ -120,14 +120,6 @@ input::placeholder { color:#aaa; }
 <!-- CONSUMPTION -->
 <div class="card p-3 mb-3 d-none" id="consumptionSection">
   <h6>Consumption & Charges</h6>
-<!-- BILL PERIOD -->
-<div class="card p-3 mb-3" id="billPeriodSection">
-  <h6>Bill Period</h6>
-  <label>From</label>
-  <input type="date" id="billFrom1st" class="form-control mb-2">
-  <label>To</label>
-  <input type="date" id="billTo1st" class="form-control">
-</div>
   <label>Gross Units (e.g. 1354)</label>
  <div class="input-group mb-2">
   <input id="gross"
@@ -135,7 +127,7 @@ input::placeholder { color:#aaa; }
     inputmode="numeric"
     class="form-control"
     placeholder="Enter value"
-    oninput="this.value=this.value.replace(/[^0-9+ ]/g,'')">
+ oninput="handleNumericInput(this)"
 
   <button class="btn btn-outline-secondary"
           type="button"
@@ -152,7 +144,8 @@ input::placeholder { color:#aaa; }
     inputmode="numeric"
     class="form-control"
     placeholder="Enter value"
-    oninput="this.value=this.value.replace(/[^0-9+ ]/g,'')" onblur="validateUnits()">
+oninput="handleNumericInput(this)"
+onblur="validateUnits()"
 
   <button class="btn btn-outline-secondary"
           type="button"
@@ -168,7 +161,8 @@ input::placeholder { color:#aaa; }
     inputmode="numeric"
     class="form-control"
     placeholder="Enter value"
-    oninput="this.value=this.value.replace(/[^0-9+ ]/g,'')" onblur="validateUnits()">
+oninput="handleNumericInput(this)"
+onblur="validateUnits()"
 
   <button class="btn btn-outline-secondary"
           type="button"
@@ -185,7 +179,7 @@ input::placeholder { color:#aaa; }
     inputmode="numeric"
     class="form-control"
     placeholder="Enter amount"
-    oninput="this.value=this.value.replace(/[^0-9+ ]/g,'')">
+oninput="handleNumericInput(this)"
 
   <button class="btn btn-outline-secondary"
           type="button"
@@ -202,7 +196,7 @@ input::placeholder { color:#aaa; }
     inputmode="numeric"
     class="form-control"
     placeholder="Enter amount"
-    oninput="this.value=this.value.replace(/[^0-9+ ]/g,'')">
+oninput="handleNumericInput(this)"
 
   <button class="btn btn-outline-secondary"
           type="button"
@@ -220,7 +214,7 @@ input::placeholder { color:#aaa; }
     inputmode="numeric"
     class="form-control"
     placeholder="Enter amount"
-    oninput="this.value=this.value.replace(/[^0-9+ ]/g,'')">
+oninput="handleNumericInput(this)"
 
   <button class="btn btn-outline-secondary"
           type="button"
@@ -246,13 +240,27 @@ const billPeriodSection = document.getElementById("billPeriodSection");
 const arrearsRow = document.getElementById("arrearsRow");
 const result = document.getElementById("result");
 
-let mode = "one";
+let entryMode = "one"; // "one" or "save"
 
-  function appendPlus(id){
+function appendPlus(id){
+  if (entryMode === "save") {
+    alert("Multiple values (+) are not allowed when saving a bill for future reference.");
+    return;
+  }
+
   const el = document.getElementById(id);
   if (!el.value.trim().endsWith("+")) {
     el.value = el.value.trim() + " + ";
     el.focus();
+  }
+}
+function handleNumericInput(el){
+  if (entryMode === "save") {
+    // Only digits allowed
+    el.value = el.value.replace(/[^0-9]/g,'');
+  } else {
+    // Digits + plus allowed
+    el.value = el.value.replace(/[^0-9+ ]/g,'');
   }
 }
 
@@ -260,16 +268,15 @@ let mode = "one";
   
 /* Intent */
 function selectIntent(type){
+  entryMode = type;   // 🔴 IMPORTANT LINE
+
   const one = document.getElementById("intentOne");
   const save = document.getElementById("intentSave");
   const intentSection = document.getElementById("intentSection");
   const consumption = document.getElementById("consumptionSection");
   const summary = document.getElementById("intentSummary");
-
-  if (!one || !save || !intentSection || !consumption || !summary) {
-    console.error("Intent elements missing in DOM");
-    return;
-  }
+  const identity = document.getElementById("identitySection");
+  const billPeriod = document.getElementById("billPeriodSection");
 
   one.classList.toggle("active", type === "one");
   save.classList.toggle("active", type === "save");
@@ -277,6 +284,15 @@ function selectIntent(type){
   intentSection.classList.add("d-none");
   consumption.classList.remove("d-none");
   summary.classList.remove("d-none");
+
+  // 🔹 MODE-SPECIFIC VISIBILITY
+  if (type === "save") {
+    identity.classList.remove("d-none");
+    billPeriod.classList.remove("d-none");
+  } else {
+    identity.classList.add("d-none");
+    billPeriod.classList.add("d-none");
+  }
 }
 function clearErrors(){
   document
@@ -330,9 +346,9 @@ function validateUnits(){
   let g, i, e;
 
   try {
-    g = parsePlusExpression(gross.value, "Gross Units");
-    i = parsePlusExpression(importU.value, "Import Units");
-    e = parsePlusExpression(exportU.value, "Export Units");
+    g = entryMode === "save" ? Number(gross.value) : parsePlusExpression(gross.value, "Gross Units");
+    i = entryMode === "save" ? Number(importU.value) : parsePlusExpression(importU.value, "Import Units");
+    e = entryMode === "save" ? Number(exportU.value) : parsePlusExpression(exportU.value, "Export Units");
   } catch(err) {
     // Don't block typing; show error only on Calculate
     return;
@@ -366,12 +382,12 @@ function calculate(){
 let g=0, i=0, e=0, f=0, t=0, a=0;
 
 try {
-  g = parsePlusExpression(gross.value, "Gross Units");
-  i = parsePlusExpression(importU.value, "Import Units");
-  e = parsePlusExpression(exportU.value, "Export Units");
-  f = parsePlusExpression(fixed.value, "Fixed Charges");
-  t = parsePlusExpression(totalBill.value, "Total Bill Amount");
-  a = parsePlusExpression(arrears.value, "Arrears");
+    g = entryMode === "save" ? Number(gross.value) : parsePlusExpression(gross.value, "Gross Units");
+    i = entryMode === "save" ? Number(importU.value) : parsePlusExpression(importU.value, "Import Units");
+    e = entryMode === "save" ? Number(exportU.value) : parsePlusExpression(exportU.value, "Export Units");
+    f = entryMode === "save" ? Number(fixed.value) : parsePlusExpression(fixed.value, "Fixed Charges");
+    t = entryMode === "save" ? Number(totalBill.value) : parsePlusExpression(totalBill.value, "Total Bill Amount");
+    a = entryMode === "save" ? Number(arrears.value) : parsePlusExpression(arrears.value, "Arrears");
 } catch (err) {
   alert(err.message);
   return;
@@ -382,8 +398,8 @@ try {
   const unitRate=(t-f)/net;
   const without=(g*unitRate)+f;
 
-const billFromEl = document.getElementById("billFrom1st");
-const billToEl   = document.getElementById("billTo1st");
+const billFromEl = document.getElementById("billFrom");
+const billToEl   = document.getElementById("billTo");
 
 let days = null;
 let from = null;
