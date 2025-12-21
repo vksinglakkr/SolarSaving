@@ -410,9 +410,7 @@ result.innerHTML = `
    <b>Bill Period:</b>
 ${from ? from.toLocaleDateString("en-IN") : "—"}
 &nbsp; to &nbsp;
-${to ? to.toLocaleDateString("en-IN") : "—"}
-<br>
-<b>Total Days:</b> ${days ?? "—"}
+${to ? to.toLocaleDateString("en-IN") : "—"}  |  <b>Total Days:</b> ${days ?? "—"}<br>
 
     <b>Gross Units:</b> ${g} <br>
     <b>Import Units:</b> ${i} &nbsp; | &nbsp;
@@ -455,10 +453,8 @@ ${to ? to.toLocaleDateString("en-IN") : "—"}
 
       <i class="text-muted">(Actual bill amount)</i><br>
 
-      ${days
-        ? `<b>Per Day:</b> ₹${(t/days).toFixed(0)} / day`
-        : `<span class="text-muted">Per-day not calculated</span>`
-      }
+      ${days ? `<b>Per Day:</b> ₹${(t/days).toFixed(0)} / day` : `<span class="text-muted">Per-day not calculated</span>`}<br>
+      ${days ? `<b>365 Day:</b> ₹${((t/days)*365).toFixed(0)}` : `<span class="text-muted">Per-day not calculated</span>`}
     </div>
   </div>
 
