@@ -129,12 +129,21 @@ input::placeholder { color:#aaa; }
   <input type="date" id="billTo" class="form-control">
 </div>
   <label>Gross Units (e.g. 1354)</label>
+ <div class="input-group mb-2">
   <input id="gross"
-  type="text"
-  inputmode="numeric"
-  class="form-control mb-2"
-  placeholder="Enter value"
-  oninput="this.value=this.value.replace(/[^0-9+ ]/g,'')">
+    type="text"
+    inputmode="numeric"
+    class="form-control"
+    placeholder="Enter value"
+    oninput="this.value=this.value.replace(/[^0-9+ ]/g,'')">
+
+  <button class="btn btn-outline-secondary"
+          type="button"
+          onclick="appendPlus('gross')">
+    +
+  </button>
+</div>
+
 
   <label>Import Units (e.g. 1114)</label>
 <input id="importU"
