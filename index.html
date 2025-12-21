@@ -326,6 +326,77 @@ function appendPlus(id){
     el.focus();
   }
 }
+function handleAction(){
+  if (entryMode === "one") {
+    calculate();          // frontend only
+  } else {
+    submitToN8N();        // backend save
+  }
+}
+async function submitToN8N(){
+
+  // basic required checks
+  if (!billNumber.value.trim()) {
+    alert("Bill Number is required to save the record.");
+    return;
+  }
+
+  if (!meter.value.trim()) {
+    alert("Meter / Account Number is required.");
+    return;
+  }
+
+  if (!billFrom.value || !billTo.value) {
+    alert("Bill period is required for saving.");
+    return;
+  }
+
+  // reuse already-calculated values
+  const payload = {
+    mode: "save",
+    billNumber: billNumber.value,
+    meter: meter.value,
+    billFrom: billFrom.value,
+    billTo: billTo.value,
+
+    gross: g,
+    importUnits: i,
+    exportUnits: e,
+    directSolar: direct,
+
+    fixedCharges: f,
+    totalBill: t,
+    unitRate: unitRate,
+
+    withoutSolar: without,
+    withSolar: t,
+    saving: (without - t),
+    savingPerDay: savingPerDay,
+    annualSaving: annualSaving,
+
+    timestamp: new Date().toISOString()
+  };
+
+  try {
+    const res = await fetch(
+      "https://n8n-workflow-test.duckdns.org/webhook/solar-saving",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error("Server error");
+    }
+
+    alert("✅ Bill saved successfully for future reference.");
+  } catch (err) {
+    alert("❌ Unable to save data. Please try again later.");
+    console.error(err);
+  }
+}
 
 function handleNumericInput(el){
   if (entryMode === "save") {
@@ -372,15 +443,19 @@ intentSummary.classList.remove("d-none");
   summary.classList.remove("d-none");
 
   // 🔹 MODE-SPECIFIC VISIBILITY
+  const btn = document.getElementById("actionBtn");
   if (type === "save") {
     identity.classList.remove("d-none");
     billPeriod.classList.remove("d-none");
+    btn.innerText = "💾 Save & Submit";
   } else {
     identity.classList.add("d-none");
     billPeriod.classList.add("d-none");
+    btn.innerText = "🔍 Calculate Saving";
   }
 document.getElementById("calculateBtn").classList.remove("d-none");
 document.getElementById("helperCards").classList.add("d-none");
+btn.classList.remove("d-none");
 }
 function clearErrors(){
   document
