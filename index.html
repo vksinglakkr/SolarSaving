@@ -92,6 +92,59 @@ input::placeholder { color:#aaa; }
     <small class="text-muted">Maintain bill history & analysis</small>
   </div>
 </div>
+<!-- HELPFUL LINKS -->
+<div class="row g-3 mt-3">
+
+  <!-- DOWNLOAD BILL -->
+  <div class="col-md-4">
+    <div class="card h-100 shadow-sm">
+      <div class="card-body">
+        <h6 class="card-title">📄 Download Electricity Bill</h6>
+        <p class="card-text small text-muted">
+          You can download your official electricity bill from the utility website
+          before entering details here.
+        </p>
+        <a href="https://www.uhbvn.org.in/web/portal/auth?lastPage=/view-bill"
+           target="_blank"
+           class="btn btn-outline-primary btn-sm">
+          Open Bill Portal
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- HELP / TERMINOLOGY -->
+  <div class="col-md-4">
+    <div class="card h-100 shadow-sm">
+      <div class="card-body">
+        <h6 class="card-title">ℹ️ Understanding Bill Terms</h6>
+        <p class="card-text small text-muted">
+          Gross Units, Import, Export and Fixed Charges are mentioned clearly
+          on your electricity bill.
+        </p>
+        <button class="btn btn-outline-secondary btn-sm"
+                onclick="openHelpModal()">
+          View Explanation
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- WHY THIS TOOL -->
+  <div class="col-md-4">
+    <div class="card h-100 shadow-sm">
+      <div class="card-body">
+        <h6 class="card-title">☀️ Why use SolarSaving?</h6>
+        <p class="card-text small text-muted">
+          This tool shows how much money you save due to solar,
+          with transparent calculations.
+        </p>
+        <span class="badge bg-success">No login • No data saved</span>
+      </div>
+    </div>
+  </div>
+
+</div>
 
 <!-- INTENT SUMMARY -->
 <div id="intentSummary" class="alert alert-info d-none">
