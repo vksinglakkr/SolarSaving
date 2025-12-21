@@ -209,6 +209,32 @@ if (type === "save") {
       : "Mode: Save for future reference";
 }
 
+  function parsePlusExpression(input, fieldName) {
+  if (!input || !input.trim()) return 0;
+
+  // Allow only digits, + and spaces
+  if (!/^[0-9+\s]+$/.test(input)) {
+    throw new Error(
+      fieldName + " can contain only numbers and '+' sign"
+    );
+  }
+
+  const parts = input.split("+");
+  let sum = 0;
+
+  for (let part of parts) {
+    const val = part.trim();
+    if (val === "") {
+      throw new Error(
+        "Invalid format in " + fieldName + ". Please check '+' usage."
+      );
+    }
+    sum += Number(val);
+  }
+
+  return sum;
+}
+
 function resetIntent(){
   document.getElementById("intentSection").classList.remove("d-none");
   document.getElementById("intentSummary").classList.add("d-none");
@@ -222,7 +248,16 @@ function validateUnits(){
   document.querySelectorAll(".invalid-feedback").forEach(e=>e.remove());
   document.querySelectorAll(".is-invalid").forEach(e=>e.classList.remove("is-invalid"));
 
-  const g=+gross.value,i=+importU.value,e=+exportU.value;
+ let g, i, e, f, t;
+
+try {
+  g = parsePlusExpression(gross.value, "Gross Units");
+  i = parsePlusExpression(importU.value, "Import Units");
+  e = parsePlusExpression(exportU.value, "Export Units");
+} catch (err) {
+  alert(err.message);
+  return;
+}
   if(i>g) markError(importU,"Import cannot exceed Gross");
   if(e>i) markError(exportU,"Export cannot exceed Import");
 }
@@ -242,8 +277,19 @@ function calculate(){
     return;
   }
 
-  const g=+gross.value,i=+importU.value,e=+exportU.value;
-  const f=+fixed.value,t=+totalBill.value;
+let g, i, e, f, t;
+
+try {
+  g = parsePlusExpression(gross.value, "Gross Units");
+  i = parsePlusExpression(importU.value, "Import Units");
+  e = parsePlusExpression(exportU.value, "Export Units");
+  f = parsePlusExpression(fixed.value, "Fixed Charges");
+  t = parsePlusExpression(totalBill.value, "Total Bill Amount");
+} catch (err) {
+  alert(err.message);
+  return;
+}
+
   const net=i-e;
   const direct=g-i;
   const unitRate=(t-f)/net;
