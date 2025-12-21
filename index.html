@@ -171,7 +171,12 @@ input::placeholder { color:#aaa; }
 
   <div id="arrearsRow" class="d-none">
     <label>Arrears ₹ (if any)</label>
-  <input id="arrears" type="number" inputmode="numeric" pattern="[0-9]*" min="0" step="1" value="0" class="form-control mb-2" placeholder="Enter amount" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+  <input id="arrears"
+  type="text"
+  inputmode="numeric"
+  class="form-control mb-2"
+  placeholder="Enter amount"
+  oninput="this.value=this.value.replace(/[^0-9+ ]/g,'')">
   </div>
 </div>
 <button class="btn btn-primary w-100" onclick="calculate()">Calculate</button>
@@ -309,7 +314,7 @@ function calculate(){
     return;
   }
 
-let g, i, e, f, t;
+let g, i, e, f, t, a;
 
 try {
   g = parsePlusExpression(gross.value, "Gross Units");
@@ -317,6 +322,7 @@ try {
   e = parsePlusExpression(exportU.value, "Export Units");
   f = parsePlusExpression(fixed.value, "Fixed Charges");
   t = parsePlusExpression(totalBill.value, "Total Bill Amount");
+  a = parsePlusExpression(arrears.value, "Total Arrears");
 } catch (err) {
   alert(err.message);
   return;
