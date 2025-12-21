@@ -397,11 +397,9 @@ function selectIntent(type){
   /* 5️⃣ Mode-specific sections */
   if (type === "save") {
     identity.classList.remove("d-none");
-    billPeriod.classList.remove("d-none");
     actionBtn.innerText = "💾 Save & Submit";
   } else {
     identity.classList.add("d-none");
-    billPeriod.classList.add("d-none");
     actionBtn.innerText = "🔍 Calculate Saving";
   }
 
