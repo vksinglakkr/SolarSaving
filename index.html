@@ -285,7 +285,7 @@ oninput="handleNumericInput(this)">
 </div>
 
 </div>
-<button id="calculateBtn"
+<button id="actionBtn"
         class="btn btn-primary w-100 d-none"
         onclick="calculate()">
   Calculate Solar Saving
@@ -307,107 +307,46 @@ oninput="handleNumericInput(this)">
 <script>
 const identitySection = document.getElementById("identitySection");
 const billPeriodSection = document.getElementById("billPeriodSection");
-const arrearsRow = document.getElementById("arrearsRow");
+const consumptionSection = document.getElementById("consumptionSection");
+const actionBtn = document.getElementById("actionBtn");
 const result = document.getElementById("result");
 
-let entryMode = "one"; // "one" or "save"
+const gross = document.getElementById("gross");
+const importU = document.getElementById("importU");
+const exportU = document.getElementById("exportU");
+const fixed = document.getElementById("fixed");
+const totalBill = document.getElementById("totalBill");
+const arrears = document.getElementById("arrears");
 
-function appendPlus(id){
+let entryMode = "one";
+
+function handleNumericInput(input) {
   if (entryMode === "save") {
-    alert(
-      "Multiple entries (+) are not allowed when saving a bill for future reference."
-    );
-    return;
-  }
-
-  const el = document.getElementById(id);
-  if (!el.value.trim().endsWith("+")) {
-    el.value = el.value.trim() + " + ";
-    el.focus();
-  }
-}
-function handleAction(){
-  if (entryMode === "one") {
-    calculate();          // frontend only
+    // Simple number only
+    input.value = input.value.replace(/[^0-9]/g, "");
   } else {
-    submitToN8N();        // backend save
-  }
-}
-async function submitToN8N(){
-
-  // basic required checks
-  if (!billNumber.value.trim()) {
-    alert("Bill Number is required to save the record.");
-    return;
-  }
-
-  if (!meter.value.trim()) {
-    alert("Meter / Account Number is required.");
-    return;
-  }
-
-  if (!billFrom.value || !billTo.value) {
-    alert("Bill period is required for saving.");
-    return;
-  }
-
-  // reuse already-calculated values
-  const payload = {
-    mode: "save",
-    billNumber: billNumber.value,
-    meter: meter.value,
-    billFrom: billFrom.value,
-    billTo: billTo.value,
-
-    gross: g,
-    importUnits: i,
-    exportUnits: e,
-    directSolar: direct,
-
-    fixedCharges: f,
-    totalBill: t,
-    unitRate: unitRate,
-
-    withoutSolar: without,
-    withSolar: t,
-    saving: (without - t),
-    savingPerDay: savingPerDay,
-    annualSaving: annualSaving,
-
-    timestamp: new Date().toISOString()
-  };
-
-  try {
-    const res = await fetch(
-      "https://n8n-workflow-test.duckdns.org/webhook/solar-saving",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      }
-    );
-
-    if (!res.ok) {
-      throw new Error("Server error");
-    }
-
-    alert("✅ Bill saved successfully for future reference.");
-  } catch (err) {
-    alert("❌ Unable to save data. Please try again later.");
-    console.error(err);
+    // Allow + but prevent multiple +
+    let cleaned = input.value.replace(/[^0-9+\s]/g, "");
+    cleaned = cleaned.replace(/\+{2,}/g, "+");
+    input.value = cleaned;
   }
 }
 
-function handleNumericInput(el){
-  if (entryMode === "save") {
-    // silently restrict to digits only
-    el.value = el.value.replace(/[^0-9]/g,'');
-  } else {
-    // allow + only in one-time mode
-    el.value = el.value.replace(/[^0-9+ ]/g,'');
-  }
-}
+function appendPlus(fieldId) {
+  const input = document.getElementById(fieldId);
 
+  if (!input.value.trim()) {
+    alert("Please enter a value first");
+    input.focus();
+    return;
+  }
+
+  if (!input.value.trim().endsWith("+")) {
+    input.value = input.value.trim() + " + ";
+  }
+
+  input.focus();
+}
 
   
 /* Intent */
@@ -415,6 +354,9 @@ function selectIntent(type){
 
   entryMode = type;
 
+  // Intent section (the selector cards)
+  const intentSection = document.getElementById("intentSection");
+  
   // Cards
   const helper = document.getElementById("helperCards");
   const intentSummary = document.getElementById("intentSummary");
@@ -434,23 +376,26 @@ function selectIntent(type){
     return;
   }
 
-  /* 1️⃣ Hide helper cards */
+  /* 1️⃣ Hide intent selector cards */
+  if (intentSection) intentSection.classList.add("d-none");
+
+  /* 2️⃣ Hide helper cards */
   if (helper) helper.classList.add("d-none");
 
-  /* 2️⃣ Show intent summary */
+  /* 3️⃣ Show intent summary */
   if (intentSummary && intentText) {
     intentSummary.classList.remove("d-none");
     intentText.innerHTML =
-      entryMode === "one"
+      type === "one"
         ? "✔ <b>One-time Analysis:</b> No data will be saved"
         : "✔ <b>Save for Future:</b> Bill details will be stored";
   }
 
-  /* 3️⃣ Show main section */
+  /* 4️⃣ Show main section */
   consumption.classList.remove("d-none");
 
-  /* 4️⃣ Mode-specific sections */
-  if (entryMode === "save") {
+  /* 5️⃣ Mode-specific sections */
+  if (type === "save") {
     identity.classList.remove("d-none");
     billPeriod.classList.remove("d-none");
     actionBtn.innerText = "💾 Save & Submit";
@@ -460,7 +405,7 @@ function selectIntent(type){
     actionBtn.innerText = "🔍 Calculate Saving";
   }
 
-  /* 5️⃣ Show action button */
+  /* 6️⃣ Show action button */
   actionBtn.classList.remove("d-none");
 }
 
@@ -505,6 +450,9 @@ function resetIntent(){
 
   entryMode = "one";
 
+  // Show intent selector cards again
+  document.getElementById("intentSection")?.classList.remove("d-none");
+  
   document.getElementById("helperCards")?.classList.remove("d-none");
   document.getElementById("intentSummary")?.classList.add("d-none");
   document.getElementById("consumptionSection")?.classList.add("d-none");
@@ -512,6 +460,9 @@ function resetIntent(){
   document.getElementById("billPeriodSection")?.classList.add("d-none");
 
   document.getElementById("actionBtn")?.classList.add("d-none");
+  
+  // Clear result
+  document.getElementById("result").innerHTML = "";
 }
 
 
