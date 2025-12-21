@@ -257,7 +257,7 @@ if (type === "save") {
       : "Mode: Save for future reference";
 }
 
-  function parsePlusExpression(input, fieldName) {
+function parsePlusExpression(input, fieldName) {
   if (!input || !input.trim()) return 0;
 
   // Allow only digits, + and spaces
@@ -267,21 +267,21 @@ if (type === "save") {
     );
   }
 
-  const parts = input.split("+");
+  // Remove trailing +
+  let cleaned = input.trim().replace(/\+\s*$/, "");
+
+  const parts = cleaned.split("+");
   let sum = 0;
 
   for (let part of parts) {
     const val = part.trim();
-    if (val === "") {
-      throw new Error(
-        "Invalid format in " + fieldName + ". Please check '+' usage."
-      );
-    }
+    if (val === "") continue;   // <-- silently ignore empty part
     sum += Number(val);
   }
 
   return sum;
 }
+
 
 function resetIntent(){
   document.getElementById("intentSection").classList.remove("d-none");
