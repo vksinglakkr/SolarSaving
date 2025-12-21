@@ -215,6 +215,14 @@ let mode = "one";
     billTo.value = "";
   }
 } 
+  function appendPlus(id){
+  const el = document.getElementById(id);
+  if (!el.value.trim().endsWith("+")) {
+    el.value = el.value.trim() + " + ";
+    el.focus();
+  }
+}
+
 
   
 /* Intent */
