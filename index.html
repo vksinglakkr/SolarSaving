@@ -248,15 +248,6 @@ const result = document.getElementById("result");
 
 let mode = "one";
 
- function toggleBillPeriod(){
-  if(document.getElementById("wantPerDay").checked){
-    billPeriodSection.classList.remove("d-none");
-  } else {
-    billPeriodSection.classList.add("d-none");
-    billFrom.value = "";
-    billTo.value = "";
-  }
-} 
   function appendPlus(id){
   const el = document.getElementById(id);
   if (!el.value.trim().endsWith("+")) {
@@ -269,35 +260,34 @@ let mode = "one";
   
 /* Intent */
 function selectIntent(type){
-  mode = type;
+  const one = document.getElementById("intentOne");
+  const save = document.getElementById("intentSave");
+  const intentSection = document.getElementById("intentSection");
+  const consumption = document.getElementById("consumptionSection");
+  const summary = document.getElementById("intentSummary");
 
-document.getElementById("intentOne").classList.toggle("active", type === "one");
-document.getElementById("intentSave").classList.toggle("active", type === "save");
+  if (!one || !save || !intentSection || !consumption || !summary) {
+    console.error("Intent elements missing in DOM");
+    return;
+  }
 
-// Hide intent selection
-document.getElementById("intentSection").classList.add("d-none");
+  one.classList.toggle("active", type === "one");
+  save.classList.toggle("active", type === "save");
 
-// Always show main consumption inputs
-document.getElementById("consumptionSection").classList.remove("d-none");
-
-// Show intent summary
-document.getElementById("intentSummary").classList.remove("d-none");
-
-// Conditional sections
-if (type === "save") {
-  identitySection.classList.remove("d-none");
-  billPeriodSection.classList.remove("d-none");
-  arrearsRow.classList.remove("d-none");
-} else {
-  identitySection.classList.add("d-none");
-  billPeriodSection.classList.add("d-none");
-  arrearsRow.classList.add("d-none");
+  intentSection.classList.add("d-none");
+  consumption.classList.remove("d-none");
+  summary.classList.remove("d-none");
 }
-  document.getElementById("intentText").innerText =
-    type==="one"
-      ? "Mode: One-time saving check"
-      : "Mode: Save for future reference";
+function clearErrors(){
+  document
+    .querySelectorAll(".invalid-feedback")
+    .forEach(e => e.remove());
+
+  document
+    .querySelectorAll(".is-invalid")
+    .forEach(e => e.classList.remove("is-invalid"));
 }
+
 
 function parsePlusExpression(input, fieldName) {
   if (!input || !input.trim()) return 0;
@@ -392,16 +382,7 @@ try {
   const unitRate=(t-f)/net;
   const without=(g*unitRate)+f;
 
-let showPerDay = document.getElementById("wantPerDay").checked;
 let days = null;
-
-if(showPerDay && billFrom.value && billTo.value){
-  days = Math.max(
-    1,
-    (new Date(billTo.value) - new Date(billFrom.value)) / 86400000
-  );
-}
-
   result.innerHTML=`
     <div class="result-box">
       <b>Input Summary</b><br>
