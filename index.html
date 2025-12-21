@@ -383,6 +383,15 @@ try {
   const without=(g*unitRate)+f;
 
 let days = null;
+if (billFrom.value && billTo.value) {
+  const from = new Date(billFrom.value);
+  const to = new Date(billTo.value);
+
+  const diffMs = to - from;
+  if (diffMs > 0) {
+    days = Math.round(diffMs / (1000 * 60 * 60 * 24));
+  }
+}
   result.innerHTML=`
     <div class="result-box">
       <b>Input Summary</b><br>
@@ -405,6 +414,10 @@ let days = null;
         (Total Bill Amount)<br>
         Per day: ${days?`₹${(t/days).toFixed(0)} / day`:""}
       </div>
+    </div>
+    <div class="result-box">
+      <b>Total Savings: </b>  ₹${without.toFixed(0)} - ${t}
+      <b>Savings (per day): </b>  (₹${without.toFixed(0)} - ${t}) /${days}
     </div>
 
  <button class="btn btn-success mt-2"
