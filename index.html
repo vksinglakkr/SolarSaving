@@ -402,7 +402,18 @@ if (billFromEl && billToEl && billFromEl.value && billToEl.value) {
     days = Math.round(diffMs / (1000 * 60 * 60 * 24));
   }
 }
+let savingPerDay = null;
 
+if (days && days > 0) {
+  savingPerDay = (without - t) / days;
+}
+let annualSaving = null;
+
+if (savingPerDay !== null) {
+  annualSaving = savingPerDay * 365;
+}
+
+  
 result.innerHTML = `
   <!-- INPUT SUMMARY -->
   <div class="result-box">
@@ -433,6 +444,9 @@ ${to ? to.toLocaleDateString("en-IN") : "—"}  |  <b>Total Days:</b> ${days ?? 
 
   <!-- COMPARISON -->
   <div class="result-box row text-center">
+    <h5 class="text-success">
+      💰 Comparison (Bill)
+    </h5>
     <div class="col-6 border-end">
       <h6>❌ Without Solar</h6>
       <b class="fs-5">₹${without.toFixed(0)}</b><br>
@@ -453,8 +467,7 @@ ${to ? to.toLocaleDateString("en-IN") : "—"}  |  <b>Total Days:</b> ${days ?? 
 
       <i class="text-muted">(Actual bill amount)</i><br>
 
-      ${days ? `<b>Per Day:</b> ₹${(t/days).toFixed(0)} / day` : `<span class="text-muted">Per-day not calculated</span>`}<br>
-      ${days ? `<b>365 Day Approx.:</b> ₹${((t/days)*365).toFixed(0)}` : `<span class="text-muted">Per-day not calculated</span>`}
+      ${days ? `<b>Per Day:</b> ₹${(t/days).toFixed(0)} / day` : `<span class="text-muted">Per-day not calculated</span>`}
     </div>
   </div>
 
@@ -469,7 +482,20 @@ ${to ? to.toLocaleDateString("en-IN") : "—"}  |  <b>Total Days:</b> ${days ?? 
            = (₹${without.toFixed(0)} − ₹${t}) ÷ ${days} days
          </i>`
       : ``
-    }
+    }<br>
+     ${days && savingPerDay !== null ? `<b>Saving (Per Day):</b> ₹${savingPerDay.toFixed(0)} <br><i class="text-muted">
+       (₹${without.toFixed(0)} − ₹${t}) ÷ ${days} days </i>` : `<span class="text-muted">Per-day saving not calculated</span>`
+}<br>
+${annualSaving
+  ? `<hr>
+     <h6 class="text-success">📅 Estimated Yearly Saving</h6>
+     <b>₹${annualSaving.toFixed(0)} / year</b><br>
+     <i class="text-muted">
+       Based on current bill’s daily saving × 365 days
+     </i>`
+  : ``
+}
+
   </div>
 
   <!-- WHATSAPP -->
