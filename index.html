@@ -122,23 +122,23 @@ input::placeholder { color:#aaa; }
   <h6>Consumption & Charges</h6>
 
   <label>Gross Units (e.g. 1354)</label>
-  <input id="gross" class="form-control mb-2" placeholder="Enter value" onblur="validateUnits()">
+  <input id="gross" type="number" inputmode="numeric" pattern="[0-9]*" min="0" step="1" class="form-control mb-2" placeholder="Enter value" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
 
   <label>Import Units (e.g. 1114)</label>
-  <input id="importU" class="form-control mb-2" placeholder="Enter value" onblur="validateUnits()">
+  <input id="importU" type="number" inputmode="numeric" pattern="[0-9]*" min="0" step="1" class="form-control mb-2" placeholder="Enter value" oninput="this.value=this.value.replace(/[^0-9]/g,'')" onblur="validateUnits()">
 
-  <label>Export Units (e.g. 240)</label>
-  <input id="exportU" class="form-control mb-2" placeholder="Enter value" onblur="validateUnits()">
+  <label>Export Units (e.g. 944)</label>
+  <input id="exportU" type="number" inputmode="numeric" pattern="[0-9]*" min="0" step="1" class="form-control mb-2" placeholder="Enter value" oninput="this.value=this.value.replace(/[^0-9]/g,'')" onblur="validateUnits()">
 
   <label>Fixed Charges ₹ (e.g. 1605)</label>
-  <input id="fixed" class="form-control mb-2" placeholder="Enter amount">
+  <input id="fixed" type="number" inputmode="numeric" pattern="[0-9]*" min="0" step="1" class="form-control mb-2" placeholder="Enter amount" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
 
   <label>Total Bill Amount ₹ (e.g. 2700)</label>
-  <input id="totalBill" class="form-control mb-2" placeholder="Enter amount">
+  <input id="totalBill" type="number" inputmode="numeric" pattern="[0-9]*" min="0" step="1" class="form-control mb-2" placeholder="Enter amount" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
 
   <div id="arrearsRow" class="d-none">
     <label>Arrears ₹ (if any)</label>
-    <input id="arrears" class="form-control" value="0">
+  <input id="arrears" type="number" inputmode="numeric" pattern="[0-9]*" min="0" step="1" value="0" class="form-control mb-2" placeholder="Enter amount" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
   </div>
 </div>
 
