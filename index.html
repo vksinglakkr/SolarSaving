@@ -474,27 +474,13 @@ ${to ? to.toLocaleDateString("en-IN") : "—"}  |  <b>Total Days:</b> ${days ?? 
   <!-- SAVINGS -->
   <div class="result-box text-center">
     <h5 class="text-success">
-      💰 Total Saving: ₹${(without - t).toFixed(0)}
+      💰 Total Saving: ₹${(without - t).toFixed(0)} | ${`<i class="text-muted"> = (₹${without.toFixed(0)} − ₹${t})</i>`}<br>
     </h5>
 
-    ${days
-      ? `<i class="text-muted">
-           = (₹${without.toFixed(0)} − ₹${t}) ÷ ${days} days
-         </i>`
-      : ``
-    }<br>
-     ${days && savingPerDay !== null ? `<b>Saving (Per Day):</b> ₹${savingPerDay.toFixed(0)} <br><i class="text-muted">
-       (₹${without.toFixed(0)} − ₹${t}) ÷ ${days} days </i>` : `<span class="text-muted">Per-day saving not calculated</span>`
-}<br>
-${annualSaving
-  ? `<hr>
-     <h6 class="text-success">📅 Estimated Yearly Saving</h6>
-     <b>₹${annualSaving.toFixed(0)} / year</b><br>
-     <i class="text-muted">
-       Based on current bill’s daily saving × 365 days
-     </i>`
-  : ``
-}
+  ${days && savingPerDay !== null ? `<b>Saving (Per Day):</b> ₹${savingPerDay.toFixed(0)}<i class="text-muted">
+       (₹${without.toFixed(0)} − ₹${t}) ÷ ${days} days </i>` : `<span class="text-muted">Per-day saving not calculated</span>`}<br>
+  ${days && annualSaving !== null ? `<b>Estimated Yearly Saving:</b> ₹${annualSaving.toFixed(0)} / year<b><i class="text-muted">
+       Based on current bill's daily saving x 365 days </i>` : ``}
 
   </div>
 
