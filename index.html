@@ -396,13 +396,14 @@ let days = null;
       <div class="col-6">
         <b>Without Solar</b><br>
         ₹${without.toFixed(0)}<br>
-        (Gross Units * Per Unit Rate)+Fixed Charges)
-        ${days?`₹${(without/days).toFixed(0)} / day`:""}
+        (Gross Units * Per Unit Rate)+Fixed Charges i.e. (${g} * ₹${(unitRate).toFixed(2)}) + ₹${f}<br>
+        Per day: ${days?`₹${(without/days).toFixed(0)} / day`:""}
       </div>
       <div class="col-6">
         <b>With Solar</b><br>
         ₹${t}<br>
-        ${days?`₹${(t/days).toFixed(0)} / day`:""}
+        (Total Bill Amount)<br>
+        Per day: ${days?`₹${(t/days).toFixed(0)} / day`:""}
       </div>
     </div>
 
