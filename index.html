@@ -269,6 +269,19 @@ function handleNumericInput(el){
 /* Intent */
 function selectIntent(type){
   entryMode = type;   // 🔴 IMPORTANT LINE
+const intentText = document.getElementById("intentText");
+const intentSummary = document.getElementById("intentSummary");
+
+if (type === "one") {
+intentText.innerHTML =
+  "✔ <b>One-time Analysis:</b> Just checking solar savings for this bill";
+} else if (type === "save") {
+intentText.innerHTML =
+  "✔ <b>Save for Future:</b> Bill details will be stored for comparison";
+}
+
+intentSummary.classList.remove("d-none");
+
 
   const one = document.getElementById("intentOne");
   const save = document.getElementById("intentSave");
