@@ -107,13 +107,7 @@ input::placeholder { color:#aaa; }
   <label>Meter / Account Number (e.g. 24600455)</label>
   <input id="meter" class="form-control" placeholder="Enter meter or account no">
 </div>
-<div class="form-check mb-2">
-  <input class="form-check-input" type="checkbox"
-         id="wantPerDay" onchange="toggleBillPeriod()">
-  <label class="form-check-label">
-    Show per-day calculation (requires bill period)
-  </label>
-</div>
+
 <!-- BILL PERIOD -->
 <div class="card p-3 mb-3 d-none" id="billPeriodSection">
   <h6>Bill Period</h6>
@@ -126,7 +120,14 @@ input::placeholder { color:#aaa; }
 <!-- CONSUMPTION -->
 <div class="card p-3 mb-3 d-none" id="consumptionSection">
   <h6>Consumption & Charges</h6>
-
+<!-- BILL PERIOD -->
+<div class="card p-3 mb-3 d-none" id="billPeriodSection">
+  <h6>Bill Period</h6>
+  <label>From</label>
+  <input type="date" id="billFrom" class="form-control mb-2">
+  <label>To</label>
+  <input type="date" id="billTo" class="form-control">
+</div>
   <label>Gross Units (e.g. 1354)</label>
   <input id="gross" type="number" inputmode="numeric" pattern="[0-9]*" min="0" step="1" class="form-control mb-2" placeholder="Enter value" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
 
