@@ -146,46 +146,88 @@ input::placeholder { color:#aaa; }
 
 
   <label>Import Units (e.g. 1114)</label>
-<input id="importU"
-  type="text"
-  inputmode="numeric"
-  class="form-control mb-2"
-  placeholder="Enter value"
-  oninput="this.value=this.value.replace(/[^0-9+ ]/g,'')"
-  onblur="validateUnits()">
+ <div class="input-group mb-2">
+  <input id="importU"
+    type="text"
+    inputmode="numeric"
+    class="form-control"
+    placeholder="Enter value"
+    oninput="this.value=this.value.replace(/[^0-9+ ]/g,'')" onblur="validateUnits()">
+
+  <button class="btn btn-outline-secondary"
+          type="button"
+          onclick="appendPlus('importU')">
+    +
+  </button>
+</div>
 
   <label>Export Units (e.g. 944)</label>
-<input id="exportU"
-  type="text"
-  inputmode="numeric"
-  class="form-control mb-2"
-  placeholder="Enter value"
-  oninput="this.value=this.value.replace(/[^0-9+ ]/g,'')"
-  onblur="validateUnits()">
+ <div class="input-group mb-2">
+  <input id="exportU"
+    type="text"
+    inputmode="numeric"
+    class="form-control"
+    placeholder="Enter value"
+    oninput="this.value=this.value.replace(/[^0-9+ ]/g,'')" onblur="validateUnits()">
+
+  <button class="btn btn-outline-secondary"
+          type="button"
+          onclick="appendPlus('exportU')">
+    +
+  </button>
+</div>
+
+  
   <label>Fixed Charges ₹ (e.g. 1605)</label>
+ <div class="input-group mb-2">
   <input id="fixed"
-  type="text"
-  inputmode="numeric"
-  class="form-control mb-2"
-  placeholder="Enter amount"
-  oninput="this.value=this.value.replace(/[^0-9+ ]/g,'')">
+    type="text"
+    inputmode="numeric"
+    class="form-control"
+    placeholder="Enter amount"
+    oninput="this.value=this.value.replace(/[^0-9+ ]/g,'')">
+
+  <button class="btn btn-outline-secondary"
+          type="button"
+          onclick="appendPlus('fixed')">
+    +
+  </button>
+</div>
+
 
   <label>Total Bill Amount ₹ (e.g. 2700)</label>
-  <input id="totalBill"
-  type="text"
-  inputmode="numeric"
-  class="form-control mb-2"
-  placeholder="Enter amount"
-  oninput="this.value=this.value.replace(/[^0-9+ ]/g,'')">
+ <div class="input-group mb-2">
+  <input id="totalbill"
+    type="text"
+    inputmode="numeric"
+    class="form-control"
+    placeholder="Enter amount"
+    oninput="this.value=this.value.replace(/[^0-9+ ]/g,'')">
+
+  <button class="btn btn-outline-secondary"
+          type="button"
+          onclick="appendPlus('totalbill')">
+    +
+  </button>
+</div>
+
 
  
     <label>Arrears ₹ (if any)</label>
+ <div class="input-group mb-2">
   <input id="arrears"
-  type="text"
-  inputmode="numeric"
-  class="form-control mb-2"
-  placeholder="Enter amount"
-  oninput="this.value=this.value.replace(/[^0-9+ ]/g,'')">
+    type="text"
+    inputmode="numeric"
+    class="form-control"
+    placeholder="Enter amount"
+    oninput="this.value=this.value.replace(/[^0-9+ ]/g,'')">
+
+  <button class="btn btn-outline-secondary"
+          type="button"
+          onclick="appendPlus('arrears')">
+    +
+  </button>
+</div>
 
 </div>
 <button class="btn btn-primary w-100" onclick="calculate()">Calculate</button>
