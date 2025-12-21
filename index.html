@@ -55,10 +55,16 @@ input::placeholder { color:#aaa; }
 @media (max-width:768px){
   .govt-text { display:none; }
 }
-.helper-card {
-    background: #ffffff;
-    border: 1px solid #e0e0e0;
+  .helper-wrapper {
+    background: #f3f7ff;
+    border: 2px dashed #6c8cff;
   }
+
+  .helper-card {
+    border: 2px solid #6c8cff;
+    background: #ffffff;
+  }
+ 
 </style>
 </head>
 
@@ -97,12 +103,11 @@ input::placeholder { color:#aaa; }
   </div>
 </div>
 <!-- HELPFUL LINKS -->
-<!-- SUPPORTING INFO (NOT PART OF FORM) -->
-<div class="mt-4 p-3 rounded"
-     style="background:#f8f9fa;border:1px dashed #ced4da;">
+<div id="helperCards"
+     class="mt-4 p-3 rounded helper-wrapper">
 
   <div class="mb-2 text-muted small">
-    Need help before entering bill details?
+    Helpful resources before you start
   </div>
 
   <div class="row g-3"><div class="row g-3 mt-3">
@@ -379,7 +384,7 @@ intentSummary.classList.remove("d-none");
     billPeriod.classList.add("d-none");
   }
 document.getElementById("calculateBtn").classList.remove("d-none");
-
+document.getElementById("helperCards").classList.add("d-none");
 }
 function clearErrors(){
   document
@@ -422,6 +427,7 @@ function resetIntent(){
   document.getElementById("intentSection").classList.remove("d-none");
   document.getElementById("intentSummary").classList.add("d-none");
  document.getElementById("calculateBtn").classList.add("d-none");
+document.getElementById("helperCards").classList.remove("d-none");
  identitySection.classList.add("d-none");
   billPeriodSection.classList.add("d-none");
   arrearsRow.classList.add("d-none");
