@@ -47,6 +47,75 @@ input::placeholder { color:#aaa; }
   box-shadow:0 2px 8px rgba(0,0,0,0.06);
 }
 
+/* Bill Card */
+.bill-card {
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.bill-card:hover {
+  border-color: #0b5ed7;
+  box-shadow: 0 4px 12px rgba(11, 94, 215, 0.1);
+}
+.bill-card.selected {
+  border-color: #0b5ed7;
+  background: #eef4ff;
+}
+
+/* Stat Cards */
+.stat-card {
+  padding: 1.5rem;
+  border-radius: 12px;
+  text-align: center;
+  color: white;
+  margin-bottom: 1rem;
+}
+
+/* Modal */
+.custom-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.custom-modal.show {
+  display: flex;
+}
+.modal-content-custom {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+/* Spinner */
+.spinner {
+  border: 3px solid #f3f4f6;
+  border-top: 3px solid #0b5ed7;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 /* Validation */
 .is-invalid { border-color:#dc3545; }
 .invalid-feedback { display:block; }
@@ -55,16 +124,15 @@ input::placeholder { color:#aaa; }
 @media (max-width:768px){
   .govt-text { display:none; }
 }
-  .helper-wrapper {
-    background: #f3f7ff;
-    border: 2px dashed #6c8cff;
-  }
+.helper-wrapper {
+  background: #f3f7ff;
+  border: 2px dashed #6c8cff;
+}
 
-  .helper-card {
-    border: 2px solid #6c8cff;
-    background: #ffffff;
-  }
- 
+.helper-card {
+  border: 2px solid #6c8cff;
+  background: #ffffff;
+}
 </style>
 </head>
 
@@ -96,12 +164,19 @@ input::placeholder { color:#aaa; }
     <small class="text-muted">Quick calculation, no data saved</small>
   </div>
 
-  <div class="intent-card" id="intentSave"
+  <div class="intent-card mb-2" id="intentSave"
        onclick="selectIntent('save')">
     <h6>💾 Save for Future Reference</h6>
     <small class="text-muted">Maintain bill history & analysis</small>
   </div>
+
+  <div class="intent-card" id="intentDashboard"
+       onclick="selectIntent('dashboard')">
+    <h6>📊 My Dashboard</h6>
+    <small class="text-muted">View, edit & manage saved bills</small>
+  </div>
 </div>
+
 <!-- HELPFUL LINKS -->
 <div id="helperCards"
      class="mt-4 p-3 rounded helper-wrapper">
@@ -110,7 +185,7 @@ input::placeholder { color:#aaa; }
     <h5>Helpful resources before you start</h5>
   </div>
 
-  <div class="row g-3"><div class="row g-3 mt-3">
+  <div class="row g-3">
   <!-- DOWNLOAD BILL -->
   <div class="col-md-4">
    <div class="card helper-card h-100 shadow-sm">
@@ -127,7 +202,7 @@ input::placeholder { color:#aaa; }
 
   <!-- HELP / TERMINOLOGY -->
   <div class="col-md-4">
-<div class="card helper-card h-100 shadow-sm">
+    <div class="card helper-card h-100 shadow-sm">
       <div class="card-body">
         <h6 class="card-title">ℹ️ Understanding Bill Terms</h6>
         <button class="btn btn-outline-secondary btn-sm"
@@ -140,17 +215,14 @@ input::placeholder { color:#aaa; }
 
   <!-- WHY THIS TOOL -->
   <div class="col-md-4">
-<div class="card helper-card h-100 shadow-sm">
+    <div class="card helper-card h-100 shadow-sm">
       <div class="card-body">
         <h6 class="card-title">☀️ Why use SolarSaving?</h6>
-        <span class="badge bg-success">No login • No data saved</span>
+        <span class="badge bg-success">No login • Secure data</span>
       </div>
     </div>
   </div>
-
-</div>
   </div>
-
 </div>
     
 
@@ -160,13 +232,36 @@ input::placeholder { color:#aaa; }
   <button class="btn btn-sm btn-link" onclick="resetIntent()">Change</button>
 </div>
 
+<!-- AUTHENTICATION SECTION (for Dashboard) -->
+<div class="card p-3 mb-3 d-none" id="authSection">
+  <h6>🔐 Login to Dashboard</h6>
+  <label>Meter Number</label>
+  <input id="authMeter" class="form-control mb-2" placeholder="Enter meter number">
+  <label>Account Number</label>
+  <input id="authAccount" class="form-control mb-2" placeholder="Enter account number">
+  <button class="btn btn-primary w-100" onclick="authenticateUser()">Login</button>
+  <button class="btn btn-secondary w-100 mt-2" onclick="resetIntent()">Back</button>
+</div>
+
+<!-- DASHBOARD SECTION -->
+<div class="d-none" id="dashboardSection">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h6 class="mb-0">📊 My Dashboard</h6>
+    <div id="userInfo" class="text-muted small"></div>
+  </div>
+  <div id="billsList"></div>
+  <button class="btn btn-secondary w-100 mt-3" onclick="logout()">Logout</button>
+</div>
+
 <!-- IDENTITY -->
 <div class="card p-3 mb-3 d-none" id="identitySection">
   <h6>Consumer Identification</h6>
   <label>Bill Number (e.g. 123456)</label>
   <input id="billNumber" class="form-control mb-2" placeholder="Enter bill number">
-  <label>Meter / Account Number (e.g. 24600455)</label>
-  <input id="meter" class="form-control" placeholder="Enter meter or account no">
+  <label>Meter Number (e.g. 24600455)</label>
+  <input id="meter" class="form-control mb-2" placeholder="Enter meter number">
+  <label>Account Number (e.g. ACC12345)</label>
+  <input id="accountNum" class="form-control" placeholder="Enter account number">
 </div>
 
 <!-- BILL PERIOD -->
@@ -295,6 +390,16 @@ oninput="handleNumericInput(this)">
 
 </div>
 
+<!-- Custom Modal -->
+<div id="customModal" class="custom-modal">
+  <div class="modal-content-custom">
+    <div style="text-align: center; font-size: 3rem;" id="modalIcon">✅</div>
+    <h4 style="text-align: center; margin: 1rem 0;" id="modalTitle">Success</h4>
+    <div id="modalMessage" style="color: #64748b;"></div>
+    <div id="modalButtons" style="display: flex; gap: 1rem; margin-top: 1.5rem;"></div>
+  </div>
+</div>
+
 <footer class="mt-5 py-3 text-center"
         style="background:#f8f9fa;border-top:1px solid #dee2e6;">
   <small class="text-muted">
@@ -305,59 +410,30 @@ oninput="handleNumericInput(this)">
 </footer>
 
 <script>
-const identitySection = document.getElementById("identitySection");
-const billPeriodSection = document.getElementById("billPeriodSection");
-const consumptionSection = document.getElementById("consumptionSection");
-const actionBtn = document.getElementById("actionBtn");
-const result = document.getElementById("result");
+// ==========================================
+// GLOBAL VARIABLES
+// ==========================================
+let entryMode = "one";
+let currentUser = null;
+let userBills = [];
+let selectedBillIndex = null;
 
+// Elements
 const gross = document.getElementById("gross");
 const importU = document.getElementById("importU");
 const exportU = document.getElementById("exportU");
 const fixed = document.getElementById("fixed");
 const totalBill = document.getElementById("totalBill");
 const arrears = document.getElementById("arrears");
+const result = document.getElementById("result");
 
-let entryMode = "one";
-
-function handleNumericInput(input) {
-  if (entryMode === "save") {
-    // Simple number only
-    input.value = input.value.replace(/[^0-9]/g, "");
-  } else {
-    // Allow + but prevent multiple +
-    let cleaned = input.value.replace(/[^0-9+\s]/g, "");
-    cleaned = cleaned.replace(/\+{2,}/g, "+");
-    input.value = cleaned;
-  }
-}
-
-function appendPlus(fieldId) {
-  const input = document.getElementById(fieldId);
-
-  if (!input.value.trim()) {
-    alert("Please enter a value first");
-    input.focus();
-    return;
-  }
-
-  if (!input.value.trim().endsWith("+")) {
-    input.value = input.value.trim() + " + ";
-  }
-
-  input.focus();
-}
-
-  
-/* Intent */
+// ==========================================
+// INTENT SELECTION
+// ==========================================
 function selectIntent(type){
-
   entryMode = type;
 
-  // Intent section (the selector cards)
   const intentSection = document.getElementById("intentSection");
-  
-  // Cards
   const helper = document.getElementById("helperCards");
   const intentSummary = document.getElementById("intentSummary");
   const intentText = document.getElementById("intentText");
@@ -366,106 +442,578 @@ function selectIntent(type){
   const consumption = document.getElementById("consumptionSection");
   const identity = document.getElementById("identitySection");
   const billPeriod = document.getElementById("billPeriodSection");
+  const authSection = document.getElementById("authSection");
+  const dashboardSection = document.getElementById("dashboardSection");
 
   // Button
   const actionBtn = document.getElementById("actionBtn");
 
-  // SAFETY CHECK
-  if (!consumption || !actionBtn) {
-    console.error("Critical UI elements missing");
-    return;
-  }
-
-  /* 1️⃣ Hide intent selector cards */
+  // Hide intent selector cards
   if (intentSection) intentSection.classList.add("d-none");
-
-  /* 2️⃣ Hide helper cards */
   if (helper) helper.classList.add("d-none");
 
-  /* 3️⃣ Show intent summary */
-  if (intentSummary && intentText) {
-    intentSummary.classList.remove("d-none");
-    intentText.innerHTML =
-      type === "one"
-        ? "✔ <b>One-time Analysis:</b> No data will be saved"
-        : "✔ <b>Save for Future:</b> Bill details will be stored";
-  }
-
-  /* 4️⃣ Show main section */
-  consumption.classList.remove("d-none");
-    billPeriod.classList.remove("d-none");
-
-  /* 5️⃣ Mode-specific sections */
-  if (type === "save") {
-    identity.classList.remove("d-none");
-    actionBtn.innerText = "💾 Save & Submit";
-  } else {
+  if (type === "dashboard") {
+    // Show authentication for dashboard
+    authSection.classList.remove("d-none");
+    consumption.classList.add("d-none");
     identity.classList.add("d-none");
-    actionBtn.innerText = "🔍 Calculate Saving";
-  }
+    billPeriod.classList.add("d-none");
+    actionBtn.classList.add("d-none");
+    dashboardSection.classList.add("d-none");
+    if (intentSummary) intentSummary.classList.add("d-none");
+  } else {
+    // Show intent summary
+    if (intentSummary && intentText) {
+      intentSummary.classList.remove("d-none");
+      intentText.innerHTML =
+        type === "one"
+          ? "✔ <b>One-time Analysis:</b> No data will be saved"
+          : "✔ <b>Save for Future:</b> Bill details will be stored";
+    }
 
-  /* 6️⃣ Show action button */
-  actionBtn.classList.remove("d-none");
+    // Show main sections
+    consumption.classList.remove("d-none");
+    billPeriod.classList.remove("d-none");
+    authSection.classList.add("d-none");
+    dashboardSection.classList.add("d-none");
+
+    // Mode-specific sections
+    if (type === "save") {
+      identity.classList.remove("d-none");
+      actionBtn.innerText = "💾 Save & Submit";
+    } else {
+      identity.classList.add("d-none");
+      actionBtn.innerText = "🔍 Calculate Saving";
+    }
+
+    actionBtn.classList.remove("d-none");
+  }
+}
+
+// ==========================================
+// AUTHENTICATION & DASHBOARD
+// ==========================================
+async function authenticateUser() {
+  const meter = document.getElementById('authMeter').value.trim();
+  const account = document.getElementById('authAccount').value.trim();
+  
+  if (!meter || !account) {
+    showErrorModal('⚠️ Please enter both Meter and Account Number');
+    return;
+  }
+  
+  const authSection = document.getElementById('authSection');
+  authSection.innerHTML += '<div id="authLoading" style="text-align: center; margin-top: 1rem;"><div class="spinner"></div></div>';
+  
+  try {
+    const response = await fetch('https://n8n-workflow-test.duckdns.org/webhook/solar-authenticate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ meterNumber: meter, accountNumber: account })
+    });
+    
+    let data = await response.json();
+    
+    // Handle array-wrapped response
+    if (Array.isArray(data)) {
+      data = data[0];
+    }
+    
+    document.getElementById('authLoading')?.remove();
+    
+    if (data.status === 'success' && data.authenticated) {
+      currentUser = { meter, account };
+      userBills = Array.isArray(data.bills) ? data.bills : [];
+      
+      showSuccessModal(`✅ Login Successful!<br><br>Found ${data.billCount} bill(s).`);
+      
+      setTimeout(() => {
+        closeModal();
+        showDashboard();
+      }, 1500);
+      
+    } else {
+      if (data.billCount === 0 || data.message.includes('No records')) {
+        showModal('ℹ️', 'No Bills Found', `
+          <p>You haven't saved any bills yet.</p>
+          <p><strong>First time user?</strong></p>
+          <p>Save a bill using "Save for Future Reference" option.</p>
+        `, [
+          { text: 'Save First Bill', type: 'primary', action: () => { closeModal(); selectIntent('save'); } },
+          { text: 'Cancel', type: 'secondary', action: closeModal }
+        ]);
+      } else {
+        showErrorModal('❌ Authentication Failed<br><br>Invalid credentials.');
+      }
+    }
+  } catch (error) {
+    document.getElementById('authLoading')?.remove();
+    console.error(error);
+    showErrorModal('❌ Connection error. Please try again.');
+  }
+}
+
+async function authenticateUserSilent() {
+  const meter = currentUser.meter;
+  const account = currentUser.account;
+  
+  try {
+    const response = await fetch('https://n8n-workflow-test.duckdns.org/webhook/solar-authenticate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ meterNumber: meter, accountNumber: account })
+    });
+    
+    let data = await response.json();
+    if (Array.isArray(data)) data = data[0];
+    
+    if (data.status === 'success' && data.authenticated) {
+      currentUser = { meter, account };
+      userBills = Array.isArray(data.bills) ? data.bills : [];
+      displayBillsList();
+    } else {
+      showErrorModal('Failed to refresh dashboard');
+    }
+  } catch (error) {
+    console.error(error);
+    showErrorModal('❌ Failed to refresh');
+  }
+}
+
+function showDashboard() {
+  document.getElementById('authSection').classList.add('d-none');
+  document.getElementById('dashboardSection').classList.remove('d-none');
+  document.getElementById('userInfo').textContent = `Meter: ${currentUser.meter} | Account: ${currentUser.account}`;
+  displayBillsList();
+}
+
+function displayBillsList() {
+  const billsList = document.getElementById('billsList');
+  
+  if (!userBills || userBills.length === 0) {
+    billsList.innerHTML = `
+      <div style="text-align: center; padding: 3rem; color: #64748b;">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">📭</div>
+        <p style="font-size: 1.2rem; font-weight: 600;">No Bills Found</p>
+      </div>
+    `;
+    return;
+  }
+  
+  const totalSavings = userBills.reduce((sum, bill) => sum + parseFloat(bill['Solar Saving Amount'] || 0), 0);
+  const avgSaving = totalSavings / userBills.length;
+  
+  billsList.innerHTML = `
+    <div class="row g-2 mb-3">
+      <div class="col-md-4">
+        <div class="stat-card" style="background: linear-gradient(135deg, #10b981, #059669);">
+          <div style="font-size: 0.85rem; opacity: 0.9;">Total Bills</div>
+          <div style="font-size: 2rem; font-weight: 700;">${userBills.length}</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="stat-card" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">
+          <div style="font-size: 0.85rem; opacity: 0.9;">Total Savings</div>
+          <div style="font-size: 2rem; font-weight: 700;">₹${totalSavings.toFixed(0)}</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="stat-card" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+          <div style="font-size: 0.85rem; opacity: 0.9;">Avg Saving</div>
+          <div style="font-size: 2rem; font-weight: 700;">₹${avgSaving.toFixed(0)}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-2 mb-3">
+      <div class="col-md-4">
+        <button class="btn btn-primary w-100" onclick="viewSelectedBill()" id="viewBtn" disabled>
+          📄 View
+        </button>
+      </div>
+      <div class="col-md-4">
+        <button class="btn btn-warning w-100" onclick="editSelectedBill()" id="editBtn" disabled>
+          ✏️ Edit
+        </button>
+      </div>
+      <div class="col-md-4">
+        <button class="btn btn-danger w-100" onclick="deleteSelectedBill()" id="deleteBtn" disabled>
+          🗑️ Delete
+        </button>
+      </div>
+    </div>
+
+    <div id="billCards">
+      ${userBills.map((bill, index) => createBillCard(bill, index)).join('')}
+    </div>
+  `;
+}
+
+function createBillCard(bill, index) {
+  const billDate = bill['Entry DateTime'] ? new Date(bill['Entry DateTime']).toLocaleDateString('en-IN') : 'N/A';
+  const saving = parseFloat(bill['Solar Saving Amount'] || 0);
+  const savingPercent = parseFloat(bill['Saving Percentage'] || 0);
+  const billAmount = parseFloat(bill['Total Bill Amount'] || 0);
+  
+  return `
+    <div class="bill-card" onclick="selectBill(${index})">
+      <div class="d-flex align-items-center gap-3">
+        <input type="radio" name="billSelection" value="${index}" 
+               style="width: 20px; height: 20px; cursor: pointer;"
+               onchange="selectBill(${index})">
+        
+        <div class="flex-grow-1">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <div>
+              <div style="font-weight: 700; font-size: 1.1rem; color: #1e3a8a;">
+                Bill #${bill['Bill Number'] || 'N/A'}
+              </div>
+              <div style="font-size: 0.85rem; color: #64748b;">
+                📅 ${billDate}
+              </div>
+            </div>
+            <div class="text-end">
+              <div style="font-size: 0.85rem; color: #64748b;">Bill Amount</div>
+              <div style="font-weight: 600; color: #1e3a8a;">₹${billAmount.toFixed(0)}</div>
+            </div>
+          </div>
+          
+          <div class="row g-2 pt-2" style="border-top: 1px solid #e2e8f0;">
+            <div class="col-6">
+              <div style="font-size: 0.75rem; color: #64748b;">Solar Saving</div>
+              <div style="font-weight: 700; font-size: 1.3rem; color: #10b981;">₹${saving.toFixed(0)}</div>
+            </div>
+            <div class="col-6">
+              <div style="font-size: 0.75rem; color: #64748b;">Saving %</div>
+              <div style="font-weight: 700; font-size: 1.3rem; color: #3b82f6;">${savingPercent.toFixed(1)}%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function selectBill(index) {
+  selectedBillIndex = index;
+  
+  document.getElementById('viewBtn').disabled = false;
+  document.getElementById('editBtn').disabled = false;
+  document.getElementById('deleteBtn').disabled = false;
+  
+  document.querySelectorAll('input[name="billSelection"]').forEach((radio, i) => {
+    radio.checked = (i === index);
+  });
+  
+  document.querySelectorAll('.bill-card').forEach((card, i) => {
+    if (i === index) {
+      card.classList.add('selected');
+    } else {
+      card.classList.remove('selected');
+    }
+  });
+}
+
+function viewSelectedBill() {
+  if (selectedBillIndex === null) {
+    showErrorModal('Please select a bill first');
+    return;
+  }
+  
+  const bill = userBills[selectedBillIndex];
+  
+  const modalContent = `
+    <div style="text-align: left;">
+      <h5 style="color: #1e3a8a; margin-bottom: 1.5rem;">Bill Details</h5>
+      
+      <div style="background: #f8fafc; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+        <table class="table table-sm">
+          <tr>
+            <td><strong>Bill Number:</strong></td>
+            <td>${bill['Bill Number'] || 'N/A'}</td>
+          </tr>
+          <tr>
+            <td><strong>Meter Number:</strong></td>
+            <td>${bill['Meter Number'] || 'N/A'}</td>
+          </tr>
+          <tr>
+            <td><strong>Entry Date:</strong></td>
+            <td>${bill['Entry DateTime'] ? new Date(bill['Entry DateTime']).toLocaleString('en-IN') : 'N/A'}</td>
+          </tr>
+        </table>
+      </div>
+      
+      <h6 style="color: #1e3a8a; margin: 1rem 0;">Consumption</h6>
+      <div style="background: #f8fafc; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+        <table class="table table-sm">
+          <tr><td>Gross Units:</td><td>${bill['Gross Units'] || 0}</td></tr>
+          <tr><td>Import Units:</td><td>${bill['Import Units'] || 0}</td></tr>
+          <tr><td>Export Units:</td><td>${bill['Export Units'] || 0}</td></tr>
+        </table>
+      </div>
+      
+      <h6 style="color: #1e3a8a; margin: 1rem 0;">Charges & Savings</h6>
+      <div style="background: #f8fafc; padding: 1rem; border-radius: 8px;">
+        <table class="table table-sm">
+          <tr><td>Fixed Charges:</td><td>₹${bill['Fixed Charges'] || 0}</td></tr>
+          <tr><td>Total Bill:</td><td>₹${bill['Total Bill Amount'] || 0}</td></tr>
+          <tr class="table-success"><td><strong>Solar Saving:</strong></td><td><strong>₹${bill['Solar Saving Amount'] || 0}</strong></td></tr>
+          <tr class="table-info"><td><strong>Saving %:</strong></td><td><strong>${bill['Saving Percentage'] || 0}%</strong></td></tr>
+        </table>
+      </div>
+    </div>
+  `;
+  
+  showModal('📄', 'Bill Details', modalContent, [
+    { text: 'Close', type: 'secondary', action: closeModal }
+  ]);
+}
+
+function editSelectedBill() {
+  if (selectedBillIndex === null) {
+    showErrorModal('Please select a bill first');
+    return;
+  }
+  
+  const bill = userBills[selectedBillIndex];
+  
+  const modalContent = `
+    <div style="text-align: left;">
+      <h5 style="color: #1e3a8a; margin-bottom: 1rem;">Edit Bill</h5>
+      <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 1.5rem;">
+        Editing: Bill #${bill['Bill Number']}
+      </p>
+      
+      <div class="mb-3">
+        <label class="form-label">Gross Units *</label>
+        <input type="number" class="form-control" id="editGross" value="${bill['Gross Units'] || ''}">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Import Units *</label>
+        <input type="number" class="form-control" id="editImport" value="${bill['Import Units'] || ''}">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Export Units *</label>
+        <input type="number" class="form-control" id="editExport" value="${bill['Export Units'] || ''}">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Fixed Charges (₹) *</label>
+        <input type="number" class="form-control" id="editFixed" value="${bill['Fixed Charges'] || ''}">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Total Bill (₹) *</label>
+        <input type="number" class="form-control" id="editTotal" value="${bill['Total Bill Amount'] || ''}">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Revision Reason</label>
+        <input type="text" class="form-control" id="editReason" placeholder="Why are you updating this?">
+      </div>
+    </div>
+  `;
+  
+  showModal('✏️', 'Edit Bill', modalContent, [
+    { text: 'Cancel', type: 'secondary', action: closeModal },
+    { text: 'Save Changes', type: 'primary', action: saveEditedBill }
+  ]);
+}
+
+async function saveEditedBill() {
+  const bill = userBills[selectedBillIndex];
+  
+  const updatedData = {
+    billNumber: bill['Bill Number'],
+    meterNumber: bill['Meter Number'],
+    accountNumber: bill['Account Number'],
+    entryType: 'EDIT',
+    revisionReason: document.getElementById('editReason').value || 'Updated by user',
+    grossUnits: parseFloat(document.getElementById('editGross').value),
+    importUnits: parseFloat(document.getElementById('editImport').value),
+    exportUnits: parseFloat(document.getElementById('editExport').value),
+    fixedCharges: parseFloat(document.getElementById('editFixed').value),
+    totalBillAmount: parseFloat(document.getElementById('editTotal').value)
+  };
+  
+  closeModal();
+  
+  const billsList = document.getElementById('billsList');
+  billsList.innerHTML = '<div style="text-align: center; padding: 3rem;"><div class="spinner"></div><p style="margin-top: 1rem; color: #64748b;">Updating bill...</p></div>';
+  
+  try {
+    const response = await fetch('https://n8n-workflow-test.duckdns.org/webhook/solar-update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedData)
+    });
+    
+    const data = await response.json();
+    
+    if (data.status === 'success') {
+      selectedBillIndex = null;
+      await authenticateUserSilent();
+    } else {
+      showErrorModal('Failed to update: ' + (data.message || 'Unknown error'));
+    }
+  } catch (error) {
+    console.error(error);
+    showErrorModal('❌ Connection error');
+  }
+}
+
+function deleteSelectedBill() {
+  if (selectedBillIndex === null) {
+    showErrorModal('Please select a bill first');
+    return;
+  }
+  
+  const bill = userBills[selectedBillIndex];
+  
+  showModal('⚠️', 'Confirm Deletion', `
+    <p>Are you sure you want to delete this bill?</p>
+    <div class="alert alert-danger">
+      <div><strong>Bill #${bill['Bill Number']}</strong></div>
+      <div class="small mt-2">Entered on: ${bill['Entry DateTime'] ? new Date(bill['Entry DateTime']).toLocaleDateString('en-IN') : 'N/A'}</div>
+    </div>
+    <p class="small text-muted">This will mark the bill as inactive.</p>
+  `, [
+    { text: 'Cancel', type: 'secondary', action: closeModal },
+    { text: 'Yes, Delete', type: 'primary', action: confirmDeleteBill }
+  ]);
+}
+
+async function confirmDeleteBill() {
+  const bill = userBills[selectedBillIndex];
+  
+  closeModal();
+  
+  const billsList = document.getElementById('billsList');
+  billsList.innerHTML = '<div style="text-align: center; padding: 3rem;"><div class="spinner"></div><p style="margin-top: 1rem; color: #64748b;">Deleting bill...</p></div>';
+  
+  try {
+    const response = await fetch('https://n8n-workflow-test.duckdns.org/webhook/solar-delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        billNumber: bill['Bill Number'],
+        meterNumber: bill['Meter Number'],
+        accountNumber: bill['Account Number']
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (data.status === 'success') {
+      selectedBillIndex = null;
+      await authenticateUserSilent();
+    } else {
+      showErrorModal('Failed to delete: ' + (data.message || 'Unknown error'));
+    }
+  } catch (error) {
+    console.error(error);
+    showErrorModal('❌ Connection error');
+  }
+}
+
+function logout() {
+  currentUser = null;
+  userBills = [];
+  selectedBillIndex = null;
+  resetIntent();
+}
+
+// ==========================================
+// MODAL FUNCTIONS
+// ==========================================
+function showModal(icon, title, message, buttons) {
+  document.getElementById('modalIcon').textContent = icon;
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalMessage').innerHTML = message;
+  
+  const btnContainer = document.getElementById('modalButtons');
+  btnContainer.innerHTML = '';
+  buttons.forEach(btn => {
+    const button = document.createElement('button');
+    button.className = `btn btn-${btn.type} flex-fill`;
+    button.textContent = btn.text;
+    button.onclick = btn.action;
+    btnContainer.appendChild(button);
+  });
+  
+  document.getElementById('customModal').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('customModal').classList.remove('show');
+}
+
+function showSuccessModal(msg) {
+  showModal('✅', 'Success', msg, [{ text: 'OK', type: 'primary', action: closeModal }]);
+}
+
+function showErrorModal(msg) {
+  showModal('❌', 'Error', msg, [{ text: 'OK', type: 'primary', action: closeModal }]);
+}
+
+// ==========================================
+// HELPERS
+// ==========================================
+function openHelpModal() {
+  alert("Help content will be shown here");
+}
+
+function handleNumericInput(el){
+  // Allow +, digits, spaces
+  el.value = el.value.replace(/[^0-9+\s]/g,"");
+}
+
+function appendPlus(id){
+  const el=document.getElementById(id);
+  if(!el.value.endsWith("+")) el.value+= el.value ? "+" : "";
+  el.focus();
 }
 
 function clearErrors(){
-  document
-    .querySelectorAll(".invalid-feedback")
-    .forEach(e => e.remove());
-
-  document
-    .querySelectorAll(".is-invalid")
-    .forEach(e => e.classList.remove("is-invalid"));
+  document.querySelectorAll(".invalid-feedback").forEach(e => e.remove());
+  document.querySelectorAll(".is-invalid").forEach(e => e.classList.remove("is-invalid"));
 }
-
 
 function parsePlusExpression(input, fieldName) {
   if (!input || !input.trim()) return 0;
 
-  // Allow only digits, + and spaces
   if (!/^[0-9+\s]+$/.test(input)) {
-    throw new Error(
-      fieldName + " can contain only numbers and '+' sign"
-    );
+    throw new Error(fieldName + " can contain only numbers and '+' sign");
   }
 
-  // Remove trailing +
   let cleaned = input.trim().replace(/\+\s*$/, "");
-
   const parts = cleaned.split("+");
   let sum = 0;
 
   for (let part of parts) {
     const val = part.trim();
-    if (val === "") continue;   // <-- silently ignore empty part
+    if (val === "") continue;
     sum += Number(val);
   }
 
   return sum;
 }
 
-
 function resetIntent(){
-
   entryMode = "one";
+  currentUser = null;
+  userBills = [];
+  selectedBillIndex = null;
 
-  // Show intent selector cards again
   document.getElementById("intentSection")?.classList.remove("d-none");
-  
   document.getElementById("helperCards")?.classList.remove("d-none");
   document.getElementById("intentSummary")?.classList.add("d-none");
   document.getElementById("consumptionSection")?.classList.add("d-none");
   document.getElementById("identitySection")?.classList.add("d-none");
   document.getElementById("billPeriodSection")?.classList.add("d-none");
-
+  document.getElementById("authSection")?.classList.add("d-none");
+  document.getElementById("dashboardSection")?.classList.add("d-none");
   document.getElementById("actionBtn")?.classList.add("d-none");
-  
-  // Clear result
   document.getElementById("result").innerHTML = "";
 }
 
-
-/* Validation */
 function validateUnits(){
   clearErrors();
 
@@ -476,7 +1024,6 @@ function validateUnits(){
     i = entryMode === "save" ? Number(importU.value) : parsePlusExpression(importU.value, "Import Units");
     e = entryMode === "save" ? Number(exportU.value) : parsePlusExpression(exportU.value, "Export Units");
   } catch(err) {
-    // Don't block typing; show error only on Calculate
     return;
   }
 
@@ -489,7 +1036,6 @@ function validateUnits(){
   }
 }
 
-
 function markError(el,msg){
   el.classList.add("is-invalid");
   const d=document.createElement("div");
@@ -498,66 +1044,130 @@ function markError(el,msg){
   el.parentNode.appendChild(d);
 }
 
-/* Calculation */
-function calculate(){
+// ==========================================
+// CALCULATION (Save Mode Integration)
+// ==========================================
+async function calculate(){
   if(document.querySelector(".is-invalid")){
     alert("Please correct highlighted fields");
     return;
   }
 
-let g=0, i=0, e=0, f=0, t=0, a=0;
+  let g=0, i=0, e=0, f=0, t=0, a=0;
 
-try {
+  try {
     g = entryMode === "save" ? Number(gross.value) : parsePlusExpression(gross.value, "Gross Units");
     i = entryMode === "save" ? Number(importU.value) : parsePlusExpression(importU.value, "Import Units");
     e = entryMode === "save" ? Number(exportU.value) : parsePlusExpression(exportU.value, "Export Units");
     f = entryMode === "save" ? Number(fixed.value) : parsePlusExpression(fixed.value, "Fixed Charges");
     t = entryMode === "save" ? Number(totalBill.value) : parsePlusExpression(totalBill.value, "Total Bill Amount");
     a = entryMode === "save" ? Number(arrears.value) : parsePlusExpression(arrears.value, "Arrears");
-} catch (err) {
-  alert(err.message);
-  return;
-}
+  } catch (err) {
+    alert(err.message);
+    return;
+  }
 
   const net=i-e;
   const direct=g-i;
   const unitRate=(t-f)/net;
   const without=(g*unitRate)+f;
+  const saving = without - t;
+  const savingPercent = (saving / without) * 100;
 
-const billFromEl = document.getElementById("billFrom");
-const billToEl   = document.getElementById("billTo");
+  const billFromEl = document.getElementById("billFrom");
+  const billToEl   = document.getElementById("billTo");
 
-let days = null;
-let from = null;
-let to = null;
+  let days = null;
+  let from = null;
+  let to = null;
 
-if (billFromEl && billToEl && billFromEl.value && billToEl.value) {
-  from = new Date(billFromEl.value);
-  to = new Date(billToEl.value);
-
-  const diffMs = to - from;
-
-  console.log("From:", billFromEl.value);
-  console.log("To:", billToEl.value);
-
-  if (diffMs > 0) {
-    days = Math.round(diffMs / (1000 * 60 * 60 * 24));
+  if (billFromEl && billToEl && billFromEl.value && billToEl.value) {
+    from = new Date(billFromEl.value);
+    to = new Date(billToEl.value);
+    const diffMs = to - from;
+    if (diffMs > 0) {
+      days = Math.round(diffMs / (1000 * 60 * 60 * 24));
+    }
   }
-}
-let savingPerDay = null;
 
-if (days && days > 0) {
-  savingPerDay = (without - t) / days;
-}
-let annualSaving = null;
+  let savingPerDay = null;
+  if (days && days > 0) {
+    savingPerDay = saving / days;
+  }
 
-if (savingPerDay !== null) {
-  annualSaving = savingPerDay * 365;
-}
+  let annualSaving = null;
+  if (savingPerDay !== null) {
+    annualSaving = savingPerDay * 365;
+  }
 
-  
-result.innerHTML = `
-  <!-- INPUT SUMMARY -->
+  // If save mode, send to n8n
+  if (entryMode === "save") {
+    const billNum = document.getElementById("billNumber").value;
+    const meter = document.getElementById("meter").value;
+    const accountNum = document.getElementById("accountNum").value;
+
+    if (!billNum || !meter || !accountNum) {
+      alert("Please fill Bill Number, Meter Number, and Account Number");
+      return;
+    }
+
+    const webhookData = {
+      billNumber: billNum,
+      meterNumber: meter,
+      accountNumber: accountNum,
+      billPeriod: {
+        from: billFromEl.value,
+        to: billToEl.value,
+        days: days
+      },
+      consumption: {
+        grossUnits: g,
+        importUnits: i,
+        exportUnits: e,
+        directSolarUsed: direct
+      },
+      charges: {
+        fixedCharges: f,
+        totalBillAmount: t,
+        arrears: a,
+        perUnitRate: parseFloat(unitRate.toFixed(2))
+      },
+      calculation: {
+        billWithSolar: t,
+        billWithoutSolar: parseFloat(without.toFixed(2)),
+        totalSaving: parseFloat(saving.toFixed(2)),
+        savingPercentage: parseFloat(savingPercent.toFixed(2)),
+        savingPerDay: savingPerDay ? parseFloat(savingPerDay.toFixed(2)) : null,
+        annualSaving: annualSaving ? parseFloat(annualSaving.toFixed(2)) : null
+      }
+    };
+
+    try {
+      const response = await fetch('https://n8n-workflow-test.duckdns.org/webhook/solar-saving', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(webhookData)
+      });
+
+      if (response.ok) {
+        const data = await response.json().catch(() => ({ status: 'success' }));
+
+        if (data.status === 'error' && data.code === 'DUPLICATE_FOUND') {
+          alert('⚠️ Duplicate bill found! This bill already exists.');
+        } else {
+          alert('✅ Bill saved successfully!');
+        }
+      } else {
+        throw new Error('Server error');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('⚠️ Failed to save. Showing results anyway.');
+    }
+  }
+
+  // Display results
+  result.innerHTML = `
   <div class="result-box">
     <h6>📥 Input Summary</h6>
    <b>Bill Period:</b>
@@ -584,7 +1194,6 @@ ${to ? to.toLocaleDateString("en-IN") : "—"}  |  <b>Total Days:</b> ${days ?? 
     </i>
   </div>
 
-  <!-- COMPARISON -->
   <div class="result-box row text-center">
     <h5 class="text-success">
       💰 Comparison (Bill)
@@ -613,10 +1222,9 @@ ${to ? to.toLocaleDateString("en-IN") : "—"}  |  <b>Total Days:</b> ${days ?? 
     </div>
   </div>
 
-  <!-- SAVINGS -->
   <div class="result-box text-center">
     <h5 class="text-success">
-      💰 Total Saving: ₹${(without - t).toFixed(0)} | ${`<i class="text-muted"> = (₹${without.toFixed(0)} − ₹${t})</i>`}<br>
+      💰 Total Saving: ₹${saving.toFixed(0)} | ${`<i class="text-muted"> = (₹${without.toFixed(0)} − ₹${t})</i>`}<br>
     </h5>
 
   ${days && savingPerDay !== null ? `<b>Saving (Per Day):</b> ₹${savingPerDay.toFixed(0)}<i class="text-muted">
@@ -626,7 +1234,6 @@ ${to ? to.toLocaleDateString("en-IN") : "—"}  |  <b>Total Days:</b> ${days ?? 
 
   </div>
 
-  <!-- WHATSAPP -->
   <button class="btn btn-success w-100 mt-2"
     onclick='shareWhatsApp({
       gross:${g},
@@ -635,12 +1242,11 @@ ${to ? to.toLocaleDateString("en-IN") : "—"}  |  <b>Total Days:</b> ${days ?? 
       direct:${direct},
       withSolar:${t},
       withoutSolar:${without.toFixed(0)},
-      saving:${(without-t).toFixed(0)}
+      saving:${saving.toFixed(0)}
     })'>
     📤 Share Result on WhatsApp
   </button>
 `;
-
 }
 
 function shareWhatsApp(data){
