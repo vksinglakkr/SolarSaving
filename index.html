@@ -354,6 +354,52 @@ background: linear-gradient(135deg, #5568d3 0%, #6a3f91 100%);
     animation: none;
   }
 } 
+/* ==========================================
+   OPTION 2: 2-COLUMN LAYOUT
+   Add this class to container: "two-column-layout"
+   ========================================== */
+
+@media (max-width: 768px) {
+  .two-column-layout .row.g-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+  
+  /* First two cards in 2 columns */
+  .two-column-layout .row.g-3 > .col-md-4:nth-child(1),
+  .two-column-layout .row.g-3 > .col-md-4:nth-child(2) {
+    grid-column: span 1;
+  }
+  
+  /* Third card spans full width */
+  .two-column-layout .row.g-3 > .col-md-4:nth-child(3) {
+    grid-column: span 2;
+  }
+  
+  /* Smaller cards for 2-column */
+  .two-column-layout .intent-card-modern {
+    min-height: 200px;
+    padding: 1.5rem 1rem;
+  }
+  
+  .two-column-layout .intent-icon {
+    font-size: 3rem; /* 48px */
+  }
+  
+  .two-column-layout .intent-title {
+    font-size: 1.1rem; /* 17.6px */
+  }
+  
+  .two-column-layout .intent-desc {
+    font-size: 0.8rem; /* 12.8px */
+  }
+  
+  .two-column-layout .intent-badge {
+    font-size: 0.7rem; /* 11.2px */
+    padding: 0.35rem 0.8rem;
+  }
+}
 </style>
 </head>
 
