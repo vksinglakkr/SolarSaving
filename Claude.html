@@ -544,6 +544,12 @@ function displayResults(results) {
 // ==========================================
 // AUTHENTICATION & DASHBOARD
 // ==========================================
+// ==========================================
+// FIXED authenticateUser() Function
+// Handles response wrapped in array
+// Replace in your HTML around line 490
+// ==========================================
+
 async function authenticateUser() {
   const meter = document.getElementById('authMeter').value.trim();
   const account = document.getElementById('authAccount').value.trim();
@@ -566,12 +572,24 @@ async function authenticateUser() {
       body: JSON.stringify({ meterNumber: meter, accountNumber: account })
     });
     
-    const data = await response.json();
+    let data = await response.json();
+    
+    // FIX: Handle array-wrapped response
+    if (Array.isArray(data)) {
+      console.log('Response is array, extracting first item');
+      data = data[0];
+    }
+    
+    console.log('Processed data:', data);
+    
     document.getElementById('authLoading')?.remove();
     
     if (data.status === 'success' && data.authenticated) {
       currentUser = { meter, account };
       userBills = data.bills || [];
+      
+      console.log('User bills:', userBills);
+      console.log('Bill count:', userBills.length);
       
       showSuccessModal(`✅ Login Successful!<br><br>Found ${data.billCount} bill(s).`);
       
@@ -605,7 +623,6 @@ async function authenticateUser() {
     showErrorModal('❌ Connection error. Please try again.');
   }
 }
-
 function showDashboard() {
   document.getElementById('authSection').classList.add('hidden');
   document.getElementById('dashboardSection').classList.remove('hidden');
