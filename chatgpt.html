@@ -714,6 +714,12 @@ function selectBill(index) {
   });
 }
 
+// ==========================================
+// UPDATED viewSelectedBill() Function
+// Replace in your chatgpt_updated.html
+// Shows bill in calculation result format
+// ==========================================
+
 function viewSelectedBill() {
   if (selectedBillIndex === null) {
     showErrorModal('Please select a bill first');
@@ -722,53 +728,299 @@ function viewSelectedBill() {
   
   const bill = userBills[selectedBillIndex];
   
+  // Extract data from bill
+  const billNum = bill['Bill Number'] || 'N/A';
+  const meterNum = bill['Meter Number'] || 'N/A';
+  const entryDate = bill['Entry DateTime'] ? new Date(bill['Entry DateTime']).toLocaleString('en-IN') : 'N/A';
+  
+  const billFromDate = bill['Bill From Date'] ? new Date(bill['Bill From Date']).toLocaleDateString('en-IN') : '—';
+  const billToDate = bill['Bill To Date'] ? new Date(bill['Bill To Date']).toLocaleDateString('en-IN') : '—';
+  const days = bill['Billing Days'] || '—';
+  
+  const g = parseFloat(bill['Gross Units'] || 0);
+  const i = parseFloat(bill['Import Units'] || 0);
+  const e = parseFloat(bill['Export Units'] || 0);
+  const direct = g - i;
+  
+  const f = parseFloat(bill['Fixed Charges'] || 0);
+  const t = parseFloat(bill['Total Bill Amount'] || 0);
+  const unitRate = parseFloat(bill['Unit Rate'] || 0);
+  
+  const without = parseFloat(bill['Bill Without Solar'] || 0);
+  const saving = parseFloat(bill['Solar Saving Amount'] || 0);
+  const savingPercent = parseFloat(bill['Saving Percentage'] || 0);
+  
+  const savingPerDay = days !== '—' && days > 0 ? (saving / days) : null;
+  const annualSaving = savingPerDay ? savingPerDay * 365 : null;
+  
+  const withoutPerDay = days !== '—' && days > 0 ? (without / days) : null;
+  const withPerDay = days !== '—' && days > 0 ? (t / days) : null;
+  
   const modalContent = `
     <div style="text-align: left;">
-      <h5 style="color: #1e3a8a; margin-bottom: 1.5rem;">Bill Details</h5>
-      
-      <div style="background: #f8fafc; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-        <table class="table table-sm">
-          <tr>
-            <td><strong>Bill Number:</strong></td>
-            <td>${bill['Bill Number'] || 'N/A'}</td>
-          </tr>
-          <tr>
-            <td><strong>Meter Number:</strong></td>
-            <td>${bill['Meter Number'] || 'N/A'}</td>
-          </tr>
-          <tr>
-            <td><strong>Entry Date:</strong></td>
-            <td>${bill['Entry DateTime'] ? new Date(bill['Entry DateTime']).toLocaleString('en-IN') : 'N/A'}</td>
-          </tr>
-        </table>
+      <div style="background: #f8fafc; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid #0b5ed7;">
+        <div style="font-size: 0.85rem; color: #64748b; margin-bottom: 0.5rem;">
+          <strong>Bill Number:</strong> ${billNum} | 
+          <strong>Meter:</strong> ${meterNum}
+        </div>
+        <div style="font-size: 0.75rem; color: #64748b;">
+          Entry Date: ${entryDate}
+        </div>
       </div>
       
-      <h6 style="color: #1e3a8a; margin: 1rem 0;">Consumption</h6>
-      <div style="background: #f8fafc; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-        <table class="table table-sm">
-          <tr><td>Gross Units:</td><td>${bill['Gross Units'] || 0}</td></tr>
-          <tr><td>Import Units:</td><td>${bill['Import Units'] || 0}</td></tr>
-          <tr><td>Export Units:</td><td>${bill['Export Units'] || 0}</td></tr>
-        </table>
+      <!-- INPUT SUMMARY -->
+      <div class="result-box">
+        <h6>📥 Input Summary</h6>
+        <b>Bill Period:</b> ${billFromDate} &nbsp; to &nbsp; ${billToDate} | 
+        <b>Total Days:</b> ${days}<br>
+
+        <b>Gross Units:</b> ${g} <br>
+        <b>Import Units:</b> ${i} &nbsp; | &nbsp;
+        <b>Export Units:</b> ${e} <br>
+
+        <b>Direct Solar Used:</b> ${direct} units  
+        <i class="text-muted">
+          (Gross − Import → electricity used directly from solar during daytime)
+        </i>
+        <hr>
+
+        <b>Fixed Charges:</b> ₹${f} <br>
+        <b>Total Bill Amount:</b> ₹${t} <br>
+
+        <b>Per-Unit Rate:</b> ₹${unitRate.toFixed(2)}  
+        <i class="text-muted">
+          = (Total Bill − Fixed Charges) ÷ (Import − Export)
+        </i>
       </div>
-      
-      <h6 style="color: #1e3a8a; margin: 1rem 0;">Charges & Savings</h6>
-      <div style="background: #f8fafc; padding: 1rem; border-radius: 8px;">
-        <table class="table table-sm">
-          <tr><td>Fixed Charges:</td><td>₹${bill['Fixed Charges'] || 0}</td></tr>
-          <tr><td>Total Bill:</td><td>₹${bill['Total Bill Amount'] || 0}</td></tr>
-          <tr class="table-success"><td><strong>Solar Saving:</strong></td><td><strong>₹${bill['Solar Saving Amount'] || 0}</strong></td></tr>
-          <tr class="table-info"><td><strong>Saving %:</strong></td><td><strong>${bill['Saving Percentage'] || 0}%</strong></td></tr>
-        </table>
+
+      <!-- COMPARISON -->
+      <div class="result-box">
+        <h5 class="text-success text-center">
+          💰 Comparison (Bill)
+        </h5>
+        <div class="row text-center">
+          <div class="col-6 border-end">
+            <h6>❌ Without Solar</h6>
+            <b style="font-size: 1.5rem;">₹${without.toFixed(0)}</b><br>
+
+            <i class="text-muted small">
+              (${g} × ₹${unitRate.toFixed(2)}) + ₹${f}
+            </i><br>
+
+            ${withoutPerDay !== null
+              ? `<b>Per Day:</b> ₹${withoutPerDay.toFixed(0)} / day`
+              : `<span class="text-muted small">Per-day not calculated</span>`
+            }
+          </div>
+
+          <div class="col-6">
+            <h6>☀️ With Solar</h6>
+            <b style="font-size: 1.5rem;">₹${t}</b><br>
+
+            <i class="text-muted small">(Actual bill amount)</i><br>
+
+            ${withPerDay !== null 
+              ? `<b>Per Day:</b> ₹${withPerDay.toFixed(0)} / day` 
+              : `<span class="text-muted small">Per-day not calculated</span>`}
+          </div>
+        </div>
+      </div>
+
+      <!-- SAVINGS -->
+      <div class="result-box text-center">
+        <h5 class="text-success">
+          💰 Total Saving: ₹${saving.toFixed(0)} | 
+          <i class="text-muted small"> = (₹${without.toFixed(0)} − ₹${t})</i>
+        </h5>
+
+        ${savingPerDay !== null 
+          ? `<b>Saving (Per Day):</b> ₹${savingPerDay.toFixed(0)} 
+             <i class="text-muted small">(₹${without.toFixed(0)} − ₹${t}) ÷ ${days} days</i><br>` 
+          : `<span class="text-muted small">Per-day saving not calculated</span><br>`}
+        
+        ${annualSaving !== null 
+          ? `<b>Estimated Yearly Saving:</b> ₹${annualSaving.toFixed(0)} / year 
+             <i class="text-muted small">Based on current bill's daily saving × 365 days</i>` 
+          : ``}
       </div>
     </div>
   `;
   
-  showModal('📄', 'Bill Details', modalContent, [
+  showModal('📄', 'Bill Details - ' + billNum, modalContent, [
+    { text: 'Share on WhatsApp', type: 'success', action: () => shareSelectedBillWhatsApp() },
     { text: 'Close', type: 'secondary', action: closeModal }
   ]);
 }
 
+// ==========================================
+// UPDATED viewSelectedBill() Function
+// Replace in your chatgpt_updated.html
+// Shows bill in calculation result format
+// ==========================================
+
+function viewSelectedBill() {
+  if (selectedBillIndex === null) {
+    showErrorModal('Please select a bill first');
+    return;
+  }
+  
+  const bill = userBills[selectedBillIndex];
+  
+  // Extract data from bill
+  const billNum = bill['Bill Number'] || 'N/A';
+  const meterNum = bill['Meter Number'] || 'N/A';
+  const entryDate = bill['Entry DateTime'] ? new Date(bill['Entry DateTime']).toLocaleString('en-IN') : 'N/A';
+  
+  const billFromDate = bill['Bill From Date'] ? new Date(bill['Bill From Date']).toLocaleDateString('en-IN') : '—';
+  const billToDate = bill['Bill To Date'] ? new Date(bill['Bill To Date']).toLocaleDateString('en-IN') : '—';
+  const days = bill['Billing Days'] || '—';
+  
+  const g = parseFloat(bill['Gross Units'] || 0);
+  const i = parseFloat(bill['Import Units'] || 0);
+  const e = parseFloat(bill['Export Units'] || 0);
+  const direct = g - i;
+  
+  const f = parseFloat(bill['Fixed Charges'] || 0);
+  const t = parseFloat(bill['Total Bill Amount'] || 0);
+  const unitRate = parseFloat(bill['Unit Rate'] || 0);
+  
+  const without = parseFloat(bill['Bill Without Solar'] || 0);
+  const saving = parseFloat(bill['Solar Saving Amount'] || 0);
+  const savingPercent = parseFloat(bill['Saving Percentage'] || 0);
+  
+  const savingPerDay = days !== '—' && days > 0 ? (saving / days) : null;
+  const annualSaving = savingPerDay ? savingPerDay * 365 : null;
+  
+  const withoutPerDay = days !== '—' && days > 0 ? (without / days) : null;
+  const withPerDay = days !== '—' && days > 0 ? (t / days) : null;
+  
+  const modalContent = `
+    <div style="text-align: left;">
+      <div style="background: #f8fafc; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid #0b5ed7;">
+        <div style="font-size: 0.85rem; color: #64748b; margin-bottom: 0.5rem;">
+          <strong>Bill Number:</strong> ${billNum} | 
+          <strong>Meter:</strong> ${meterNum}
+        </div>
+        <div style="font-size: 0.75rem; color: #64748b;">
+          Entry Date: ${entryDate}
+        </div>
+      </div>
+      
+      <!-- INPUT SUMMARY -->
+      <div class="result-box">
+        <h6>📥 Input Summary</h6>
+        <b>Bill Period:</b> ${billFromDate} &nbsp; to &nbsp; ${billToDate} | 
+        <b>Total Days:</b> ${days}<br>
+
+        <b>Gross Units:</b> ${g} <br>
+        <b>Import Units:</b> ${i} &nbsp; | &nbsp;
+        <b>Export Units:</b> ${e} <br>
+
+        <b>Direct Solar Used:</b> ${direct} units  
+        <i class="text-muted">
+          (Gross − Import → electricity used directly from solar during daytime)
+        </i>
+        <hr>
+
+        <b>Fixed Charges:</b> ₹${f} <br>
+        <b>Total Bill Amount:</b> ₹${t} <br>
+
+        <b>Per-Unit Rate:</b> ₹${unitRate.toFixed(2)}  
+        <i class="text-muted">
+          = (Total Bill − Fixed Charges) ÷ (Import − Export)
+        </i>
+      </div>
+
+      <!-- COMPARISON -->
+      <div class="result-box">
+        <h5 class="text-success text-center">
+          💰 Comparison (Bill)
+        </h5>
+        <div class="row text-center">
+          <div class="col-6 border-end">
+            <h6>❌ Without Solar</h6>
+            <b style="font-size: 1.5rem;">₹${without.toFixed(0)}</b><br>
+
+            <i class="text-muted small">
+              (${g} × ₹${unitRate.toFixed(2)}) + ₹${f}
+            </i><br>
+
+            ${withoutPerDay !== null
+              ? `<b>Per Day:</b> ₹${withoutPerDay.toFixed(0)} / day`
+              : `<span class="text-muted small">Per-day not calculated</span>`
+            }
+          </div>
+
+          <div class="col-6">
+            <h6>☀️ With Solar</h6>
+            <b style="font-size: 1.5rem;">₹${t}</b><br>
+
+            <i class="text-muted small">(Actual bill amount)</i><br>
+
+            ${withPerDay !== null 
+              ? `<b>Per Day:</b> ₹${withPerDay.toFixed(0)} / day` 
+              : `<span class="text-muted small">Per-day not calculated</span>`}
+          </div>
+        </div>
+      </div>
+
+      <!-- SAVINGS -->
+      <div class="result-box text-center">
+        <h5 class="text-success">
+          💰 Total Saving: ₹${saving.toFixed(0)} | 
+          <i class="text-muted small"> = (₹${without.toFixed(0)} − ₹${t})</i>
+        </h5>
+
+        ${savingPerDay !== null 
+          ? `<b>Saving (Per Day):</b> ₹${savingPerDay.toFixed(0)} 
+             <i class="text-muted small">(₹${without.toFixed(0)} − ₹${t}) ÷ ${days} days</i><br>` 
+          : `<span class="text-muted small">Per-day saving not calculated</span><br>`}
+        
+        ${annualSaving !== null 
+          ? `<b>Estimated Yearly Saving:</b> ₹${annualSaving.toFixed(0)} / year 
+             <i class="text-muted small">Based on current bill's daily saving × 365 days</i>` 
+          : ``}
+      </div>
+    </div>
+  `;
+  
+  showModal('📄', 'Bill Details - ' + billNum, modalContent, [
+    { text: 'Share on WhatsApp', type: 'success', action: () => shareSelectedBillWhatsApp() },
+    { text: 'Close', type: 'secondary', action: closeModal }
+  ]);
+}
+
+// ==========================================
+// NEW FUNCTION: Share selected bill on WhatsApp
+// Add this function to your script
+// ==========================================
+
+function shareSelectedBillWhatsApp() {
+  if (selectedBillIndex === null) return;
+  
+  const bill = userBills[selectedBillIndex];
+  
+  const g = parseFloat(bill['Gross Units'] || 0);
+  const i = parseFloat(bill['Import Units'] || 0);
+  const e = parseFloat(bill['Export Units'] || 0);
+  const direct = g - i;
+  const t = parseFloat(bill['Total Bill Amount'] || 0);
+  const without = parseFloat(bill['Bill Without Solar'] || 0);
+  const saving = parseFloat(bill['Solar Saving Amount'] || 0);
+  
+  shareWhatsApp({
+    gross: g,
+    importU: i,
+    exportU: e,
+    direct: direct,
+    withSolar: t,
+    withoutSolar: without.toFixed(0),
+    saving: saving.toFixed(0)
+  });
+  
+  closeModal();
+}
+  
 function editSelectedBill() {
   if (selectedBillIndex === null) {
     showErrorModal('Please select a bill first');
