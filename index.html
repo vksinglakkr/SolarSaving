@@ -1564,9 +1564,11 @@ function validateUnits(){
     return;
   }
 
-  if (i > g) {
-    markError(importU, "Import cannot exceed Gross");
-  }
+if (i > g) {
+  showHint(
+    "Import is greater than Gross. Please verify Gross units if this was estimated."
+  );
+}
 }
 
 function markError(el,msg){
