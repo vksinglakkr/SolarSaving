@@ -624,16 +624,36 @@ async function authenticateUser() {
   }
 }
 function showDashboard() {
+  console.log('=== SHOW DASHBOARD ===');
+  console.log('currentUser:', currentUser);
+  console.log('userBills:', userBills);
+  console.log('userBills length:', userBills ? userBills.length : 'undefined');
+  
   document.getElementById('authSection').classList.add('hidden');
   document.getElementById('dashboardSection').classList.remove('hidden');
-  document.getElementById('userInfo').textContent = `Meter: ${currentUser.meter} | Account: ${currentUser.account}`;
+  
+  if (currentUser) {
+    document.getElementById('userInfo').textContent = `Meter: ${currentUser.meter} | Account: ${currentUser.account}`;
+  }
+  
   displayBillsList();
 }
 
 function displayBillsList() {
+  console.log('=== DISPLAY BILLS LIST ===');
+  console.log('userBills:', userBills);
+  console.log('userBills is Array?', Array.isArray(userBills));
+  console.log('userBills length:', userBills ? userBills.length : 'undefined');
+  
   const billsList = document.getElementById('billsList');
   
+  if (!billsList) {
+    console.error('billsList element not found!');
+    return;
+  }
+  
   if (!userBills || userBills.length === 0) {
+    console.log('No bills to display');
     billsList.innerHTML = `
       <div style="text-align: center; padding: 3rem; color: #64748b;">
         <div style="font-size: 3rem; margin-bottom: 1rem;">📭</div>
@@ -643,8 +663,17 @@ function displayBillsList() {
     return;
   }
   
-  const totalSavings = userBills.reduce((sum, bill) => sum + parseFloat(bill['Solar Saving Amount'] || 0), 0);
+  console.log('Displaying', userBills.length, 'bills');
+  
+  const totalSavings = userBills.reduce((sum, bill) => {
+    const saving = parseFloat(bill['Solar Saving Amount'] || 0);
+    console.log('Bill saving:', bill['Bill Number'], saving);
+    return sum + saving;
+  }, 0);
   const avgSaving = totalSavings / userBills.length;
+  
+  console.log('Total savings:', totalSavings);
+  console.log('Avg saving:', avgSaving);
   
   billsList.innerHTML = `
     <div class="stat-grid" style="margin-bottom: 2rem;">
@@ -678,9 +707,13 @@ function displayBillsList() {
       ${userBills.map((bill, index) => createBillCard(bill, index)).join('')}
     </div>
   `;
+  
+  console.log('Bills displayed successfully');
 }
 
 function createBillCard(bill, index) {
+  console.log('Creating card for bill:', bill['Bill Number']);
+  
   const billDate = bill['Entry DateTime'] ? new Date(bill['Entry DateTime']).toLocaleDateString('en-IN') : 'N/A';
   const saving = parseFloat(bill['Solar Saving Amount'] || 0);
   const savingPercent = parseFloat(bill['Saving Percentage'] || 0);
@@ -724,7 +757,6 @@ function createBillCard(bill, index) {
     </div>
   `;
 }
-
 function selectBill(index) {
   selectedBillIndex = index;
   
