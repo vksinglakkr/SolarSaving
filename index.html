@@ -1567,10 +1567,6 @@ function validateUnits(){
   if (i > g) {
     markError(importU, "Import cannot exceed Gross");
   }
-
-  if (e > i) {
-    markError(exportU, "Export cannot exceed Import");
-  }
 }
 
 function markError(el,msg){
