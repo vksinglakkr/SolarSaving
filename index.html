@@ -1641,8 +1641,8 @@ async function calculate() {
           : `<span class="text-muted small">Per-day saving not calculated</span><br>`}
         
         ${annualSaving !== null 
-          ? `<b>Estimated Yearly Saving:</b> ₹${annualSaving.toFixed(0)} / year 
-             <i class="text-muted small">Based on current bill's daily saving × 365 days</i>` 
+          ? `<b>Estimated Yearly Saving:</b> ₹${annualSaving.toFixed(0)} / year <br>
+             <i class="text-muted small">(Based on current bill's daily saving × 365 days)</i>` 
           : ``}
       </div>
 
