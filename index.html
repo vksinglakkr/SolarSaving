@@ -1480,6 +1480,8 @@ async function calculate(){
     f = entryMode === "save" ? Number(fixed.value) : parsePlusExpression(fixed.value, "Fixed Charges");
     t = entryMode === "save" ? Number(totalBill.value) : parsePlusExpression(totalBill.value, "Total Bill Amount");
     a = entryMode === "save" ? Number(arrears.value) : parsePlusExpression(arrears.value, "Arrears");
+    const direct = g - i;
+    const netGridUnits = i - e;
   } catch (err) {
     alert(err.message);
     return;
@@ -1502,6 +1504,7 @@ async function calculate(){
   }
 
 
+
   // If save mode, send to n8n
   if (entryMode === "save") {
     const billNum = document.getElementById("billNumber").value;
@@ -1512,10 +1515,14 @@ async function calculate(){
       alert("Please fill Bill Number, Meter Number, and Account Number");
       return;
     }
-const direct = g - i;
+let unitRate = 0;
+const effectiveUnits = netGridUnits > 0 ? netGridUnits : 0;
+
+if (effectiveUnits > 0) {
+  unitRate = (t - f) / effectiveUnits;
+}
 
 // ---------- GRID + CARRY FORWARD LOGIC ----------
-const netGridUnits = i - e;
 
 // Opening carry forward (Save mode only)
 let openingCarry = 0;
@@ -1539,12 +1546,6 @@ if (adjustedNet > 0) {
   billableUnits = adjustedNet;
 } else {
   closingCarryForward = Math.abs(adjustedNet);
-}
-
-// ---------- UNIT RATE ----------
-let unitRate = 0;
-if (billableUnits > 0) {
-  unitRate = (t - f) / billableUnits;
 }
 
 // ---------- FINAL CALCULATIONS ----------
