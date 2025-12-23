@@ -611,6 +611,20 @@ onblur="validateUnits()">
     +
   </button>
 </div>
+<!-- Opening Carry Forward (Save mode only) -->
+<div id="carryForwardSection" class="mb-2 d-none">
+  <label>
+    Opening Carry Forward Units
+    <small class="text-muted">(from previous bills)</small>
+  </label>
+  <input id="openingCarry"
+         class="form-control"
+         inputmode="numeric"
+         oninput="handleNumericInput(this)">
+  <small class="text-muted">
+    Will be reset automatically at the start of financial year (April)
+  </small>
+</div>
 
   
   <label>Fixed Charges ₹ (e.g. 1605)</label>
@@ -729,6 +743,7 @@ function selectIntent(type){
   const billPeriod = document.getElementById("billPeriodSection");
   const authSection = document.getElementById("authSection");
   const dashboardSection = document.getElementById("dashboardSection");
+  const carrySec = document.getElementById("carryForwardSection");
 
   // Button
   const actionBtn = document.getElementById("actionBtn");
@@ -766,9 +781,12 @@ function selectIntent(type){
     if (type === "save") {
       identity.classList.remove("d-none");
       actionBtn.innerText = "💾 Save & Submit";
+      carrySec.classList.remove("d-none");
     } else {
       identity.classList.add("d-none");
       actionBtn.innerText = "🔍 Calculate Saving";
+      carrySec.classList.add("d-none");
+      document.getElementById("openingCarry").value = "";
     }
 
     actionBtn.classList.remove("d-none");
@@ -1602,9 +1620,8 @@ async function calculate(){
     return;
   }
 
-  const net=i-e;
   const direct=g-i;
-  const unitRate=(t-f)/net;
+ 
   const without=(g*unitRate)+f;
   const saving = without - t;
   const savingPercent = (saving / without) * 100;
@@ -1645,11 +1662,48 @@ async function calculate(){
       alert("Please fill Bill Number, Meter Number, and Account Number");
       return;
     }
+// Opening carry forward (Save mode only)
+let openingCarry = 0;
+if (entryMode === "save") {
+  openingCarry = Number(document.getElementById("openingCarry").value || 0);
+}
+
+// Financial Year reset (April)
+const billMonth = new Date(billFrom.value).getMonth(); // 0=Jan, 3=April
+if (billMonth === 3) {
+  openingCarry = 0;
+}
+
+// Net grid units for this bill
+const netGridUnits = i - e;
+
+// Adjust with previous carry forward
+const adjustedNet = netGridUnits - openingCarry;
+
+// Determine billable units vs carry forward
+let billableUnits = 0;
+let closingCarryForward = 0;
+
+if (adjustedNet > 0) {
+  billableUnits = adjustedNet;
+} else {
+  closingCarryForward = Math.abs(adjustedNet);
+}
+
+// Unit rate ONLY if billable units exist
+let unitRate = 0;
+if (billableUnits > 0) {
+  unitRate = (t - f) / billableUnits;
+}
 
     const webhookData = {
       billNumber: billNum,
       meterNumber: meter,
       accountNumber: accountNum,
+      openingCarryForward: openingCarry,
+      closingCarryForward: closingCarryForward,
+      netGridUnits: netGridUnits,
+      adjustedNetUnits: adjustedNet
       billPeriod: {
         from: billFromEl.value,
         to: billToEl.value,
@@ -1728,6 +1782,13 @@ ${to ? to.toLocaleDateString("en-IN") : "—"}  |  <b>Total Days:</b> ${days ?? 
       = (Total Bill − Fixed Charges) ÷ (Import − Export)
     </i>
   </div>
+  <b>Opening Carry Forward:</b> ${openingCarry} units<br>
+  <b>Closing Carry Forward:</b> ${closingCarryForward} units
+${closingCarryForward > 0 ? 
+  `<div class="alert alert-success mt-2">
+     🔄 ${closingCarryForward} units will be carried forward to next bill
+   </div>` : ``}
+
 
   <div class="result-box row text-center">
     <h5 class="text-success">
