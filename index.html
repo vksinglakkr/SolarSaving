@@ -1146,6 +1146,7 @@ function viewSelectedBill() {
              <i class="text-muted small">Based on current bill's daily saving × 365 days</i>` 
           : ``}
       </div>
+      
     </div>
   `;
   
@@ -1563,7 +1564,7 @@ async function calculate() {
   without = (g * unitRate) + f;
   saving = without - t;
   savingPercent = without > 0 ? (saving / without) * 100 : 0;
-
+  const withPerDay = days !== '—' && days > 0 ? (t / days) : null;
   let savingPerDay = null;
   let annualSaving = null;
 
@@ -1584,36 +1585,65 @@ async function calculate() {
       <b>Import Units:</b> ${i} &nbsp; | &nbsp;
       <b>Export Units:</b> ${e}<br>
       <b>Direct Solar Used:</b> ${direct} units
-      <hr>
+       <i class="text-muted">
+          (Gross − Import → electricity used directly from solar during daytime)
+        </i>
+        <hr>
 
       <b>Fixed Charges:</b> ₹${f}<br>
-      <b>Total Bill:</b> ₹${t}<br>
+      <b>Total Bill Amount:</b> ₹${t}<br>
       <b>Per Unit Rate:</b> ₹${unitRate ? unitRate.toFixed(2) : "—"}
-    </div>
+      <i class="text-muted">
+          = (Total Bill − Fixed Charges) ÷ (Import − Export)
+        </i>    </div>
 
     <div class="result-box row text-center">
-      <div class="col-6 border-end">
-        <h6>❌ Without Solar</h6>
-        <b class="fs-5">₹${without.toFixed(0)}</b><br>
-        ${days ? `₹${(without/days).toFixed(0)} / day` : ``}
-      </div>
-      <div class="col-6">
-        <h6>☀️ With Solar</h6>
-        <b class="fs-5">₹${t}</b><br>
-        ${days ? `₹${(t/days).toFixed(0)} / day` : ``}
-      </div>
+        <h5 class="text-success text-center">
+          💰 Comparison (Bill)
+        </h5>
+          <div class="col-6 border-end">
+            <h6>❌ Without Solar</h6>
+            <b style="font-size: 1.5rem;">₹${without.toFixed(0)}</b><br>
+
+            <i class="text-muted small">
+              (${g} × ₹${unitRate.toFixed(2)}) + ₹${f}
+            </i><br>
+
+            ${withoutPerDay !== null
+              ? `<b>Per Day:</b> ₹${(without/days).toFixed(0)} / day`
+              : `<span class="text-muted small">Per-day not calculated</span>`
+            }
+          </div>
+          <div class="col-6">
+            <h6>☀️ With Solar</h6>
+            <b style="font-size: 1.5rem;">₹${t}</b><br>
+
+            <i class="text-muted small">(Actual bill amount)</i><br>
+
+            ${withPerDay !== null 
+              ? `<b>Per Day:</b> ₹${(t/days).toFixed(0)} / day` 
+              : `<span class="text-muted small">Per-day not calculated</span>`}
+          </div>
     </div>
 
-    <div class="result-box text-center">
-      <h5 class="text-success">
-        💰 Saving: ₹${saving.toFixed(0)} (${savingPercent.toFixed(1)}%)
-      </h5>
-      ${savingPerDay ? `<b>Per Day:</b> ₹${savingPerDay.toFixed(0)}` : ``}
-      ${annualSaving ? `<br><b>Estimated Yearly:</b> ₹${annualSaving.toFixed(0)}` : ``}
-      ${closingCarryForward > 0 ? `<div class="alert alert-success mt-2">
-        🔄 ${closingCarryForward} units will be carried forward
-      </div>` : ``}
-    </div>
+
+      <!-- SAVINGS -->
+      <div class="result-box text-center">
+        <h5 class="text-success">
+          💰 Total Saving: ₹${saving.toFixed(0)} | 
+          <i class="text-muted small"> = (₹${without.toFixed(0)} − ₹${t})</i>
+        </h5>
+
+        ${savingPerDay !== null 
+          ? `<b>Saving (Per Day):</b> ₹${savingPerDay.toFixed(0)} 
+             <i class="text-muted small">(₹${without.toFixed(0)} − ₹${t}) ÷ ${days} days</i><br>` 
+          : `<span class="text-muted small">Per-day saving not calculated</span><br>`}
+        
+        ${annualSaving !== null 
+          ? `<b>Estimated Yearly Saving:</b> ₹${annualSaving.toFixed(0)} / year 
+             <i class="text-muted small">Based on current bill's daily saving × 365 days</i>` 
+          : ``}
+      </div>
 
     <button class="btn btn-success w-100 mt-2"
       onclick='shareWhatsApp({
