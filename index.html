@@ -1462,23 +1462,29 @@ function markError(el,msg){
   el.parentNode.appendChild(d);
 }
 
-// ==========================================
-// CALCULATION (Save Mode Integration)
-// ==========================================
-async function calculate(){
-  if(document.querySelector(".is-invalid")){
+async function calculate() {
+
+  // ---------- BASIC VALIDATION ----------
+  if (document.querySelector(".is-invalid")) {
     alert("Please correct highlighted fields");
     return;
   }
 
+  // ---------- DECLARATIONS ----------
   let g=0, i=0, e=0, f=0, t=0, a=0;
   let direct = 0;
   let netGridUnits = 0;
-  let unitRate = 0;
-  let billableUnits = 0;
+
   let openingCarry = 0;
   let closingCarryForward = 0;
-  let without =0;
+  let billableUnits = 0;
+
+  let unitRate = 0;
+  let without = 0;
+  let saving = 0;
+  let savingPercent = 0;
+
+  // ---------- PARSE INPUTS ----------
   try {
     g = entryMode === "save" ? Number(gross.value) : parsePlusExpression(gross.value, "Gross Units");
     i = entryMode === "save" ? Number(importU.value) : parsePlusExpression(importU.value, "Import Units");
@@ -1486,13 +1492,16 @@ async function calculate(){
     f = entryMode === "save" ? Number(fixed.value) : parsePlusExpression(fixed.value, "Fixed Charges");
     t = entryMode === "save" ? Number(totalBill.value) : parsePlusExpression(totalBill.value, "Total Bill Amount");
     a = entryMode === "save" ? Number(arrears.value) : parsePlusExpression(arrears.value, "Arrears");
+
     direct = g - i;
     netGridUnits = i - e;
+
   } catch (err) {
     alert(err.message);
     return;
   }
 
+  // ---------- BILL PERIOD (OPTIONAL) ----------
   const billFromEl = document.getElementById("billFrom");
   const billToEl   = document.getElementById("billTo");
 
@@ -1500,252 +1509,127 @@ async function calculate(){
   let from = null;
   let to = null;
 
-  if (billFromEl && billToEl && billFromEl.value && billToEl.value) {
+  if (billFromEl?.value && billToEl?.value) {
     from = new Date(billFromEl.value);
-    to = new Date(billToEl.value);
+    to   = new Date(billToEl.value);
     const diffMs = to - from;
     if (diffMs > 0) {
       days = Math.round(diffMs / (1000 * 60 * 60 * 24));
     }
   }
-// =====================
-// ONE-TIME CALCULATION
-// =====================
-if (entryMode === "one") {
 
-  if (netGridUnits <= 0) {
-    alert("No billable units (net export). Saving cannot be estimated accurately.");
-    return;
-  }
+  // =================================================
+  // MODE 1: ONE-TIME QUICK CALCULATION
+  // =================================================
+  if (entryMode === "one") {
 
-  billableUnits = netGridUnits;
-  unitRate = (t - f) / billableUnits;
-}
-
-if (entryMode === "save") {
-
-  openingCarry = Number(openingCarryInput.value || 0);
-
-  // April reset
-  if (billFrom.value) {
-    const m = new Date(billFrom.value).getMonth();
-    if (m === 3) openingCarry = 0;
-  }
-
-  const adjustedNet = netGridUnits - openingCarry;
-
-  if (adjustedNet > 0) {
-    billableUnits = adjustedNet;
-  } else {
-    closingCarryForward = Math.abs(adjustedNet);
-    billableUnits = 0;
-  }
-
-  if (billableUnits > 0) {
-    unitRate = (t - f) / billableUnits;
-  }
-}  
-
-
-  // If save mode, send to n8n
-  if (entryMode === "save") {
-    const billNum = document.getElementById("billNumber").value;
-    const meter = document.getElementById("meter").value;
-    const accountNum = document.getElementById("accountNum").value;
-
-    if (!billNum || !meter || !accountNum) {
-      alert("Please fill Bill Number, Meter Number, and Account Number");
+    if (netGridUnits <= 0) {
+      alert("Net export detected. Saving cannot be estimated accurately in one-time mode.");
       return;
     }
-// ---------- GRID + CARRY FORWARD LOGIC ----------
 
-// Opening carry forward (Save mode only)
-let openingCarry = 0;
-if (entryMode === "save") {
-  openingCarry = Number(document.getElementById("openingCarry").value || 0);
-}
-
-// Reset carry forward in April
-const billMonth = new Date(billFrom.value).getMonth(); // April = 3
-if (billMonth === 3) {
-  openingCarry = 0;
-}
-
-// Adjust with carry forward
-const adjustedNet = netGridUnits - openingCarry;
-
-let billableUnits = 0;
-let closingCarryForward = 0;
-
-if (adjustedNet > 0) {
-  billableUnits = adjustedNet;
-} else {
-  closingCarryForward = Math.abs(adjustedNet);
-}
-
-// ---------- FINAL CALCULATIONS ----------
-const without = (g * unitRate) + f;
-const saving = without - t;
-const savingPercent = without > 0 ? (saving / without) * 100 : 0;
-  let savingPerDay = null;
-  if (days && days > 0) {
-    savingPerDay = saving / days;
+    billableUnits = netGridUnits;
+    unitRate = (t - f) / billableUnits;
   }
 
-  let annualSaving = null;
-  if (savingPerDay !== null) {
-    annualSaving = savingPerDay * 365;
-  }
-    
+  // =================================================
+  // MODE 2: SAVE FOR FUTURE (WITH CARRY FORWARD)
+  // =================================================
+  if (entryMode === "save") {
 
-    const webhookData = {
-      billNumber: billNum,
-      meterNumber: meter,
-      accountNumber: accountNum,
-      openingCarryForward: openingCarry,
-      closingCarryForward: closingCarryForward,
-      netGridUnits: netGridUnits,
-      adjustedNetUnits: adjustedNet,
-      billPeriod: {
-        from: billFromEl.value,
-        to: billToEl.value,
-        days: days
-      },
-      consumption: {
-        grossUnits: g,
-        importUnits: i,
-        exportUnits: e,
-        directSolarUsed: direct
-      },
-      charges: {
-        fixedCharges: f,
-        totalBillAmount: t,
-        arrears: a,
-        perUnitRate: parseFloat(unitRate.toFixed(2))
-      },
-      calculation: {
-        billWithSolar: t,
-        billWithoutSolar: parseFloat(without.toFixed(2)),
-        totalSaving: parseFloat(saving.toFixed(2)),
-        savingPercentage: parseFloat(savingPercent.toFixed(2)),
-        savingPerDay: savingPerDay ? parseFloat(savingPerDay.toFixed(2)) : null,
-        annualSaving: annualSaving ? parseFloat(annualSaving.toFixed(2)) : null
-      }
-    };
+    openingCarry = Number(document.getElementById("openingCarry")?.value || 0);
 
-    try {
-      const response = await fetch('https://n8n-workflow-test.duckdns.org/webhook/solar-saving', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(webhookData)
-      });
+    // Financial year reset (April)
+    if (billFromEl?.value) {
+      const month = new Date(billFromEl.value).getMonth();
+      if (month === 3) openingCarry = 0;
+    }
 
-      if (response.ok) {
-        const data = await response.json().catch(() => ({ status: 'success' }));
+    const adjustedNet = netGridUnits - openingCarry;
 
-        if (data.status === 'error' && data.code === 'DUPLICATE_FOUND') {
-          alert('⚠️ Duplicate bill found! This bill already exists.');
-        } else {
-          alert('✅ Bill saved successfully!');
-        }
-      } else {
-        throw new Error('Server error');
-      }
-    } catch (error) {
-      console.error(error);
-      alert('⚠️ Failed to save. Showing results anyway.');
+    if (adjustedNet > 0) {
+      billableUnits = adjustedNet;
+    } else {
+      billableUnits = 0;
+      closingCarryForward = Math.abs(adjustedNet);
+    }
+
+    if (billableUnits > 0) {
+      unitRate = (t - f) / billableUnits;
     }
   }
 
-  // Display results
+  // ---------- FINAL CALCULATIONS ----------
+  without = (g * unitRate) + f;
+  saving = without - t;
+  savingPercent = without > 0 ? (saving / without) * 100 : 0;
+
+  let savingPerDay = null;
+  let annualSaving = null;
+
+  if (days && days > 0) {
+    savingPerDay = saving / days;
+    annualSaving = savingPerDay * 365;
+  }
+
+  // ---------- DISPLAY RESULT ----------
   result.innerHTML = `
-  <div class="result-box">
-    <h6>📥 Input Summary</h6>
-   <b>Bill Period:</b>
-${from ? from.toLocaleDateString("en-IN") : "—"}
-&nbsp; to &nbsp;
-${to ? to.toLocaleDateString("en-IN") : "—"}  |  <b>Total Days:</b> ${days ?? "—"}<br>
+    <div class="result-box">
+      <h6>📥 Input Summary</h6>
+      <b>Bill Period:</b> ${from ? from.toLocaleDateString("en-IN") : "—"}
+      to ${to ? to.toLocaleDateString("en-IN") : "—"}
+      | <b>Days:</b> ${days ?? "—"}<br><br>
 
-    <b>Gross Units:</b> ${g} <br>
-    <b>Import Units:</b> ${i} &nbsp; | &nbsp;
-    <b>Export Units:</b> ${e} <br>
+      <b>Gross Units:</b> ${g}<br>
+      <b>Import Units:</b> ${i} &nbsp; | &nbsp;
+      <b>Export Units:</b> ${e}<br>
+      <b>Direct Solar Used:</b> ${direct} units
+      <hr>
 
-    <b>Direct Solar Used:</b> ${direct} units  
-    <i class="text-muted">
-      (Gross − Import → electricity used directly from solar during daytime)
-    </i>
-    <hr>
-
-    <b>Fixed Charges:</b> ₹${f} <br>
-    <b>Total Bill Amount:</b> ₹${t} <br>
-
-  <b>Per-Unit Rate:</b> ₹${unitRate ? unitRate.toFixed(2) : "—"}
-    <i class="text-muted">
-      = (Total Bill − Fixed Charges) ÷ (Import − Export)
-    </i>
-  </div>
-  <b>Opening Carry Forward:</b> ${openingCarry} units<br>
-  <b>Closing Carry Forward:</b> ${closingCarryForward} units
-${closingCarryForward > 0 ? 
-  `<div class="alert alert-success mt-2">
-     🔄 ${closingCarryForward} units will be carried forward to next bill
-   </div>` : ``}
-
-
-  <div class="result-box row text-center">
-    <h5 class="text-success">
-      💰 Comparison (Bill)
-    </h5>
-    <div class="col-6 border-end">
-      <h6>❌ Without Solar</h6>
-      <b class="fs-5">₹${without.toFixed(0)}</b><br>
-
-      <i class="text-muted">
-        (${g} × ₹${unitRate.toFixed(2)}) + ₹${f}
-      </i><br>
-
-      ${days
-        ? `<b>Per Day:</b> ₹${(without/days).toFixed(0)} / day`
-        : `<span class="text-muted">Per-day not calculated</span>`
-      }
+      <b>Fixed Charges:</b> ₹${f}<br>
+      <b>Total Bill:</b> ₹${t}<br>
+      <b>Per Unit Rate:</b> ₹${unitRate ? unitRate.toFixed(2) : "—"}
     </div>
 
-    <div class="col-6">
-      <h6>☀️ With Solar</h6>
-      <b class="fs-5">₹${t}</b><br>
-
-      <i class="text-muted">(Actual bill amount)</i><br>
-
-      ${days ? `<b>Per Day:</b> ₹${(t/days).toFixed(0)} / day` : `<span class="text-muted">Per-day not calculated</span>`}
+    <div class="result-box row text-center">
+      <div class="col-6 border-end">
+        <h6>❌ Without Solar</h6>
+        <b class="fs-5">₹${without.toFixed(0)}</b><br>
+        ${days ? `₹${(without/days).toFixed(0)} / day` : ``}
+      </div>
+      <div class="col-6">
+        <h6>☀️ With Solar</h6>
+        <b class="fs-5">₹${t}</b><br>
+        ${days ? `₹${(t/days).toFixed(0)} / day` : ``}
+      </div>
     </div>
-  </div>
 
-  <div class="result-box text-center">
-    <h5 class="text-success">
-      💰 Total Saving: ₹${saving.toFixed(0)} | ${`<i class="text-muted"> = (₹${without.toFixed(0)} − ₹${t})</i>`}<br>
-    </h5>
+    <div class="result-box text-center">
+      <h5 class="text-success">
+        💰 Saving: ₹${saving.toFixed(0)} (${savingPercent.toFixed(1)}%)
+      </h5>
+      ${savingPerDay ? `<b>Per Day:</b> ₹${savingPerDay.toFixed(0)}` : ``}
+      ${annualSaving ? `<br><b>Estimated Yearly:</b> ₹${annualSaving.toFixed(0)}` : ``}
+      ${closingCarryForward > 0 ? `<div class="alert alert-success mt-2">
+        🔄 ${closingCarryForward} units will be carried forward
+      </div>` : ``}
+    </div>
 
-  ${days && savingPerDay !== null ? `<b>Saving (Per Day):</b> ₹${savingPerDay.toFixed(0)}<i class="text-muted">
-       (₹${without.toFixed(0)} − ₹${t}) ÷ ${days} days </i>` : `<span class="text-muted">Per-day saving not calculated</span>`}<br>
-  ${days && annualSaving !== null ? `<b>Estimated Yearly Saving:</b> ₹${annualSaving.toFixed(0)} / year<b><i class="text-muted">
-       Based on current bill's daily saving x 365 days </i>` : ``}
-
-  </div>
-
-  <button class="btn btn-success w-100 mt-2"
-    onclick='shareWhatsApp({
-      gross:${g},
-      importU:${i},
-      exportU:${e},
-      direct:${direct},
-      withSolar:${t},
-      withoutSolar:${without.toFixed(0)},
-      saving:${saving.toFixed(0)}
-    })'>
-    📤 Share Result on WhatsApp
-  </button>
-`;
+    <button class="btn btn-success w-100 mt-2"
+      onclick='shareWhatsApp({
+        gross:${g},
+        importU:${i},
+        exportU:${e},
+        direct:${direct},
+        withSolar:${t},
+        withoutSolar:${without.toFixed(0)},
+        saving:${saving.toFixed(0)}
+      })'>
+      📤 Share on WhatsApp
+    </button>
+  `;
 }
+
 
 
 function shareWhatsApp(data){
