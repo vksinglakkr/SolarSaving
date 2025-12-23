@@ -1565,6 +1565,7 @@ async function calculate() {
   saving = without - t;
   savingPercent = without > 0 ? (saving / without) * 100 : 0;
   const withPerDay = days !== '—' && days > 0 ? (t / days) : null;
+  const withoutPerDay = days !== '—' && days > 0 ? (without / days) : null;
   let savingPerDay = null;
   let annualSaving = null;
 
