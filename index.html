@@ -1483,10 +1483,10 @@ function markError(el,msg){
 }
 
 // ==========================================
-// CORRECTED calculate() FUNCTION
-// Fixes: 1) Surplus unit rate calculation
-//        2) Days calculation (off-by-one)
-//        3) Proper savings estimation
+// COMPLETE FIXED calculate() FUNCTION
+// With: 1) Surplus unit rate fix
+//       2) Days calculation fix
+//       3) PROMINENT CARRY FORWARD DISPLAY
 // ==========================================
 
 async function calculate() {
@@ -1507,7 +1507,7 @@ async function calculate() {
   let billableUnits = 0;
 
   let unitRate = 0;
-  let estimatedRate = 0; // NEW: For savings calculation
+  let estimatedRate = 0;
   let without = 0;
   let saving = 0;
   let savingPercent = 0;
@@ -1542,7 +1542,6 @@ async function calculate() {
     to   = new Date(billToEl.value);
     const diffMs = to - from;
     if (diffMs > 0) {
-      // FIX: Add 1 to include both start and end dates
       days = Math.round(diffMs / (1000 * 60 * 60 * 24)) + 1;
     }
   }
@@ -1561,7 +1560,6 @@ async function calculate() {
     unitRate = (t - f) / billableUnits;
     estimatedRate = unitRate;
     
-    // Calculate for one-time mode
     without = (g * estimatedRate) + f;
     saving = without - t;
     savingPercent = without > 0 ? (saving / without) * 100 : 0;
@@ -1572,9 +1570,6 @@ async function calculate() {
   // =================================================
   if (entryMode === "save") {
 
-    // ========================================
-    // VALIDATION: Check required fields FIRST
-    // ========================================
     const billNum = document.getElementById("billNumber")?.value;
     const meter = document.getElementById("meter")?.value;
     const accountNum = document.getElementById("accountNum")?.value;
@@ -1584,12 +1579,8 @@ async function calculate() {
       return;
     }
 
-    // ========================================
-    // CARRY FORWARD CALCULATIONS
-    // ========================================
     openingCarry = Number(document.getElementById("openingCarry")?.value || 0);
 
-    // Financial year reset (April)
     if (billFromEl?.value) {
       const month = new Date(billFromEl.value).getMonth();
       if (month === 3) openingCarry = 0;
@@ -1605,32 +1596,18 @@ async function calculate() {
       closingCarryForward = Math.abs(adjustedNet);
     }
 
-    // ========================================
-    // UNIT RATE CALCULATION (FIXED FOR SURPLUS)
-    // ========================================
     if (billableUnits > 0) {
-      // Normal month - calculate rate from bill
       unitRate = (t - f) / billableUnits;
       estimatedRate = unitRate;
     } else {
-      // Surplus month - use standard Haryana rate
-      unitRate = 0; // No energy charges this month
-      estimatedRate = 6.50; // Standard UHBVN residential rate
-      
-      // Alternative: Use user's last known rate if available
-      // estimatedRate = parseFloat(localStorage.getItem('lastUnitRate')) || 6.50;
+      unitRate = 0;
+      estimatedRate = 6.50;
     }
 
-    // ========================================
-    // SAVINGS CALCULATION (ALWAYS USE ESTIMATED RATE)
-    // ========================================
     without = (g * estimatedRate) + f;
     saving = without - t;
     savingPercent = without > 0 ? (saving / without) * 100 : 0;
 
-    // ========================================
-    // SAVE TO n8n WEBHOOK
-    // ========================================
     const webhookData = {
       billNumber: billNum,
       meterNumber: meter,
@@ -1651,7 +1628,7 @@ async function calculate() {
         totalBillAmount: t,
         arrears: a,
         perUnitRate: unitRate ? parseFloat(unitRate.toFixed(2)) : 0,
-        estimatedRate: parseFloat(estimatedRate.toFixed(2)) // NEW: Send estimated rate
+        estimatedRate: parseFloat(estimatedRate.toFixed(2))
       },
       calculation: {
         billWithSolar: t,
@@ -1669,7 +1646,7 @@ async function calculate() {
       }
     };
 
-    console.log("Sending to webhook:", webhookData); // Debug log
+    console.log("Sending to webhook:", webhookData);
 
     try {
       const response = await fetch('https://n8n-workflow-test.duckdns.org/webhook/solar-saving', {
@@ -1680,18 +1657,17 @@ async function calculate() {
         body: JSON.stringify(webhookData)
       });
 
-      console.log("Response status:", response.status); // Debug log
+      console.log("Response status:", response.status);
 
       if (response.ok) {
         const data = await response.json().catch(() => ({ status: 'success' }));
-        console.log("Response data:", data); // Debug log
+        console.log("Response data:", data);
 
         if (data.status === 'error' && data.code === 'DUPLICATE_FOUND') {
           alert('⚠️ Duplicate bill found! This bill already exists.');
-          return; // Don't show results if duplicate
+          return;
         }
         
-        // Success! Continue to show modal
         console.log("✅ Bill saved successfully");
         
       } else {
@@ -1700,7 +1676,6 @@ async function calculate() {
     } catch (error) {
       console.error("Webhook error:", error);
       alert('⚠️ Failed to save to server: ' + error.message + '\n\nShowing results anyway.');
-      // Continue to show results even if save failed
     }
   }
 
@@ -1716,7 +1691,7 @@ async function calculate() {
   }
 
   // ========================================
-  // BUILD MODAL CONTENT (WITH IMPROVED DISPLAY)
+  // BUILD MODAL CONTENT - WITH CARRY FORWARD!
   // ========================================
   const modalContent = `
     <div style="text-align: left;">
@@ -1750,6 +1725,58 @@ async function calculate() {
         ${billableUnits === 0 ? '<br><b>Estimated Rate Used:</b> ₹' + estimatedRate.toFixed(2) + ' <i class="text-muted">(for savings comparison)</i>' : ''}
         ${billableUnits > 0 ? '<br><i class="text-muted">= (Total Bill − Fixed Charges) ÷ Billable Units</i>' : ''}
       </div>
+
+      <!-- GRID SUPPLY & CARRY FORWARD -->
+      ${entryMode === "save" ? `
+      <div class="result-box" style="background: ${closingCarryForward > 0 ? '#f0fdf4' : '#f8fafc'}; border-left: 4px solid ${closingCarryForward > 0 ? '#22c55e' : '#94a3b8'};">
+        <h6>⚡ Grid Supply & Carry Forward</h6>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 0.5rem;">
+          <div>
+            <b>Import from Grid:</b> ${i} units<br>
+            <b>Export to Grid:</b> ${e} units
+          </div>
+          <div>
+            <b>Net Grid Units:</b> ${netGridUnits} units<br>
+            <i class="text-muted small">(Import − Export)</i>
+          </div>
+        </div>
+
+        <hr>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div>
+            <b>Opening Carry:</b> ${openingCarry} units<br>
+            <i class="text-muted small">(From previous month)</i>
+          </div>
+          <div>
+            <b>Billable Units:</b> ${billableUnits} units<br>
+            <i class="text-muted small">(What you pay for)</i>
+          </div>
+        </div>
+
+        ${closingCarryForward > 0 ? `
+        <div style="background: #dcfce7; padding: 1rem; border-radius: 8px; margin-top: 1rem; border: 2px solid #22c55e;">
+          <div style="text-align: center;">
+            <h5 style="color: #15803d; margin-bottom: 0.5rem;">
+              🎉 Surplus Generation!
+            </h5>
+            <div style="font-size: 2rem; font-weight: bold; color: #15803d;">
+              ${closingCarryForward} units
+            </div>
+            <div style="font-size: 0.9rem; color: #166534; margin-top: 0.5rem;">
+              <strong>Closing Carry Forward</strong><br>
+              Credit for next month's bill
+            </div>
+            <div style="font-size: 0.85rem; color: #65a30d; margin-top: 0.75rem; padding: 0.5rem; background: rgba(255,255,255,0.5); border-radius: 6px;">
+              💡 These ${closingCarryForward} units will reduce your next month's billing!<br>
+              Estimated value: ₹${(closingCarryForward * estimatedRate).toFixed(0)} @ ₹${estimatedRate.toFixed(2)}/unit
+            </div>
+          </div>
+        </div>
+        ` : ''}
+      </div>
+      ` : ''}
 
       <!-- COMPARISON -->
       <div class="result-box">
@@ -1801,10 +1828,10 @@ async function calculate() {
              <i class="text-muted small">Based on current bill's daily saving × 365 days</i>` 
           : ``}
         
-        ${billableUnits === 0 
-          ? `<br><br><div class="alert alert-info" style="font-size: 0.9rem; margin-top: 1rem;">
-             <strong>ℹ️ Surplus Month:</strong> Your solar generated more than you consumed! 
-             The estimated savings use Haryana's standard rate (₹${estimatedRate.toFixed(2)}/unit) for comparison.
+        ${closingCarryForward > 0
+          ? `<br><br><div class="alert alert-success" style="font-size: 0.9rem; margin-top: 1rem;">
+             <strong>🌟 Bonus Benefit:</strong> Your ${closingCarryForward} units carry forward 
+             will provide additional savings of approximately ₹${(closingCarryForward * estimatedRate).toFixed(0)} in next month's bill!
              </div>` 
           : ''}
       </div>
@@ -1815,7 +1842,6 @@ async function calculate() {
   // SHOW MODAL WITH RESULTS
   // ========================================
   
-  // Store calculation data for WhatsApp sharing
   window.lastCalculation = {
     gross: g,
     importU: i,
