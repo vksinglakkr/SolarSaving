@@ -1478,6 +1478,7 @@ async function calculate(){
   let billableUnits = 0;
   let openingCarry = 0;
   let closingCarryForward = 0;
+  let without =0;
   try {
     g = entryMode === "save" ? Number(gross.value) : parsePlusExpression(gross.value, "Gross Units");
     i = entryMode === "save" ? Number(importU.value) : parsePlusExpression(importU.value, "Import Units");
