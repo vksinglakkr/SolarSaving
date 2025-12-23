@@ -1472,7 +1472,8 @@ async function calculate(){
   }
 
   let g=0, i=0, e=0, f=0, t=0, a=0;
-
+  let direct = 0;
+  let netGridUnits = 0;
   try {
     g = entryMode === "save" ? Number(gross.value) : parsePlusExpression(gross.value, "Gross Units");
     i = entryMode === "save" ? Number(importU.value) : parsePlusExpression(importU.value, "Import Units");
@@ -1480,8 +1481,8 @@ async function calculate(){
     f = entryMode === "save" ? Number(fixed.value) : parsePlusExpression(fixed.value, "Fixed Charges");
     t = entryMode === "save" ? Number(totalBill.value) : parsePlusExpression(totalBill.value, "Total Bill Amount");
     a = entryMode === "save" ? Number(arrears.value) : parsePlusExpression(arrears.value, "Arrears");
-    const direct = g - i;
-    const netGridUnits = i - e;
+    direct = g - i;
+    netGridUnits = i - e;
   } catch (err) {
     alert(err.message);
     return;
