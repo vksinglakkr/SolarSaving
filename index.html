@@ -1485,12 +1485,6 @@ async function calculate(){
     return;
   }
 
-  const direct=g-i;
- 
-  const without=(g*unitRate)+f;
-  const saving = without - t;
-  const savingPercent = (saving / without) * 100;
-
   const billFromEl = document.getElementById("billFrom");
   const billToEl   = document.getElementById("billTo");
 
@@ -1527,25 +1521,26 @@ async function calculate(){
       alert("Please fill Bill Number, Meter Number, and Account Number");
       return;
     }
+const direct = g - i;
+
+// ---------- GRID + CARRY FORWARD LOGIC ----------
+const netGridUnits = i - e;
+
 // Opening carry forward (Save mode only)
 let openingCarry = 0;
 if (entryMode === "save") {
   openingCarry = Number(document.getElementById("openingCarry").value || 0);
 }
 
-// Financial Year reset (April)
-const billMonth = new Date(billFrom.value).getMonth(); // 0=Jan, 3=April
+// Reset carry forward in April
+const billMonth = new Date(billFrom.value).getMonth(); // April = 3
 if (billMonth === 3) {
   openingCarry = 0;
 }
 
-// Net grid units for this bill
-const netGridUnits = i - e;
-
-// Adjust with previous carry forward
+// Adjust with carry forward
 const adjustedNet = netGridUnits - openingCarry;
 
-// Determine billable units vs carry forward
 let billableUnits = 0;
 let closingCarryForward = 0;
 
@@ -1555,11 +1550,16 @@ if (adjustedNet > 0) {
   closingCarryForward = Math.abs(adjustedNet);
 }
 
-// Unit rate ONLY if billable units exist
+// ---------- UNIT RATE ----------
 let unitRate = 0;
 if (billableUnits > 0) {
   unitRate = (t - f) / billableUnits;
 }
+
+// ---------- FINAL CALCULATIONS ----------
+const without = (g * unitRate) + f;
+const saving = without - t;
+const savingPercent = without > 0 ? (saving / without) * 100 : 0;
 
     const webhookData = {
       billNumber: billNum,
