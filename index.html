@@ -1484,9 +1484,9 @@ function markError(el,msg){
 
 // ==========================================
 // CORRECTED calculate() FUNCTION
-// Fixed: 1) Syntax error in alert
-//        2) Webhook execution flow
-// Replace lines 1491-1780 in your HTML
+// Fixes: 1) Surplus unit rate calculation
+//        2) Days calculation (off-by-one)
+//        3) Proper savings estimation
 // ==========================================
 
 async function calculate() {
@@ -1507,6 +1507,7 @@ async function calculate() {
   let billableUnits = 0;
 
   let unitRate = 0;
+  let estimatedRate = 0; // NEW: For savings calculation
   let without = 0;
   let saving = 0;
   let savingPercent = 0;
@@ -1541,7 +1542,8 @@ async function calculate() {
     to   = new Date(billToEl.value);
     const diffMs = to - from;
     if (diffMs > 0) {
-      days = Math.round(diffMs / (1000 * 60 * 60 * 24));
+      // FIX: Add 1 to include both start and end dates
+      days = Math.round(diffMs / (1000 * 60 * 60 * 24)) + 1;
     }
   }
 
@@ -1551,16 +1553,16 @@ async function calculate() {
   if (entryMode === "one") {
 
     if (netGridUnits <= 0) {
-      // FIXED: Proper multi-line string
       alert("This month has surplus solar generation.\n\nPlease use 'Save for future reference' to track carry-forward benefits.");
       return;
     }
 
     billableUnits = netGridUnits;
     unitRate = (t - f) / billableUnits;
+    estimatedRate = unitRate;
     
     // Calculate for one-time mode
-    without = (g * unitRate) + f;
+    without = (g * estimatedRate) + f;
     saving = without - t;
     savingPercent = without > 0 ? (saving / without) * 100 : 0;
   }
@@ -1603,14 +1605,26 @@ async function calculate() {
       closingCarryForward = Math.abs(adjustedNet);
     }
 
+    // ========================================
+    // UNIT RATE CALCULATION (FIXED FOR SURPLUS)
+    // ========================================
     if (billableUnits > 0) {
+      // Normal month - calculate rate from bill
       unitRate = (t - f) / billableUnits;
+      estimatedRate = unitRate;
     } else {
-      unitRate = 0;
+      // Surplus month - use standard Haryana rate
+      unitRate = 0; // No energy charges this month
+      estimatedRate = 6.50; // Standard UHBVN residential rate
+      
+      // Alternative: Use user's last known rate if available
+      // estimatedRate = parseFloat(localStorage.getItem('lastUnitRate')) || 6.50;
     }
 
-    // Calculate savings
-    without = (g * unitRate) + f;
+    // ========================================
+    // SAVINGS CALCULATION (ALWAYS USE ESTIMATED RATE)
+    // ========================================
+    without = (g * estimatedRate) + f;
     saving = without - t;
     savingPercent = without > 0 ? (saving / without) * 100 : 0;
 
@@ -1636,7 +1650,8 @@ async function calculate() {
         fixedCharges: f,
         totalBillAmount: t,
         arrears: a,
-        perUnitRate: unitRate ? parseFloat(unitRate.toFixed(2)) : 0
+        perUnitRate: unitRate ? parseFloat(unitRate.toFixed(2)) : 0,
+        estimatedRate: parseFloat(estimatedRate.toFixed(2)) // NEW: Send estimated rate
       },
       calculation: {
         billWithSolar: t,
@@ -1701,7 +1716,7 @@ async function calculate() {
   }
 
   // ========================================
-  // BUILD MODAL CONTENT
+  // BUILD MODAL CONTENT (WITH IMPROVED DISPLAY)
   // ========================================
   const modalContent = `
     <div style="text-align: left;">
@@ -1731,10 +1746,9 @@ async function calculate() {
         <b>Fixed Charges:</b> ₹${f}<br>
         <b>Total Bill Amount:</b> ₹${t}<br>
 
-        <b>Per-Unit Rate:</b> ₹${unitRate ? unitRate.toFixed(2) : "0.00"}  
-        <i class="text-muted">
-          = (Total Bill − Fixed Charges) ÷ (Import − Export)
-        </i>
+        <b>Per-Unit Rate:</b> ${unitRate > 0 ? '₹' + unitRate.toFixed(2) : 'N/A (no energy charges)'}
+        ${billableUnits === 0 ? '<br><b>Estimated Rate Used:</b> ₹' + estimatedRate.toFixed(2) + ' <i class="text-muted">(for savings comparison)</i>' : ''}
+        ${billableUnits > 0 ? '<br><i class="text-muted">= (Total Bill − Fixed Charges) ÷ Billable Units</i>' : ''}
       </div>
 
       <!-- COMPARISON -->
@@ -1748,7 +1762,7 @@ async function calculate() {
             <b style="font-size: 1.5rem;">₹${without.toFixed(0)}</b><br>
 
             <i class="text-muted small">
-              (${g} × ₹${unitRate ? unitRate.toFixed(2) : "0.00"}) + ₹${f}
+              (${g} × ₹${estimatedRate.toFixed(2)}) + ₹${f}
             </i><br>
 
             ${withoutPerDay !== null
@@ -1786,6 +1800,13 @@ async function calculate() {
           ? `<b>Estimated Yearly Saving:</b> ₹${annualSaving.toFixed(0)} / year 
              <i class="text-muted small">Based on current bill's daily saving × 365 days</i>` 
           : ``}
+        
+        ${billableUnits === 0 
+          ? `<br><br><div class="alert alert-info" style="font-size: 0.9rem; margin-top: 1rem;">
+             <strong>ℹ️ Surplus Month:</strong> Your solar generated more than you consumed! 
+             The estimated savings use Haryana's standard rate (₹${estimatedRate.toFixed(2)}/unit) for comparison.
+             </div>` 
+          : ''}
       </div>
     </div>
   `;
