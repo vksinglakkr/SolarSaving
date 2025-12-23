@@ -1501,15 +1501,6 @@ async function calculate(){
     }
   }
 
-  let savingPerDay = null;
-  if (days && days > 0) {
-    savingPerDay = saving / days;
-  }
-
-  let annualSaving = null;
-  if (savingPerDay !== null) {
-    annualSaving = savingPerDay * 365;
-  }
 
   // If save mode, send to n8n
   if (entryMode === "save") {
@@ -1560,6 +1551,15 @@ if (billableUnits > 0) {
 const without = (g * unitRate) + f;
 const saving = without - t;
 const savingPercent = without > 0 ? (saving / without) * 100 : 0;
+  let savingPerDay = null;
+  if (days && days > 0) {
+    savingPerDay = saving / days;
+  }
+
+  let annualSaving = null;
+  if (savingPerDay !== null) {
+    annualSaving = savingPerDay * 365;
+  }
 
     const webhookData = {
       billNumber: billNum,
