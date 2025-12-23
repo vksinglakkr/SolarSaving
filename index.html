@@ -1474,6 +1474,10 @@ async function calculate(){
   let g=0, i=0, e=0, f=0, t=0, a=0;
   let direct = 0;
   let netGridUnits = 0;
+  let unitRate = 0;
+  let billableUnits = 0;
+  let openingCarry = 0;
+  let closingCarryForward = 0;
   try {
     g = entryMode === "save" ? Number(gross.value) : parsePlusExpression(gross.value, "Gross Units");
     i = entryMode === "save" ? Number(importU.value) : parsePlusExpression(importU.value, "Import Units");
@@ -1503,7 +1507,43 @@ async function calculate(){
       days = Math.round(diffMs / (1000 * 60 * 60 * 24));
     }
   }
+// =====================
+// ONE-TIME CALCULATION
+// =====================
+if (entryMode === "one") {
 
+  if (netGridUnits <= 0) {
+    alert("No billable units (net export). Saving cannot be estimated accurately.");
+    return;
+  }
+
+  billableUnits = netGridUnits;
+  unitRate = (t - f) / billableUnits;
+}
+
+if (entryMode === "save") {
+
+  openingCarry = Number(openingCarryInput.value || 0);
+
+  // April reset
+  if (billFrom.value) {
+    const m = new Date(billFrom.value).getMonth();
+    if (m === 3) openingCarry = 0;
+  }
+
+  const adjustedNet = netGridUnits - openingCarry;
+
+  if (adjustedNet > 0) {
+    billableUnits = adjustedNet;
+  } else {
+    closingCarryForward = Math.abs(adjustedNet);
+    billableUnits = 0;
+  }
+
+  if (billableUnits > 0) {
+    unitRate = (t - f) / billableUnits;
+  }
+}  
 
 
   // If save mode, send to n8n
@@ -1516,13 +1556,6 @@ async function calculate(){
       alert("Please fill Bill Number, Meter Number, and Account Number");
       return;
     }
-let unitRate = 0;
-const effectiveUnits = netGridUnits > 0 ? netGridUnits : 0;
-
-if (effectiveUnits > 0) {
-  unitRate = (t - f) / effectiveUnits;
-}
-
 // ---------- GRID + CARRY FORWARD LOGIC ----------
 
 // Opening carry forward (Save mode only)
@@ -1562,6 +1595,7 @@ const savingPercent = without > 0 ? (saving / without) * 100 : 0;
   if (savingPerDay !== null) {
     annualSaving = savingPerDay * 365;
   }
+    
 
     const webhookData = {
       billNumber: billNum,
