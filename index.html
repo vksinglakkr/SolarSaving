@@ -1550,7 +1550,8 @@ async function calculate() {
   if (entryMode === "one") {
 
     if (netGridUnits <= 0) {
-      alert("Net export detected. Saving cannot be estimated accurately in one-time mode.");
+      alert("This month has surplus solar generation.
+Please use ‘Save for future reference’ to track carry-forward benefits.");
       return;
     }
 
