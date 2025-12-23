@@ -1453,6 +1453,25 @@ function validateUnits(){
     showHint("Import / Export units cannot be negative");
   }
 }
+// ==========================================
+// HELPER: Show hint message (non-blocking)
+// Add this function if you don't have it
+// ==========================================
+function showHint(msg) {
+  const hint = document.createElement('div');
+  hint.className = 'alert alert-info alert-dismissible fade show';
+  hint.style.position = 'fixed';
+  hint.style.top = '20px';
+  hint.style.right = '20px';
+  hint.style.zIndex = '9999';
+  hint.innerHTML = `
+    ${msg}
+    <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
+  `;
+  document.body.appendChild(hint);
+  
+  setTimeout(() => hint.remove(), 5000);
+}
 
 
 function markError(el,msg){
@@ -1462,6 +1481,12 @@ function markError(el,msg){
   d.innerText=msg;
   el.parentNode.appendChild(d);
 }
+
+// ==========================================
+// UPDATED calculate() FUNCTION
+// Shows results in MODAL instead of below button
+// Replace your existing calculate() function
+// ==========================================
 
 async function calculate() {
 
@@ -1558,14 +1583,87 @@ async function calculate() {
     if (billableUnits > 0) {
       unitRate = (t - f) / billableUnits;
     }
+
+    // ========================================
+    // SAVE TO n8n WORKFLOW (if save mode)
+    // ========================================
+    const billNum = document.getElementById("billNumber").value;
+    const meter = document.getElementById("meter").value;
+    const accountNum = document.getElementById("accountNum").value;
+
+    if (!billNum || !meter || !accountNum) {
+      alert("Please fill Bill Number, Meter Number, and Account Number");
+      return;
+    }
+
+    // Calculate final values
+    without = (g * unitRate) + f;
+    saving = without - t;
+    savingPercent = without > 0 ? (saving / without) * 100 : 0;
+
+    const webhookData = {
+      billNumber: billNum,
+      meterNumber: meter,
+      accountNumber: accountNum,
+      billPeriod: {
+        from: billFromEl.value,
+        to: billToEl.value,
+        days: days
+      },
+      consumption: {
+        grossUnits: g,
+        importUnits: i,
+        exportUnits: e,
+        directSolarUsed: direct
+      },
+      charges: {
+        fixedCharges: f,
+        totalBillAmount: t,
+        arrears: a,
+        perUnitRate: parseFloat(unitRate.toFixed(2))
+      },
+      calculation: {
+        billWithSolar: t,
+        billWithoutSolar: parseFloat(without.toFixed(2)),
+        totalSaving: parseFloat(saving.toFixed(2)),
+        savingPercentage: parseFloat(savingPercent.toFixed(2)),
+        savingPerDay: days > 0 ? parseFloat((saving / days).toFixed(2)) : null,
+        annualSaving: days > 0 ? parseFloat(((saving / days) * 365).toFixed(2)) : null
+      }
+    };
+
+    try {
+      const response = await fetch('https://n8n-workflow-test.duckdns.org/webhook/solar-saving', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(webhookData)
+      });
+
+      if (response.ok) {
+        const data = await response.json().catch(() => ({ status: 'success' }));
+
+        if (data.status === 'error' && data.code === 'DUPLICATE_FOUND') {
+          alert('⚠️ Duplicate bill found! This bill already exists.');
+          return; // Don't show results if duplicate
+        }
+      } else {
+        throw new Error('Server error');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('⚠️ Failed to save. Showing results anyway.');
+    }
   }
 
-  // ---------- FINAL CALCULATIONS ----------
-  without = (g * unitRate) + f;
-  saving = without - t;
-  savingPercent = without > 0 ? (saving / without) * 100 : 0;
-  const withPerDay = days !== '—' && days > 0 ? (t / days) : null;
-  const withoutPerDay = days !== '—' && days > 0 ? (without / days) : null;
+  // ---------- FINAL CALCULATIONS (for one-time mode) ----------
+  if (entryMode === "one") {
+    without = (g * unitRate) + f;
+    saving = without - t;
+    savingPercent = without > 0 ? (saving / without) * 100 : 0;
+  }
+
+  const withPerDay = days !== null && days > 0 ? (t / days) : null;
+  const withoutPerDay = days !== null && days > 0 ? (without / days) : null;
   let savingPerDay = null;
   let annualSaving = null;
 
@@ -1574,34 +1672,49 @@ async function calculate() {
     annualSaving = savingPerDay * 365;
   }
 
-  // ---------- DISPLAY RESULT ----------
-  result.innerHTML = `
-    <div class="result-box">
-      <h6>📥 Input Summary</h6>
-      <b>Bill Period:</b> ${from ? from.toLocaleDateString("en-IN") : "—"}
-      to ${to ? to.toLocaleDateString("en-IN") : "—"}
-      | <b>Days:</b> ${days ?? "—"}<br><br>
+  // ========================================
+  // BUILD MODAL CONTENT (Same as viewSelectedBill)
+  // ========================================
+  const modalContent = `
+    <div style="text-align: left;">
+      <div style="background: #f8fafc; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid #0b5ed7;">
+        <div style="font-size: 0.85rem; color: #64748b;">
+          <strong>${entryMode === "one" ? "Quick Calculator" : "Save & Track"}</strong> Result
+        </div>
+      </div>
+      
+      <!-- INPUT SUMMARY -->
+      <div class="result-box">
+        <h6>📥 Input Summary</h6>
+        <b>Bill Period:</b> ${from ? from.toLocaleDateString("en-IN") : "—"} 
+        to ${to ? to.toLocaleDateString("en-IN") : "—"} | 
+        <b>Days:</b> ${days ?? "—"}<br><br>
 
-      <b>Gross Units:</b> ${g}<br>
-      <b>Import Units:</b> ${i} &nbsp; | &nbsp;
-      <b>Export Units:</b> ${e}<br>
-      <b>Direct Solar Used:</b> ${direct} units
-       <i class="text-muted">
+        <b>Gross Units:</b> ${g}<br>
+        <b>Import Units:</b> ${i} &nbsp; | &nbsp;
+        <b>Export Units:</b> ${e}<br>
+
+        <b>Direct Solar Used:</b> ${direct} units  
+        <i class="text-muted">
           (Gross − Import → electricity used directly from solar during daytime)
         </i>
         <hr>
 
-      <b>Fixed Charges:</b> ₹${f}<br>
-      <b>Total Bill Amount:</b> ₹${t}<br>
-      <b>Per Unit Rate:</b> ₹${unitRate ? unitRate.toFixed(2) : "—"}
-      <i class="text-muted">
-          = (Total Bill − Fixed Charges) ÷ (Import − Export)
-        </i>    </div>
+        <b>Fixed Charges:</b> ₹${f}<br>
+        <b>Total Bill Amount:</b> ₹${t}<br>
 
-    <div class="result-box row text-center">
+        <b>Per-Unit Rate:</b> ₹${unitRate ? unitRate.toFixed(2) : "—"}  
+        <i class="text-muted">
+          = (Total Bill − Fixed Charges) ÷ (Import − Export)
+        </i>
+      </div>
+
+      <!-- COMPARISON -->
+      <div class="result-box">
         <h5 class="text-success text-center">
           💰 Comparison (Bill)
         </h5>
+        <div class="row text-center">
           <div class="col-6 border-end">
             <h6>❌ Without Solar</h6>
             <b style="font-size: 1.5rem;">₹${without.toFixed(0)}</b><br>
@@ -1611,10 +1724,11 @@ async function calculate() {
             </i><br>
 
             ${withoutPerDay !== null
-              ? `<b>Per Day:</b> ₹${(without/days).toFixed(0)} / day`
+              ? `<b>Per Day:</b> ₹${withoutPerDay.toFixed(0)} / day`
               : `<span class="text-muted small">Per-day not calculated</span>`
             }
           </div>
+
           <div class="col-6">
             <h6>☀️ With Solar</h6>
             <b style="font-size: 1.5rem;">₹${t}</b><br>
@@ -1622,11 +1736,11 @@ async function calculate() {
             <i class="text-muted small">(Actual bill amount)</i><br>
 
             ${withPerDay !== null 
-              ? `<b>Per Day:</b> ₹${(t/days).toFixed(0)} / day` 
+              ? `<b>Per Day:</b> ₹${withPerDay.toFixed(0)} / day` 
               : `<span class="text-muted small">Per-day not calculated</span>`}
           </div>
-    </div>
-
+        </div>
+      </div>
 
       <!-- SAVINGS -->
       <div class="result-box text-center">
@@ -1641,26 +1755,38 @@ async function calculate() {
           : `<span class="text-muted small">Per-day saving not calculated</span><br>`}
         
         ${annualSaving !== null 
-          ? `<b>Estimated Yearly Saving:</b> ₹${annualSaving.toFixed(0)} / year <br>
-             <i class="text-muted small">(Based on current bill's daily saving × 365 days)</i>` 
+          ? `<b>Estimated Yearly Saving:</b> ₹${annualSaving.toFixed(0)} / year 
+             <i class="text-muted small">Based on current bill's daily saving × 365 days</i>` 
           : ``}
       </div>
-
-    <button class="btn btn-success w-100 mt-2"
-      onclick='shareWhatsApp({
-        gross:${g},
-        importU:${i},
-        exportU:${e},
-        direct:${direct},
-        withSolar:${t},
-        withoutSolar:${without.toFixed(0)},
-        saving:${saving.toFixed(0)}
-      })'>
-      📤 Share on WhatsApp
-    </button>
+    </div>
   `;
-}
 
+  // ========================================
+  // SHOW MODAL WITH RESULTS
+  // ========================================
+  
+  // Store calculation data for WhatsApp sharing
+  window.lastCalculation = {
+    gross: g,
+    importU: i,
+    exportU: e,
+    direct: direct,
+    withSolar: t,
+    withoutSolar: without.toFixed(0),
+    saving: saving.toFixed(0)
+  };
+
+  showModal(
+    '📊', 
+    entryMode === "one" ? "Quick Calculator Result" : "Bill Saved Successfully", 
+    modalContent, 
+    [
+      { text: 'Share on WhatsApp', type: 'success', action: () => { shareWhatsApp(window.lastCalculation); closeModal(); } },
+      { text: 'Close', type: 'secondary', action: closeModal }
+    ]
+  );
+}
 
 
 function shareWhatsApp(data){
