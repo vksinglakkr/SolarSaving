@@ -706,7 +706,7 @@ background: linear-gradient(135deg, #5568d3 0%, #6a3f91 100%);
 <!-- Dynamic Action Buttons -->
 <div class="mb-3">
   <!-- Single Mode Actions (Current) -->
-  <div id="singleModeActions" class="d-flex gap-2">
+  <div id="singleModeActions" class="gap-2" style="display: flex;">
     <button id="viewBtn" class="btn btn-primary" disabled onclick="viewBill()">
       📄 View
     </button>
@@ -719,7 +719,7 @@ background: linear-gradient(135deg, #5568d3 0%, #6a3f91 100%);
   </div>
   
   <!-- Summary Mode Actions (NEW) -->
-  <div id="summaryModeActions" class="d-flex gap-2" style="display: none;">
+ <div id="summaryModeActions" class="gap-2" style="display: none;">
     <button id="showSummaryBtn" class="btn btn-success" onclick="showMultiBillSummary()">
       📊 Show Summary (<span id="selectedCount">0</span> bills)
     </button>
