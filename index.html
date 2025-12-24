@@ -1295,42 +1295,55 @@ function viewBill() {
 
 // Edit button - loads bill for editing
 function editBill() {
-  if (selectedBillIndex === null) {
+  if (selectedBillIndex === null || selectedBillIndex === undefined) {
     alert('Please select a bill first.');
     return;
   }
   
-  const bill = userBills[selectedBillIndex];
+  const bills = window.userBills || [];
+  const bill = bills[selectedBillIndex];
+  
   if (!bill) {
-    alert('Bill data not found.');
+    alert('Bill not found.');
     return;
   }
   
   // Load bill data into form
   loadBillForEditing(bill);
   
-  // Show form sections
-  document.getElementById('formCard').style.display = 'block';
-  document.getElementById('dashboardCard').style.display = 'none';
+  // Switch to form view
+  const formCard = document.getElementById('formCard');
+  const dashboardCard = document.getElementById('dashboardCard');
   
-  // Update button text
-  document.getElementById('calculateBtn').textContent = '💾 Update Bill';
+  if (formCard) formCard.style.display = 'block';
+  if (dashboardCard) dashboardCard.style.display = 'none';
   
-  // Store that we're editing
+  // Update save button text
+  const calculateBtn = document.getElementById('calculateBtn');
+  if (calculateBtn) {
+    calculateBtn.textContent = '💾 Update Bill';
+  }
+  
+  // Store editing state
   window.isEditingBill = true;
   window.editingBillIndex = selectedBillIndex;
+  
+  // Scroll to top
+  window.scrollTo(0, 0);
 }
 
 // Delete button - removes selected bill
 function deleteBill() {
-  if (selectedBillIndex === null) {
+  if (selectedBillIndex === null || selectedBillIndex === undefined) {
     alert('Please select a bill first.');
     return;
   }
   
-  const bill = userBills[selectedBillIndex];
+  const bills = window.userBills || [];
+  const bill = bills[selectedBillIndex];
+  
   if (!bill) {
-    alert('Bill data not found.');
+    alert('Bill not found.');
     return;
   }
   
@@ -1338,21 +1351,25 @@ function deleteBill() {
   
   if (confirm(`Are you sure you want to delete Bill #${billNum}?`)) {
     // Remove from array
-    userBills.splice(selectedBillIndex, 1);
+    bills.splice(selectedBillIndex, 1);
     
-    // Save to Google Sheets / localStorage
-    saveBillsToStorage(userBills);
+    // Save to storage
+    saveBillsToStorage(bills);
     
     // Reset selection
     selectedBillIndex = null;
     
+    // Disable buttons
+    document.getElementById('viewBtn').disabled = true;
+    document.getElementById('editBtn').disabled = true;
+    document.getElementById('deleteBtn').disabled = true;
+    
     // Refresh dashboard
-    renderBillCards(userBills);
+    renderBillCards(bills);
     
     alert('Bill deleted successfully!');
   }
 }
-
 // Handle bill card click
 function handleBillCardClick(index) {
   if (currentSelectionMode === 'single') {
@@ -1382,30 +1399,49 @@ function selectSingleBill(index) {
 
 // Load bill data into form for editing
 function loadBillForEditing(bill) {
-  // Identity
-  document.getElementById('billNumber').value = bill['Bill Number'] || '';
-  document.getElementById('meter').value = bill['Meter Number'] || '';
-  document.getElementById('accountNum').value = bill['Account Number'] || '';
+  // Identity fields
+  const billNumber = document.getElementById('billNumber');
+  const meter = document.getElementById('meter');
+  const accountNum = document.getElementById('accountNum');
   
-  // Dates
-  document.getElementById('billFrom').value = bill['Bill From Date'] || '';
-  document.getElementById('billTo').value = bill['Bill To Date'] || '';
+  if (billNumber) billNumber.value = bill['Bill Number'] || bill.billNumber || '';
+  if (meter) meter.value = bill['Meter Number'] || bill.meterNumber || '';
+  if (accountNum) accountNum.value = bill['Account Number'] || bill.accountNumber || '';
   
-  // Units
-  document.getElementById('grossUnits').value = bill['Gross Units'] || '';
-  document.getElementById('importUnits').value = bill['Import Units'] || '';
-  document.getElementById('exportUnits').value = bill['Export Units'] || '';
+  // Date fields
+  const billFrom = document.getElementById('billFrom');
+  const billTo = document.getElementById('billTo');
+  
+  if (billFrom) billFrom.value = bill['Bill From Date'] || bill.billFromDate || '';
+  if (billTo) billTo.value = bill['Bill To Date'] || bill.billToDate || '';
+  
+  // Units fields
+  const grossUnits = document.getElementById('grossUnits');
+  const importUnits = document.getElementById('importUnits');
+  const exportUnits = document.getElementById('exportUnits');
+  
+  if (grossUnits) grossUnits.value = bill['Gross Units'] || bill.grossUnits || '';
+  if (importUnits) importUnits.value = bill['Import Units'] || bill.importUnits || '';
+  if (exportUnits) exportUnits.value = bill['Export Units'] || bill.exportUnits || '';
   
   // Carry forward
-  const openingCarry = bill['Opening Carry Forward'] || 0;
-  if (openingCarry > 0) {
-    document.getElementById('carryForwardSection').classList.remove('d-none');
-    document.getElementById('carryForwardUnits').value = openingCarry;
+  const carryForwardUnits = document.getElementById('carryForwardUnits');
+  const carryForwardSection = document.getElementById('carryForwardSection');
+  const openingCarry = bill['Opening Carry Forward'] || bill.openingCarryForward || 0;
+  
+  if (carryForwardUnits) carryForwardUnits.value = openingCarry;
+  if (carryForwardSection && openingCarry > 0) {
+    carryForwardSection.classList.remove('d-none');
   }
   
-  // Amounts
-  document.getElementById('fixedCharges').value = bill['Fixed Charges'] || '';
-  document.getElementById('totalBill').value = bill['Total Bill Amount'] || '';
+  // Amount fields
+  const fixedCharges = document.getElementById('fixedCharges');
+  const totalBill = document.getElementById('totalBill');
+  
+  if (fixedCharges) fixedCharges.value = bill['Fixed Charges'] || bill.fixedCharges || '';
+  if (totalBill) totalBill.value = bill['Total Bill Amount'] || bill.totalBillAmount || '';
+  
+  console.log('Bill loaded for editing:', bill['Bill Number'] || bill.billNumber);
 }
 
 // ==========================================
@@ -2441,57 +2477,84 @@ if (document.getElementById("carryForwardSection")) {
 
 // Update annual statistics on dashboard load
 function updateAnnualStats() {
-  // Get all saved bills (from Google Sheets or localStorage)
-  // This is a simplified version - adjust based on your data storage
+  const bills = window.userBills || [];
+  const currentFY = getCurrentFinancialYear();
+  const fyBills = bills.filter(bill => {
+    const billDate = bill['Bill From Date'] || bill.billFromDate;
+    if (!billDate) return false;
+    return isInFinancialYear(billDate, currentFY);
+  });
   
-  const allBills = getStoredBills(); // Your existing function
-  if (!allBills || allBills.length === 0) {
-    document.getElementById('annualStatsCard').style.display = 'none';
-    return;
-  }
-  
-  // Filter bills for current FY (Apr to Mar)
-  const currentFYBills = filterCurrentFYBills(allBills);
-  
-  if (currentFYBills.length === 0) {
-    document.getElementById('annualStatsCard').style.display = 'none';
+  if (fyBills.length === 0) {
+    const statsCard = document.getElementById('annualStatsCard');
+    if (statsCard) statsCard.style.display = 'none';
     return;
   }
   
   // Calculate totals
   let totalConsumption = 0;
-  let totalImport = 0;
-  let totalExport = 0;
+  let totalGeneration = 0;
   
-  currentFYBills.forEach(bill => {
-    totalConsumption += Number(bill.grossUnits || 0);
-    totalImport += Number(bill.importUnits || 0);
-    totalExport += Number(bill.exportUnits || 0);
+  fyBills.forEach(bill => {
+    totalConsumption += parseFloat(bill['Gross Units'] || bill.grossUnits || 0);
+    const imp = parseFloat(bill['Import Units'] || bill.importUnits || 0);
+    const exp = parseFloat(bill['Export Units'] || bill.exportUnits || 0);
+    const gross = parseFloat(bill['Gross Units'] || bill.grossUnits || 0);
+    totalGeneration += (gross - imp) + exp;
   });
   
-  // Approximate generation = (Consumption - Import) + Export
-  const totalGeneration = (totalConsumption - totalImport) + totalExport;
-  
-  // Calculate ratio and 90% reference
-  const ratio = totalConsumption > 0 
-    ? ((totalGeneration / totalConsumption) * 100).toFixed(1)
-    : 0;
-  
-  const limit90 = Math.round(totalConsumption * 0.90);
+  const ratio = totalConsumption > 0 ? (totalGeneration / totalConsumption * 100) : 0;
+  const referenceLimit = totalConsumption * 0.9;
   
   // Update display
-  document.getElementById('statTotalConsumption').textContent = totalConsumption.toLocaleString();
-  document.getElementById('statTotalGeneration').textContent = totalGeneration.toLocaleString();
-  document.getElementById('statRatio').textContent = ratio;
-  document.getElementById('stat90Limit').textContent = limit90.toLocaleString();
-  
-  // Show warning based on ratio
-  showLimitWarning(parseFloat(ratio), totalGeneration, limit90);
-  
-  // Show the card
-  document.getElementById('annualStatsCard').style.display = 'block';
+  const statsCard = document.getElementById('annualStatsCard');
+  if (statsCard) {
+    statsCard.style.display = 'block';
+    
+    document.getElementById('statConsumption').textContent = totalConsumption.toFixed(0);
+    document.getElementById('statGeneration').textContent = totalGeneration.toFixed(0);
+    document.getElementById('statRatio').textContent = ratio.toFixed(1) + '%';
+    document.getElementById('stat90Ref').textContent = referenceLimit.toFixed(0);
+    
+    // Warning color
+    const warningBox = document.getElementById('limitWarning');
+    if (warningBox) {
+      if (ratio >= 90) {
+        warningBox.style.background = '#fee2e2';
+        warningBox.style.borderColor = '#ef4444';
+      } else if (ratio >= 80) {
+        warningBox.style.background = '#fef3c7';
+        warningBox.style.borderColor = '#f59e0b';
+      } else {
+        warningBox.style.background = '#dcfce7';
+        warningBox.style.borderColor = '#22c55e';
+      }
+    }
+  }
 }
-
+function isInFinancialYear(dateStr, fy) {
+  const date = new Date(dateStr);
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  
+  if (month >= 3) {
+    return year === fy.start;
+  } else {
+    return year === fy.end;
+  }
+}
+function getCurrentFinancialYear() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth(); // 0-11
+  
+  // FY starts April (month 3)
+  if (month >= 3) {
+    return { start: year, end: year + 1 };
+  } else {
+    return { start: year - 1, end: year };
+  }
+}
 // Helper: Get current FY bills
 function filterCurrentFYBills(bills) {
   const today = new Date();
@@ -2570,6 +2633,105 @@ function getStoredBills() {
   // If using Google Sheets, you'll need to fetch from there
   // This is just a placeholder
   return [];
+}
+
+// ==========================================
+// RENDER BILL CARDS IN DASHBOARD
+// ==========================================
+function renderBillCards(bills) {
+  const billsList = document.getElementById('billsList');
+  
+  if (!billsList) {
+    console.error('billsList element not found!');
+    return;
+  }
+  
+  // Clear existing content
+  billsList.innerHTML = '';
+  
+  // If no bills, show message
+  if (!bills || bills.length === 0) {
+    billsList.innerHTML = `
+      <div class="text-center text-muted py-5">
+        <p style="font-size: 1.2rem;">📋 No bills saved yet</p>
+        <p>Add your first bill to start tracking!</p>
+      </div>
+    `;
+    return;
+  }
+  
+  // Render each bill card
+  bills.forEach((bill, index) => {
+    const cardHTML = createBillCard(bill, index);
+    billsList.innerHTML += cardHTML;
+  });
+}
+
+// ==========================================
+// SAVE BILLS TO STORAGE
+// ==========================================
+function saveBillsToStorage(bills) {
+  try {
+    // Save to localStorage
+    localStorage.setItem('solarBills', JSON.stringify(bills));
+    
+    // Also update global variable
+    window.userBills = bills;
+    
+    console.log('Bills saved successfully:', bills.length, 'bills');
+    
+    // TODO: If using Google Sheets, also save there
+    // saveToGoogleSheets(bills);
+    
+    return true;
+  } catch (error) {
+    console.error('Error saving bills:', error);
+    alert('Error saving bills. Please try again.');
+    return false;
+  }
+}
+
+// ==========================================
+// LOAD BILLS FROM STORAGE ON PAGE LOAD
+// ==========================================
+function loadBillsFromStorage() {
+  try {
+    const stored = localStorage.getItem('solarBills');
+    if (stored) {
+      const bills = JSON.parse(stored);
+      window.userBills = bills;
+      return bills;
+    }
+  } catch (error) {
+    console.error('Error loading bills:', error);
+  }
+  return [];
+}
+
+// ==========================================
+// INITIALIZE DASHBOARD
+// ==========================================
+function initializeDashboard() {
+  // Load bills
+  const bills = loadBillsFromStorage();
+  window.userBills = bills;
+  
+  // Render bills
+  renderBillCards(bills);
+  
+  // Update stats if function exists
+  if (typeof updateDashboardStats === 'function') {
+    updateDashboardStats(bills);
+  }
+  
+  console.log('Dashboard initialized with', bills.length, 'bills');
+}
+
+// Call initialize when page loads
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeDashboard);
+} else {
+  initializeDashboard();
 }
 
 // Call on dashboard load
@@ -2867,9 +3029,13 @@ function showMultiBillSummary() {
     return;
   }
   
-  // Get all bills from current data source
-  // CHANGED: Use the same source as dashboard uses
-  const allBills = getStoredBills() || []; // or however bills are stored
+  // Get all bills - use userBills directly
+  const allBills = window.userBills || [];
+  
+  if (allBills.length === 0) {
+    alert('No bills found. Please save some bills first.');
+    return;
+  }
   
   // Get selected bills data
   const selectedBills = [];
