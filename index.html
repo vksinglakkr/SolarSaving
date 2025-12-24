@@ -699,11 +699,35 @@ background: linear-gradient(135deg, #5568d3 0%, #6a3f91 100%);
   </button>
 </div>
 <!-- Single Mode Buttons (Current) -->
-<div id="singleModeActions" style="display: block;">
-  <button id="viewBtn" class="btn btn-primary" disabled>📄 View</button>
-  <button id="editBtn" class="btn btn-warning" disabled>✏️ Edit</button>
-  <button id="deleteBtn" class="btn btn-danger" disabled>🗑️ Delete</button>
+<!-- Dynamic Action Buttons -->
+<div class="mb-3">
+  <!-- Single Mode Actions (Current) -->
+  <div id="singleModeActions" class="d-flex gap-2">
+    <button id="viewBtn" class="btn btn-primary" disabled onclick="viewBill()">
+      📄 View
+    </button>
+    <button id="editBtn" class="btn btn-warning" disabled onclick="editBill()">
+      ✏️ Edit
+    </button>
+    <button id="deleteBtn" class="btn btn-danger" disabled onclick="deleteBill()">
+      🗑️ Delete
+    </button>
+  </div>
+  
+  <!-- Summary Mode Actions (NEW) -->
+  <div id="summaryModeActions" class="d-flex gap-2" style="display: none;">
+    <button id="showSummaryBtn" class="btn btn-success" onclick="showMultiBillSummary()">
+      📊 Show Summary (<span id="selectedCount">0</span> bills)
+    </button>
+    <button class="btn btn-secondary" onclick="clearAllSelections()">
+      ✕ Clear All
+    </button>
+    <button class="btn btn-primary" onclick="selectAllBills()">
+      ☑ Select All
+    </button>
+  </div>
 </div>
+
 
 <!-- Summary Mode Buttons (NEW) -->
 <div id="summaryModeActions" style="display: none;">
