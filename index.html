@@ -1147,24 +1147,6 @@ function displayBillsList() {
       </div>
     </div>
 
-    <div class="row g-2 mb-3">
-      <div class="col-md-4">
-        <button class="btn btn-primary w-100" onclick="viewSelectedBill()" id="viewBtn" disabled>
-          📄 View
-        </button>
-      </div>
-      <div class="col-md-4">
-        <button class="btn btn-warning w-100" onclick="editSelectedBill()" id="editBtn" disabled>
-          ✏️ Edit
-        </button>
-      </div>
-      <div class="col-md-4">
-        <button class="btn btn-danger w-100" onclick="deleteSelectedBill()" id="deleteBtn" disabled>
-          🗑️ Delete
-        </button>
-      </div>
-    </div>
-
     <div id="billCards">
       ${userBills.map((bill, index) => createBillCard(bill, index)).join('')}
     </div>
