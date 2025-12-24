@@ -698,6 +698,10 @@ background: linear-gradient(135deg, #5568d3 0%, #6a3f91 100%);
     📈 Multi-Bill Summary
   </button>
 </div>
+<!-- Mode Info Alert -->
+<div id="modeInfo" class="alert alert-info py-2 mb-3" style="font-size: 0.9rem;">
+  <strong>Single Selection Mode:</strong> Select one bill to View, Edit, or Delete.
+</div>
 <!-- Single Mode Buttons (Current) -->
 <!-- Dynamic Action Buttons -->
 <div class="mb-3">
@@ -730,15 +734,7 @@ background: linear-gradient(135deg, #5568d3 0%, #6a3f91 100%);
 
 
 <!-- Summary Mode Buttons (NEW) -->
-<div id="summaryModeActions" style="display: none;">
-  <button id="showSummaryBtn" class="btn btn-success" onclick="showMultiBillSummary()">
-    📊 Show Summary
-  </button>
-  <button id="clearSelectionBtn" class="btn btn-secondary" onclick="clearAllSelections()">
-    ✕ Clear Selection
-  </button>
-</div>
-  <div id="billsList"></div>
+ <div id="billsList"></div>
   <button class="btn btn-secondary w-100 mt-3" onclick="logout()">Logout</button>
 </div>
 
@@ -2642,7 +2638,7 @@ function togglePolicyInfo() {
 let currentSelectionMode = 'single'; // 'single' or 'summary'
 
 // Switch between Single and Summary modes
-function switchSelectionMode(mode) {
+function switchMode(mode) {
   currentSelectionMode = mode;
   
   // Update button styles
@@ -2720,6 +2716,10 @@ function showMultiBillSummary() {
     return;
   }
   
+  // Get all bills from current data source
+  // CHANGED: Use the same source as dashboard uses
+  const allBills = getStoredBills() || []; // or however bills are stored
+  
   // Get selected bills data
   const selectedBills = [];
   checkedBoxes.forEach(cb => {
@@ -2728,6 +2728,11 @@ function showMultiBillSummary() {
       selectedBills.push(allBills[index]);
     }
   });
+  
+  if (selectedBills.length === 0) {
+    alert('Selected bills data not found.');
+    return;
+  }
   
   // Calculate aggregate statistics
   const summary = calculateMultiBillSummary(selectedBills);
