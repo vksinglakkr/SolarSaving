@@ -505,7 +505,66 @@ background: linear-gradient(135deg, #5568d3 0%, #6a3f91 100%);
     </div>
   </div>
 </div>
-<!-- HELPFUL LINKS -->
+<!-- 90% LIMIT INFORMATION ALERT -->
+<div class="alert alert-info" style="margin: 1rem 0;">
+  <h6 style="margin-bottom: 0.5rem;">
+    ℹ️ 90% वार्षिक सीमा जानकारी / 90% Annual Limit Information
+  </h6>
+  
+  <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">
+    <strong>हिंदी:</strong> कुछ राज्यों में वार्षिक solar generation की 90% सीमा हो सकती है। 
+    यदि आपकी वार्षिक generation, वार्षिक consumption के 90% से अधिक हो जाती है, 
+    तो अतिरिक्त units का भुगतान कम दर पर हो सकता है।
+  </p>
+  
+  <p style="font-size: 0.9rem; margin-bottom: 0;">
+    <strong>English:</strong> Some states may have a 90% annual solar generation limit. 
+    If your annual generation exceeds 90% of annual consumption, 
+    excess units may be paid at a lower rate.
+    <a href="#" onclick="show90LimitHelp(); return false;" style="margin-left: 0.5rem;">
+      📚 Learn more
+    </a>
+  </p>
+</div>
+<!-- ANNUAL STATISTICS CARD -->
+<div class="card mb-3" id="annualStatsCard" style="display: none;">
+  <div class="card-header">
+    <h6 style="margin: 0;">
+      📊 वार्षिक सांख्यिकी / Annual Statistics (Current FY)
+    </h6>
+  </div>
+  <div class="card-body">
+    <div class="row text-center">
+      <div class="col-6 col-md-3 mb-2">
+        <small class="text-muted">Total Consumption</small>
+        <h5 id="statTotalConsumption">—</h5>
+        <small>units</small>
+      </div>
+      
+      <div class="col-6 col-md-3 mb-2">
+        <small class="text-muted">Total Generation</small>
+        <h5 id="statTotalGeneration">—</h5>
+        <small>units</small>
+      </div>
+      
+      <div class="col-6 col-md-3 mb-2">
+        <small class="text-muted">Generation Ratio</small>
+        <h5 id="statRatio">—</h5>
+        <small>%</small>
+      </div>
+      
+      <div class="col-6 col-md-3 mb-2">
+        <small class="text-muted">90% Reference</small>
+        <h5 id="stat90Limit">—</h5>
+        <small>units</small>
+      </div>
+    </div>
+    
+    <!-- Warning area -->
+    <div id="limitWarningBox" style="margin-top: 1rem;"></div>
+  </div>
+</div>
+  <!-- HELPFUL LINKS -->
 <div id="helperCards"
      class="mt-4 p-3 rounded helper-wrapper">
 
@@ -2103,6 +2162,149 @@ document.getElementById("openingCarry")?.addEventListener("blur", checkCarryForw
 if (document.getElementById("carryForwardSection")) {
   setTimeout(checkCarryForwardWarnings, 500);
 }
+
+// ==========================================
+// 90% LIMIT AWARENESS - SIMPLE VERSION
+// ==========================================
+
+// Update annual statistics on dashboard load
+function updateAnnualStats() {
+  // Get all saved bills (from Google Sheets or localStorage)
+  // This is a simplified version - adjust based on your data storage
+  
+  const allBills = getStoredBills(); // Your existing function
+  if (!allBills || allBills.length === 0) {
+    document.getElementById('annualStatsCard').style.display = 'none';
+    return;
+  }
+  
+  // Filter bills for current FY (Apr to Mar)
+  const currentFYBills = filterCurrentFYBills(allBills);
+  
+  if (currentFYBills.length === 0) {
+    document.getElementById('annualStatsCard').style.display = 'none';
+    return;
+  }
+  
+  // Calculate totals
+  let totalConsumption = 0;
+  let totalImport = 0;
+  let totalExport = 0;
+  
+  currentFYBills.forEach(bill => {
+    totalConsumption += Number(bill.grossUnits || 0);
+    totalImport += Number(bill.importUnits || 0);
+    totalExport += Number(bill.exportUnits || 0);
+  });
+  
+  // Approximate generation = (Consumption - Import) + Export
+  const totalGeneration = (totalConsumption - totalImport) + totalExport;
+  
+  // Calculate ratio and 90% reference
+  const ratio = totalConsumption > 0 
+    ? ((totalGeneration / totalConsumption) * 100).toFixed(1)
+    : 0;
+  
+  const limit90 = Math.round(totalConsumption * 0.90);
+  
+  // Update display
+  document.getElementById('statTotalConsumption').textContent = totalConsumption.toLocaleString();
+  document.getElementById('statTotalGeneration').textContent = totalGeneration.toLocaleString();
+  document.getElementById('statRatio').textContent = ratio;
+  document.getElementById('stat90Limit').textContent = limit90.toLocaleString();
+  
+  // Show warning based on ratio
+  showLimitWarning(parseFloat(ratio), totalGeneration, limit90);
+  
+  // Show the card
+  document.getElementById('annualStatsCard').style.display = 'block';
+}
+
+// Helper: Get current FY bills
+function filterCurrentFYBills(bills) {
+  const today = new Date();
+  const currentYear = today.getFullYear();
+  const currentMonth = today.getMonth(); // 0-11
+  
+  // Determine FY start year
+  const fyStartYear = currentMonth < 3 ? currentYear - 1 : currentYear;
+  const fyStart = new Date(fyStartYear, 3, 1); // April 1
+  const fyEnd = new Date(fyStartYear + 1, 2, 31); // March 31
+  
+  return bills.filter(bill => {
+    if (!bill.billPeriod || !bill.billPeriod.from) return false;
+    const billDate = new Date(bill.billPeriod.from);
+    return billDate >= fyStart && billDate <= fyEnd;
+  });
+}
+
+// Show warning message based on ratio
+function showLimitWarning(ratio, generation, limit90) {
+  const warningBox = document.getElementById('limitWarningBox');
+  if (!warningBox) return;
+  
+  let html = '';
+  
+  if (ratio >= 90) {
+    // Exceeded 90%
+    const excess = generation - limit90;
+    html = `
+      <div class="alert alert-danger" style="margin: 0;">
+        <strong>⚠️ संभावित सीमा पार / Potential Limit Exceeded</strong><br>
+        <small>
+          Generation ${ratio}% of consumption है। Excess: ${excess.toLocaleString()} units<br>
+          कृपया UHBVN से confirm करें। Please check with UHBVN.
+          <a href="#" onclick="show90LimitHelp(); return false;">Learn more →</a>
+        </small>
+      </div>
+    `;
+  } else if (ratio >= 80) {
+    // Approaching 90%
+    html = `
+      <div class="alert alert-warning" style="margin: 0;">
+        <strong>⚠️ सीमा के पास / Approaching Limit</strong><br>
+        <small>
+          Generation ${ratio}% है। 90% के पास पहुंच रहे हैं।<br>
+          कुछ states में limit हो सकती है। Some states may have limit.
+          <a href="#" onclick="show90LimitHelp(); return false;">Learn more →</a>
+        </small>
+      </div>
+    `;
+  } else {
+    // Safe
+    html = `
+      <div class="alert alert-success" style="margin: 0;">
+        <strong>✓ सीमा के अंदर / Within Limits</strong><br>
+        <small>Generation ${ratio}% है। Safe limits में है। 👍</small>
+      </div>
+    `;
+  }
+  
+  warningBox.innerHTML = html;
+}
+
+// Helper: Get stored bills (adjust based on your storage method)
+function getStoredBills() {
+  // If using localStorage:
+  const stored = localStorage.getItem('solarBills');
+  if (stored) {
+    try {
+      return JSON.parse(stored);
+    } catch (e) {
+      return [];
+    }
+  }
+  
+  // If using Google Sheets, you'll need to fetch from there
+  // This is just a placeholder
+  return [];
+}
+
+// Call on dashboard load
+document.addEventListener('DOMContentLoaded', function() {
+  // Wait a bit for data to load
+  setTimeout(updateAnnualStats, 1000);
+});
 </script>
 
 </body>
