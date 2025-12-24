@@ -3152,111 +3152,164 @@ function calculateMultiBillSummary(bills) {
 // Display summary modal
 function displaySummaryModal(summary, bills) {
   const modalHTML = `
-    <div style="text-align: left; max-height: 70vh; overflow-y: auto;">
-      <h4 style="color: #0b5ed7; margin-bottom: 1rem;">
+    <div style="text-align: left; max-height: 70vh; overflow-y: auto; font-family: system-ui;">
+      
+      <!-- Header -->
+      <h4 style="color: #0b5ed7; margin-bottom: 1.5rem; border-bottom: 2px solid #0b5ed7; padding-bottom: 0.5rem;">
         📊 Multi-Bill Summary
       </h4>
       
       <!-- Selected Bills List -->
-      <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-        <strong>Selected Bills: ${summary.count}</strong><br>
-        ${bills.map(b => `• Bill #${b['Bill Number'] || b.billNumber}`).join('<br>')}
+      <div style="background: linear-gradient(135deg, #e0f2fe, #dbeafe); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; border-left: 4px solid #3b82f6;">
+        <div style="font-weight: 700; color: #1e3a8a; margin-bottom: 0.5rem;">
+          Selected Bills: ${summary.count}
+        </div>
+        ${bills.map(b => `
+          <div style="padding: 0.25rem 0; color: #1e40af;">
+            • Bill #${b['Bill Number'] || b.billNumber} 
+            <span style="color: #64748b; font-size: 0.9rem;">
+              (${formatBillPeriod(b)})
+            </span>
+          </div>
+        `).join('')}
       </div>
       
       <!-- Period Summary -->
-      <div style="background: #e7f3ff; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-        <h6 style="color: #0b5ed7;">📅 PERIOD SUMMARY</h6>
-        <table style="width: 100%; font-size: 0.9rem;">
+      <div style="background: linear-gradient(135deg, #fef3c7, #fde68a); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid #f59e0b;">
+        <h6 style="color: #92400e; font-weight: 700; margin-bottom: 0.75rem;">📅 PERIOD SUMMARY</h6>
+        <table style="width: 100%; border-spacing: 0;">
           <tr>
-            <td>Total Days:</td>
-            <td><strong>${summary.totalDays} days</strong></td>
+            <td style="padding: 0.4rem 0; color: #78350f; font-size: 0.95rem;">Total Days:</td>
+            <td style="padding: 0.4rem 0; text-align: right; font-weight: 700; color: #92400e;">
+              ${summary.totalDays} days
+            </td>
           </tr>
           <tr>
-            <td>Avg Days/Bill:</td>
-            <td><strong>${summary.avgDaysPerBill} days</strong></td>
+            <td style="padding: 0.4rem 0; color: #78350f; font-size: 0.95rem;">Avg Days/Bill:</td>
+            <td style="padding: 0.4rem 0; text-align: right; font-weight: 700; color: #92400e;">
+              ${summary.avgDaysPerBill} days
+            </td>
           </tr>
         </table>
       </div>
       
       <!-- Units Summary -->
-      <div style="background: #fff3cd; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-        <h6 style="color: #856404;">⚡ UNITS SUMMARY</h6>
-        <table style="width: 100%; font-size: 0.9rem;">
+      <div style="background: linear-gradient(135deg, #e0e7ff, #c7d2fe); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid #6366f1;">
+        <h6 style="color: #312e81; font-weight: 700; margin-bottom: 0.75rem;">⚡ UNITS SUMMARY</h6>
+        <table style="width: 100%; border-spacing: 0;">
           <tr>
-            <td>Total Gross:</td>
-            <td><strong>${summary.totalGross.toLocaleString()} units</strong></td>
+            <td style="padding: 0.4rem 0; color: #4338ca; font-size: 0.95rem;">Total Gross:</td>
+            <td style="padding: 0.4rem 0; text-align: right; font-weight: 700; color: #312e81;">
+              ${summary.totalGross.toLocaleString()} units
+            </td>
           </tr>
           <tr>
-            <td>Total Import:</td>
-            <td><strong>${summary.totalImport.toLocaleString()} units</strong></td>
+            <td style="padding: 0.4rem 0; color: #4338ca; font-size: 0.95rem;">Total Import:</td>
+            <td style="padding: 0.4rem 0; text-align: right; font-weight: 700; color: #312e81;">
+              ${summary.totalImport.toLocaleString()} units
+            </td>
           </tr>
           <tr>
-            <td>Total Export:</td>
-            <td><strong>${summary.totalExport.toLocaleString()} units</strong></td>
+            <td style="padding: 0.4rem 0; color: #4338ca; font-size: 0.95rem;">Total Export:</td>
+            <td style="padding: 0.4rem 0; text-align: right; font-weight: 700; color: #312e81;">
+              ${summary.totalExport.toLocaleString()} units
+            </td>
+          </tr>
+          <tr style="border-top: 1px solid #a5b4fc; margin-top: 0.5rem;">
+            <td style="padding: 0.4rem 0; padding-top: 0.75rem; color: #4338ca; font-size: 0.95rem;">Net from Grid:</td>
+            <td style="padding: 0.4rem 0; padding-top: 0.75rem; text-align: right; font-weight: 700; color: #312e81;">
+              ${summary.netFromGrid.toLocaleString()} units
+            </td>
           </tr>
           <tr>
-            <td>Net from Grid:</td>
-            <td><strong>${summary.netFromGrid.toLocaleString()} units</strong></td>
-          </tr>
-          <tr style="border-top: 1px solid #ddd;">
-            <td>Solar Generated:</td>
-            <td><strong>${summary.totalSolarGenerated.toLocaleString()} units</strong></td>
+            <td style="padding: 0.4rem 0; color: #4338ca; font-size: 0.95rem;">Solar Generated:</td>
+            <td style="padding: 0.4rem 0; text-align: right; font-weight: 700; color: #10b981;">
+              ${summary.totalSolarGenerated.toLocaleString()} units
+            </td>
           </tr>
           <tr>
-            <td>Self Consumed:</td>
-            <td><strong>${summary.selfConsumption.toLocaleString()} units</strong></td>
+            <td style="padding: 0.4rem 0; color: #4338ca; font-size: 0.95rem;">Self Consumed:</td>
+            <td style="padding: 0.4rem 0; text-align: right; font-weight: 700; color: #312e81;">
+              ${summary.selfConsumption.toLocaleString()} units
+            </td>
           </tr>
         </table>
       </div>
       
       <!-- Financial Summary -->
-      <div style="background: #d1e7dd; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-        <h6 style="color: #0f5132;">💰 FINANCIAL SUMMARY</h6>
-        <table style="width: 100%; font-size: 0.9rem;">
+      <div style="background: linear-gradient(135deg, #dcfce7, #bbf7d0); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid #10b981;">
+        <h6 style="color: #14532d; font-weight: 700; margin-bottom: 0.75rem;">💰 FINANCIAL SUMMARY</h6>
+        <table style="width: 100%; border-spacing: 0;">
           <tr>
-            <td>Total Bill Amount:</td>
-            <td><strong>₹${summary.totalBillAmount.toLocaleString()}</strong></td>
+            <td style="padding: 0.4rem 0; color: #166534; font-size: 0.95rem;">Total Bill Amount:</td>
+            <td style="padding: 0.4rem 0; text-align: right; font-weight: 700; color: #14532d;">
+              ₹${summary.totalBillAmount.toLocaleString()}
+            </td>
           </tr>
           <tr>
-            <td>Without Solar:</td>
-            <td><strong>₹${summary.totalWithoutSolar.toLocaleString()}</strong></td>
+            <td style="padding: 0.4rem 0; color: #166534; font-size: 0.95rem;">Without Solar:</td>
+            <td style="padding: 0.4rem 0; text-align: right; font-weight: 700; color: #14532d;">
+              ₹${summary.totalWithoutSolar.toLocaleString()}
+            </td>
+          </tr>
+          <tr style="border-top: 2px solid #10b981;">
+            <td style="padding: 0.4rem 0; padding-top: 0.75rem; color: #166534; font-weight: 700; font-size: 1rem;">Total Savings:</td>
+            <td style="padding: 0.4rem 0; padding-top: 0.75rem; text-align: right; font-weight: 700; color: #10b981; font-size: 1.2rem;">
+              ₹${summary.totalSavings.toLocaleString()}
+            </td>
           </tr>
           <tr>
-            <td>Total Savings:</td>
-            <td><strong style="color: #10b981;">₹${summary.totalSavings.toLocaleString()}</strong></td>
-          </tr>
-          <tr>
-            <td>Avg Saving %:</td>
-            <td><strong style="color: #10b981;">${summary.avgSavingPercent}%</strong></td>
-          </tr>
-          <tr style="border-top: 1px solid #ddd;">
-            <td colspan="2"><strong>Per Day Average:</strong></td>
-          </tr>
-          <tr>
-            <td>• With Solar:</td>
-            <td>₹${summary.perDayWithSolar}/day</td>
-          </tr>
-          <tr>
-            <td>• Without Solar:</td>
-            <td>₹${summary.perDayWithoutSolar}/day</td>
-          </tr>
-          <tr>
-            <td>• Daily Saving:</td>
-            <td><strong style="color: #10b981;">₹${summary.perDaySaving}/day</strong></td>
+            <td style="padding: 0.4rem 0; color: #166534; font-size: 0.95rem;">Avg Saving %:</td>
+            <td style="padding: 0.4rem 0; text-align: right; font-weight: 700; color: #10b981; font-size: 1rem;">
+              ${summary.avgSavingPercent}%
+            </td>
           </tr>
         </table>
+        
+        <!-- Per Day Breakdown -->
+        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #86efac;">
+          <div style="font-weight: 700; color: #14532d; margin-bottom: 0.5rem; font-size: 0.95rem;">
+            Per Day Average:
+          </div>
+          <table style="width: 100%; border-spacing: 0;">
+            <tr>
+              <td style="padding: 0.3rem 0; color: #166534; font-size: 0.9rem;">• With Solar:</td>
+              <td style="padding: 0.3rem 0; text-align: right; font-weight: 600; color: #14532d;">
+                ₹${summary.perDayWithSolar}/day
+              </td>
+            </tr>
+            <tr>
+              <td style="padding: 0.3rem 0; color: #166534; font-size: 0.9rem;">• Without Solar:</td>
+              <td style="padding: 0.3rem 0; text-align: right; font-weight: 600; color: #14532d;">
+                ₹${summary.perDayWithoutSolar}/day
+              </td>
+            </tr>
+            <tr>
+              <td style="padding: 0.3rem 0; color: #166534; font-size: 0.9rem;">• Daily Saving:</td>
+              <td style="padding: 0.3rem 0; text-align: right; font-weight: 700; color: #10b981;">
+                ₹${summary.perDaySaving}/day
+              </td>
+            </tr>
+          </table>
+        </div>
       </div>
       
-      <!-- Monthly Breakdown -->
-      <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px;">
-        <h6>📈 BILL-WISE BREAKDOWN</h6>
+      <!-- Bill-wise Breakdown -->
+      <div style="background: linear-gradient(135deg, #f3f4f6, #e5e7eb); padding: 1rem; border-radius: 8px; border-left: 4px solid #6b7280;">
+        <h6 style="color: #1f2937; font-weight: 700; margin-bottom: 0.75rem;">📈 BILL-WISE BREAKDOWN</h6>
         ${summary.monthlyBreakdown.map(m => `
-          <div style="padding: 0.5rem 0; border-bottom: 1px solid #ddd;">
-            <strong>${m.billNumber}:</strong> 
-            ₹${m.saving.toLocaleString()} saved (${m.savingPercent.toFixed(1)}%)
+          <div style="padding: 0.5rem 0; border-bottom: 1px solid #d1d5db;">
+            <div style="font-weight: 600; color: #374151;">
+              ${m.billNumber}
+            </div>
+            <div style="font-size: 0.9rem; color: #6b7280; margin-top: 0.2rem;">
+              Saving: <span style="color: #10b981; font-weight: 600;">₹${m.saving.toLocaleString()}</span>
+              (${m.savingPercent.toFixed(1)}%)
+            </div>
           </div>
         `).join('')}
       </div>
+      
     </div>
   `;
   
@@ -3265,12 +3318,39 @@ function displaySummaryModal(summary, bills) {
     'Multi-Bill Summary',
     modalHTML,
     [
-      { text: 'Close', type: 'secondary', action: closeModal }
+      { text: '✕ Close', type: 'secondary', action: closeModal }
     ]
   );
 }
 
+// Helper function to format bill period
+function formatBillPeriod(bill) {
+  const fromDate = bill['Bill From Date'] || bill.billFromDate;
+  const toDate = bill['Bill To Date'] || bill.billToDate;
   
+  if (!fromDate || !toDate) return 'N/A';
+  
+  try {
+    const from = new Date(fromDate);
+    const to = new Date(toDate);
+    
+    if (isNaN(from.getTime()) || isNaN(to.getTime())) return 'N/A';
+    
+    const fromDay = from.getDate();
+    const toDay = to.getDate();
+    const fromMonth = from.toLocaleDateString('en-IN', { month: 'short' });
+    const year = from.getFullYear();
+    
+    if (from.getMonth() === to.getMonth()) {
+      return `${fromDay}-${toDay} ${fromMonth} ${year}`;
+    } else {
+      const toMonth = to.toLocaleDateString('en-IN', { month: 'short' });
+      return `${fromDay} ${fromMonth} - ${toDay} ${toMonth} ${year}`;
+    }
+  } catch (e) {
+    return 'N/A';
+  }
+}
 </script>
 
 </body>
