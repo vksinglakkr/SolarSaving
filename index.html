@@ -2628,27 +2628,27 @@ function renderBillCards(bills) {
     return;
   }
   
-  // Clear existing content
+  // IMPORTANT: Store bills globally
+  window.userBills = bills;
+  
   billsList.innerHTML = '';
   
-  // If no bills, show message
   if (!bills || bills.length === 0) {
     billsList.innerHTML = `
       <div class="text-center text-muted py-5">
         <p style="font-size: 1.2rem;">📋 No bills saved yet</p>
-        <p>Add your first bill to start tracking!</p>
       </div>
     `;
     return;
   }
   
-  // Render each bill card
   bills.forEach((bill, index) => {
     const cardHTML = createBillCard(bill, index);
     billsList.innerHTML += cardHTML;
   });
+  
+  console.log('Rendered', bills.length, 'bills'); // DEBUG
 }
-
 // ==========================================
 // SAVE BILLS TO STORAGE
 // ==========================================
@@ -3029,18 +3029,42 @@ function clearAllSelections() {
 // Show multi-bill summary modal
 function showMultiBillSummary() {
   const checkedBoxes = document.querySelectorAll('.summary-selector:checked');
+  
   if (checkedBoxes.length === 0) {
-    alert('कृपया कम से कम एक bill select करें।');
+    alert('कृपया कम से कम एक bill select करें।\nPlease select at least one bill.');
     return;
   }
   
-  // Get all bills - use userBills directly
-  const allBills = window.userBills || [];
+  // Get all bills - try multiple sources
+  let allBills = window.userBills || [];
   
+  // Fallback 1: Load from storage
   if (allBills.length === 0) {
-    alert('No bills found. Please save some bills first.');
+    try {
+      const stored = localStorage.getItem('solarBills');
+      if (stored) {
+        allBills = JSON.parse(stored);
+        window.userBills = allBills; // Store for future use
+      }
+    } catch (e) {
+      console.error('Error loading bills:', e);
+    }
+  }
+  
+  // Fallback 2: Try getStoredBills function
+  if (allBills.length === 0 && typeof getStoredBills === 'function') {
+    allBills = getStoredBills() || [];
+    window.userBills = allBills;
+  }
+  
+  // Final check
+  if (allBills.length === 0) {
+    alert('कोई bills नहीं मिले। कृपया page refresh करें।\nNo bills found. Please refresh the page.');
     return;
   }
+  
+  console.log('Total bills available:', allBills.length);
+  console.log('Bills selected:', checkedBoxes.length);
   
   // Get selected bills data
   const selectedBills = [];
@@ -3056,14 +3080,14 @@ function showMultiBillSummary() {
     return;
   }
   
+  console.log('Selected bills:', selectedBills.length);
+  
   // Calculate aggregate statistics
   const summary = calculateMultiBillSummary(selectedBills);
   
   // Show summary modal
   displaySummaryModal(summary, selectedBills);
 }
-
-// Calculate aggregate statistics
 function calculateMultiBillSummary(bills) {
   const summary = {
     count: bills.length,
