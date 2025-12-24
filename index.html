@@ -400,6 +400,49 @@ background: linear-gradient(135deg, #5568d3 0%, #6a3f91 100%);
     padding: 0.35rem 0.8rem;
   }
 }
+/* Carry Forward Warning Styles */
+.carry-warning {
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  border-left: 4px solid;
+  animation: slideIn 0.3s ease-out;
+}
+
+.carry-warning-info {
+  background-color: #cff4fc;
+  border-color: #0dcaf0;
+  color: #055160;
+}
+
+.carry-warning-april {
+  background-color: #fff3cd;
+  border-color: #ffc107;
+  color: #664d03;
+}
+
+.carry-warning-success {
+  background-color: #d1e7dd;
+  border-color: #198754;
+  color: #0f5132;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Tooltip enhancement */
+[title] {
+  position: relative;
+}
 </style>
 </head>
 
@@ -611,18 +654,37 @@ onblur="validateUnits()">
     +
   </button>
 </div>
-<!-- Opening Carry Forward (Save mode only) -->
+<!-- ==========================================
+     ENHANCED OPENING CARRY FORWARD FIELD
+     With Smart Hints, Tooltips, and Warnings
+     Replace lines 615-627 in your HTML
+     ========================================== -->
+
 <div id="carryForwardSection" class="mb-2 d-none">
-  <label>
+  <label style="display: flex; align-items: center; gap: 0.5rem;">
     Opening Carry Forward Units
-    <small class="text-muted">(from previous bills)</small>
+    <small class="text-muted">(from previous bill)</small>
+    <!-- Info icon with tooltip -->
+    <span style="cursor: help; color: #0d6efd;" 
+          title="Enter the 'Closing Carry Forward' from your previous month's bill. This will reduce your current month's billing."
+          onclick="showCarryForwardHelp()">
+      ℹ️
+    </span>
   </label>
+  
   <input id="openingCarry"
          class="form-control"
          inputmode="numeric"
-         oninput="handleNumericInput(this)">
-  <small class="text-muted">
-    Will be reset automatically at the start of financial year (April)
+         oninput="handleNumericInput(this); checkCarryForwardWarnings()">
+  
+  <!-- Dynamic hint based on month -->
+  <div id="carryForwardHint" style="margin-top: 0.5rem;">
+    <!-- This will be populated by JavaScript -->
+  </div>
+  
+  <!-- Static help text (always visible) -->
+  <small class="text-muted d-block" style="margin-top: 0.25rem;">
+    💡 <strong>Tip:</strong> Find this value in previous bill's "Closing Carry Forward"
   </small>
 </div>
 
@@ -1882,6 +1944,165 @@ Estimated Bill Without Solar: ₹${data.withoutSolar}
 
 document.getElementById("lastModified").innerText =
   new Date(document.lastModified).toLocaleString("en-IN");
+
+// ========================================
+// Check Carry Forward Warnings (Dynamic Hints)
+// ========================================
+function checkCarryForwardWarnings() {
+  const billFromEl = document.getElementById("billFrom");
+  const openingCarryEl = document.getElementById("openingCarry");
+  const hintDiv = document.getElementById("carryForwardHint");
+  
+  if (!billFromEl?.value || !hintDiv) return;
+  
+  const billDate = new Date(billFromEl.value);
+  const month = billDate.getMonth(); // 0-11 (0=Jan, 3=Apr)
+  const year = billDate.getFullYear();
+  const openingCarryValue = Number(openingCarryEl.value || 0);
+  
+  let hintHTML = '';
+  
+  // CASE 1: April (Financial Year Start)
+  if (month === 3) {
+    if (openingCarryValue > 0) {
+      // User entered carry forward in April - might be same FY
+      hintHTML = `
+        <div class="carry-warning carry-warning-april">
+          <strong>⚠️ Financial Year Alert:</strong><br>
+          April marks the start of India's Financial Year (FY ${year}-${year+1}).<br><br>
+          
+          <strong>You entered ${openingCarryValue} units carry forward.</strong><br><br>
+          
+          <strong>Is this correct?</strong><br>
+          • If this is from <strong>March ${year}</strong> (same FY): Keep ${openingCarryValue} ✓<br>
+          • If this is from <strong>March ${year-1}</strong> (old FY): Change to 0 ⚠️<br><br>
+          
+          <em>According to Haryana Net Metering Policy, carry forward resets at FY end.</em>
+        </div>
+      `;
+    } else {
+      // User entered 0 in April - this is expected for new FY
+      hintHTML = `
+        <div class="carry-warning carry-warning-success">
+          <strong>✓ Correct for New Financial Year</strong><br>
+          You've correctly reset carry forward to 0 for FY ${year}-${year+1}.<br>
+          Any surplus from this month will create new carry forward.
+        </div>
+      `;
+    }
+  }
+  
+  // CASE 2: Other months with carry forward
+  else if (openingCarryValue > 0) {
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const prevMonth = month === 0 ? 11 : month - 1;
+    const prevMonthName = monthNames[prevMonth];
+    const prevYear = month === 0 ? year - 1 : year;
+    
+    hintHTML = `
+      <div class="carry-warning carry-warning-success">
+        <strong>✓ Using Carry Forward from Previous Bill</strong><br>
+        You have ${openingCarryValue} units credit from ${prevMonthName} ${prevYear}.<br>
+        This will reduce your billable units this month! 💰
+      </div>
+    `;
+  }
+  
+  // CASE 3: Other months with no carry forward
+  else {
+    hintHTML = `
+      <div class="carry-warning carry-warning-info">
+        <strong>ℹ️ No Carry Forward</strong><br>
+        Starting fresh this month. If previous month had surplus generation,<br>
+        enter the "Closing Carry Forward" value here.
+      </div>
+    `;
+  }
+  
+  hintDiv.innerHTML = hintHTML;
+}
+
+// ========================================
+// Show Detailed Carry Forward Help (Modal)
+// ========================================
+function showCarryForwardHelp() {
+  const helpContent = `
+    <div style="text-align: left;">
+      <h5 style="color: #0b5ed7; margin-bottom: 1rem;">
+        📚 Understanding Opening Carry Forward
+      </h5>
+      
+      <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+        <strong>What is Carry Forward?</strong><br>
+        When your solar exports MORE units than you import in a month,
+        the surplus units are "carried forward" as credit for the next month.
+      </div>
+      
+      <div style="background: #d1e7dd; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+        <strong>✓ How to Use This Field:</strong><br>
+        1. Check your <strong>previous month's bill</strong><br>
+        2. Look for "Closing Carry Forward" value<br>
+        3. Enter that value here as "Opening Carry Forward"<br>
+        4. This will reduce your current month's billing!
+      </div>
+      
+      <div style="background: #fff3cd; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+        <strong>⚠️ Special Case - April (New Financial Year):</strong><br>
+        • India's FY runs from April 1 to March 31<br>
+        • Haryana Net Metering Policy resets carry forward at FY end<br>
+        • In April, enter 0 (unless using March of SAME year)<br><br>
+        
+        <strong>Example:</strong><br>
+        • March 2025 → April 2025: <span style="color: green;">Use carry forward ✓</span><br>
+        • March 2024 → April 2025: <span style="color: red;">Reset to 0 ✗</span>
+      </div>
+      
+      <div style="background: #cfe2ff; padding: 1rem; border-radius: 8px;">
+        <strong>💡 Example Scenario:</strong><br><br>
+        
+        <strong>March 2025:</strong><br>
+        • Import: 320 units, Export: 450 units<br>
+        • Net: -130 units (surplus!)<br>
+        • Closing Carry Forward: 130 units<br><br>
+        
+        <strong>April 2025:</strong><br>
+        • Opening Carry Forward: <strong>130 units</strong> ← Enter this!<br>
+        • Import: 480 units, Export: 310 units<br>
+        • Net: 170 units<br>
+        • After carry forward: 170 - 130 = <strong>40 units</strong><br>
+        • You only pay for 40 units! 💰<br>
+        • Savings from carry: 130 × ₹6.50 = ₹845
+      </div>
+      
+      <hr style="margin: 1.5rem 0;">
+      
+      <div style="font-size: 0.9rem; color: #6c757d;">
+        <strong>Need help?</strong> Contact your District Administration or<br>
+        refer to Haryana's Net Metering Policy for detailed guidelines.
+      </div>
+    </div>
+  `;
+  
+  showModal(
+    '📚',
+    'Carry Forward Help Guide',
+    helpContent,
+    [
+      { text: 'Got it!', type: 'primary', action: closeModal }
+    ]
+  );
+}
+
+// ========================================
+// Trigger warnings when bill date changes
+// ========================================
+document.getElementById("billFrom")?.addEventListener("change", checkCarryForwardWarnings);
+document.getElementById("openingCarry")?.addEventListener("blur", checkCarryForwardWarnings);
+
+// Initial check when page loads
+if (document.getElementById("carryForwardSection")) {
+  setTimeout(checkCarryForwardWarnings, 500);
+}
 </script>
 
 </body>
