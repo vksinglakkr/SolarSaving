@@ -933,7 +933,18 @@ oninput="handleNumericInput(this)">
 // ==========================================
 let entryMode = "one";
 let currentUser = null;
+// Initialize and synchronize userBills
 let userBills = [];
+
+// Create two-way binding with window.userBills
+Object.defineProperty(window, 'userBills', {
+  get: function() { return userBills; },
+  set: function(value) { 
+    userBills = value;
+    console.log('userBills updated:', value ? value.length : 0, 'bills');
+  },
+  configurable: true
+});
 let selectedBillIndex = null;
 
 // Elements
