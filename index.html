@@ -2954,16 +2954,19 @@ let currentSelectionMode = 'single'; // 'single' or 'summary'
 function switchMode(mode) {
   currentSelectionMode = mode;
   
-  // Update button styles
   if (mode === 'single') {
+    // Single mode styling
     document.getElementById('singleModeBtn').classList.add('btn-primary');
     document.getElementById('singleModeBtn').classList.remove('btn-outline-primary');
     document.getElementById('summaryModeBtn').classList.remove('btn-primary');
     document.getElementById('summaryModeBtn').classList.add('btn-outline-primary');
     
-    // Show/hide action buttons
-    document.getElementById('singleModeActions').style.display = 'flex';
-    document.getElementById('summaryModeActions').style.display = 'none';
+    // SHOW single buttons, HIDE summary buttons
+    const singleActions = document.getElementById('singleModeActions');
+    const summaryActions = document.getElementById('summaryModeActions');
+    
+    if (singleActions) singleActions.style.display = 'flex';
+    if (summaryActions) summaryActions.style.display = 'none';
     
     // Show radios, hide checkboxes
     document.querySelectorAll('.single-selector').forEach(el => el.style.display = 'block');
@@ -2973,17 +2976,24 @@ function switchMode(mode) {
     });
     
     // Update info
-    document.getElementById('modeInfo').innerHTML = 
-      '<strong>Single Selection Mode:</strong> Select one bill to View, Edit, or Delete.';
-  } else {
+    const modeInfo = document.getElementById('modeInfo');
+    if (modeInfo) {
+      modeInfo.innerHTML = '<strong>Single Selection Mode:</strong> Select one bill to View, Edit, or Delete.';
+    }
+    
+  } else if (mode === 'summary') {
+    // Summary mode styling
     document.getElementById('summaryModeBtn').classList.add('btn-primary');
     document.getElementById('summaryModeBtn').classList.remove('btn-outline-primary');
     document.getElementById('singleModeBtn').classList.remove('btn-primary');
     document.getElementById('singleModeBtn').classList.add('btn-outline-primary');
     
-    // Show/hide action buttons
-    document.getElementById('singleModeActions').style.display = 'none';
-    document.getElementById('summaryModeActions').style.display = 'flex';
+    // HIDE single buttons, SHOW summary buttons  ← THIS IS KEY!
+    const singleActions = document.getElementById('singleModeActions');
+    const summaryActions = document.getElementById('summaryModeActions');
+    
+    if (singleActions) singleActions.style.display = 'none';   // ← HIDE!
+    if (summaryActions) summaryActions.style.display = 'flex'; // ← SHOW!
     
     // Hide radios, show checkboxes
     document.querySelectorAll('.single-selector').forEach(el => {
@@ -2992,9 +3002,22 @@ function switchMode(mode) {
     });
     document.querySelectorAll('.summary-selector').forEach(el => el.style.display = 'block');
     
+    // Disable single mode buttons
+    const viewBtn = document.getElementById('viewBtn');
+    const editBtn = document.getElementById('editBtn');
+    const deleteBtn = document.getElementById('deleteBtn');
+    
+    if (viewBtn) viewBtn.disabled = true;
+    if (editBtn) editBtn.disabled = true;
+    if (deleteBtn) deleteBtn.disabled = true;
+    
+    selectedBillIndex = null;
+    
     // Update info
-    document.getElementById('modeInfo').innerHTML = 
-      '<strong>Multi-Bill Summary Mode:</strong> Select multiple bills to see aggregate statistics.';
+    const modeInfo = document.getElementById('modeInfo');
+    if (modeInfo) {
+      modeInfo.innerHTML = '<strong>Multi-Bill Summary Mode:</strong> Select multiple bills to see aggregate statistics.';
+    }
     
     updateSummarySelection();
   }
