@@ -2158,27 +2158,16 @@ function showCarryForwardHelp() {
         4. This will reduce your current month's billing!
       </div>
       
-      <div style="background: #fff3cd; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-        <strong>⚠️ Special Case - April (New Financial Year):</strong><br>
-        • India's FY runs from April 1 to March 31<br>
-        • Haryana Net Metering Policy resets carry forward at FY end<br>
-        • In April, enter 0 (unless using March of SAME year)<br><br>
-        
-        <strong>Example:</strong><br>
-        • March 2025 → April 2025: <span style="color: green;">Use carry forward ✓</span><br>
-        • March 2024 → April 2025: <span style="color: red;">Reset to 0 ✗</span>
-      </div>
-      
-      <div style="background: #cfe2ff; padding: 1rem; border-radius: 8px;">
+      <div style="background: #cfe2ff; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
         <strong>💡 Example Scenario:</strong><br><br>
         
-        <strong>March 2025:</strong><br>
+        <strong>Month 1 (Surplus Generated):</strong><br>
         • Import: 320 units, Export: 450 units<br>
         • Net: -130 units (surplus!)<br>
         • Closing Carry Forward: 130 units<br><br>
         
-        <strong>April 2025:</strong><br>
-        • Opening Carry Forward: <strong>130 units</strong> ← Enter this!<br>
+        <strong>Month 2 (Using Carry Forward):</strong><br>
+        • Opening Carry Forward: <strong>130 units</strong> ← Enter from previous bill!<br>
         • Import: 480 units, Export: 310 units<br>
         • Net: 170 units<br>
         • After carry forward: 170 - 130 = <strong>40 units</strong><br>
@@ -2186,11 +2175,28 @@ function showCarryForwardHelp() {
         • Savings from carry: 130 × ₹6.50 = ₹845
       </div>
       
+      <div style="background: #fff3cd; padding: 1rem; border-radius: 8px; border-left: 4px solid #ffc107;">
+        <strong>⚠️ Important Policy Note:</strong><br>
+        Different states have different policies regarding carry forward,
+        especially at Financial Year end (March 31).<br><br>
+        
+        <strong>Please check:</strong><br>
+        • Your state's Net Metering Policy<br>
+        • DISCOM regulations<br>
+        • Policy information shown at the top of this page<br><br>
+        
+        <a href="#" onclick="closeModal(); setTimeout(() => showMarchResetHelp(), 300); return false;">
+          📅 Learn about March 31 Reset Policy →
+        </a>
+      </div>
+      
       <hr style="margin: 1.5rem 0;">
       
       <div style="font-size: 0.9rem; color: #6c757d;">
-        <strong>Need help?</strong> Contact your District Administration or<br>
-        refer to Haryana's Net Metering Policy for detailed guidelines.
+        <strong>Need more help?</strong><br>
+        • 📊 <a href="#" onclick="closeModal(); setTimeout(() => show90LimitHelp(), 300); return false;">
+          90% Annual Limit Guide</a><br>
+        • 📞 Contact your DISCOM for policy details
       </div>
     </div>
   `;
