@@ -1127,7 +1127,37 @@ function displayBillsList() {
 }
 
 function createBillCard(bill, index) {
-  const billDate = bill['Entry DateTime'] ? new Date(bill['Entry DateTime']).toLocaleDateString('en-IN') : 'N/A';
+ // Show bill period instead of entry date
+let billPeriod = 'N/A';
+const fromDate = bill['Bill From Date'] || bill.billPeriod?.from;
+const toDate = bill['Bill To Date'] || bill.billPeriod?.to;
+
+if (fromDate && toDate) {
+  try {
+    const from = new Date(fromDate);
+    const to = new Date(toDate);
+    
+    if (!isNaN(from.getTime()) && !isNaN(to.getTime())) {
+      // Format: "1 Apr - 30 Apr 2025" (concise and clear)
+      const fromDay = from.getDate();
+      const toDay = to.getDate();
+      const month = from.toLocaleDateString('en-IN', { month: 'short' });
+      const year = from.getFullYear();
+      
+      // Same month
+      if (from.getMonth() === to.getMonth()) {
+        billPeriod = `${fromDay}-${toDay} ${month} ${year}`;
+      } 
+      // Different months
+      else {
+        const toMonth = to.toLocaleDateString('en-IN', { month: 'short' });
+        billPeriod = `${fromDay} ${month} - ${toDay} ${toMonth} ${year}`;
+      }
+    }
+  } catch (e) {
+    billPeriod = 'N/A';
+  }
+}
   const saving = parseFloat(bill['Solar Saving Amount'] || 0);
   const savingPercent = parseFloat(bill['Saving Percentage'] || 0);
   const billAmount = parseFloat(bill['Total Bill Amount'] || 0);
@@ -1146,7 +1176,7 @@ function createBillCard(bill, index) {
                 Bill #${bill['Bill Number'] || 'N/A'}
               </div>
               <div style="font-size: 0.85rem; color: #64748b;">
-                📅 ${billDate}
+                📅 ${billPeriod}
               </div>
             </div>
             <div class="text-end">
