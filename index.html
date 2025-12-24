@@ -505,26 +505,45 @@ background: linear-gradient(135deg, #5568d3 0%, #6a3f91 100%);
     </div>
   </div>
 </div>
-<!-- 90% LIMIT INFORMATION ALERT -->
+<!-- 90% LIMIT & MARCH RESET INFORMATION ALERT -->
 <div class="alert alert-info" style="margin: 1rem 0;">
-  <h6 style="margin-bottom: 0.5rem;">
-    ℹ️ 90% वार्षिक सीमा जानकारी / 90% Annual Limit Information
+  <h6 style="margin-bottom: 0.75rem;">
+    ℹ️ महत्वपूर्ण नीति जानकारी / Important Policy Information
   </h6>
   
-  <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">
-    <strong>हिंदी:</strong> कुछ राज्यों में वार्षिक solar generation की 90% सीमा हो सकती है। 
-    यदि आपकी वार्षिक generation, वार्षिक consumption के 90% से अधिक हो जाती है, 
-    तो अतिरिक्त units का भुगतान कम दर पर हो सकता है।
-  </p>
+  <!-- 90% Limit Info -->
+  <div style="margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid #0dcaf0;">
+    <strong style="color: #055160;">1️⃣ 90% वार्षिक सीमा / 90% Annual Limit:</strong>
+    <p style="font-size: 0.9rem; margin: 0.5rem 0 0 0;">
+      कुछ राज्यों में वार्षिक solar generation की 90% सीमा हो सकती है। 
+      अतिरिक्त units का भुगतान कम दर पर हो सकता है।<br>
+      <small>Some states may have 90% annual limit. Excess may be paid at lower rate.</small>
+      <a href="#" onclick="show90LimitHelp(); return false;" style="margin-left: 0.5rem;">
+        📚 Learn more
+      </a>
+    </p>
+  </div>
   
-  <p style="font-size: 0.9rem; margin-bottom: 0;">
-    <strong>English:</strong> Some states may have a 90% annual solar generation limit. 
-    If your annual generation exceeds 90% of annual consumption, 
-    excess units may be paid at a lower rate.
-    <a href="#" onclick="show90LimitHelp(); return false;" style="margin-left: 0.5rem;">
-      📚 Learn more
-    </a>
-  </p>
+  <!-- March Reset Info -->
+  <div>
+    <strong style="color: #055160;">2️⃣ मार्च के बाद Carry Forward Reset:</strong>
+    <p style="font-size: 0.9rem; margin: 0.5rem 0 0 0;">
+      कुछ राज्यों में 31 मार्च (वित्तीय वर्ष के अंत) में carry forward शून्य हो सकती है।<br>
+      <small>Some states may reset carry forward to zero on March 31 (FY end).</small>
+      <a href="#" onclick="showMarchResetHelp(); return false;" style="margin-left: 0.5rem;">
+        📚 Learn more
+      </a>
+    </p>
+  </div>
+  
+  <!-- Important Note -->
+  <div style="margin-top: 0.75rem; padding: 0.5rem; background: #fff3cd; border-radius: 6px; border-left: 3px solid #ffc107;">
+    <strong style="color: #664d03;">⚠️ महत्वपूर्ण / Important:</strong><br>
+    <small style="color: #664d03;">
+      ये नियम हर state में अलग हो सकते हैं। कृपया अपने DISCOM से confirm करें।<br>
+      These policies vary by state. Please confirm with your DISCOM.
+    </small>
+  </div>
 </div>
 <!-- ANNUAL STATISTICS CARD -->
 <div class="card mb-3" id="annualStatsCard" style="display: none;">
@@ -2305,6 +2324,198 @@ document.addEventListener('DOMContentLoaded', function() {
   // Wait a bit for data to load
   setTimeout(updateAnnualStats, 1000);
 });
+// ==========================================
+// 90% LIMIT HELP MODAL
+// ==========================================
+
+function show90LimitHelp() {
+  const helpHTML = `
+    <div style="text-align: left;">
+      <h5 style="color: #0b5ed7; margin-bottom: 1rem;">
+        📊 90% वार्षिक सीमा / 90% Annual Limit - Complete Guide
+      </h5>
+      
+      <div style="background: #fff3cd; padding: 1rem; border-radius: 8px; 
+           margin-bottom: 1rem; border-left: 4px solid #ffc107;">
+        <strong>⚠️ महत्वपूर्ण / Important:</strong><br>
+        यह limit हर state में अलग हो सकती है।<br>
+        This limit may vary by state.<br>
+        कृपया अपने state की policy check करें।<br>
+        Please check your state's policy.
+      </div>
+      
+      <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+        <strong>90% Limit क्या है? / What is 90% Limit?</strong><br><br>
+        कुछ states में नियम है कि आपके solar panels की वार्षिक generation
+        आपकी वार्षिक consumption के 90% से अधिक नहीं होनी चाहिए।<br><br>
+        Some states have a rule that your annual solar generation should not
+        exceed 90% of your annual consumption.
+      </div>
+      
+      <div style="background: #d1e7dd; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+        <strong>✓ उदाहरण / Example:</strong><br><br>
+        
+        <strong>Case 1: Safe</strong><br>
+        Annual Consumption: 10,000 units<br>
+        90% Reference: 9,000 units<br>
+        Your Generation: 8,500 units ✓<br>
+        Status: Full net metering benefits<br><br>
+        
+        <strong>Case 2: Exceeds</strong><br>
+        Annual Consumption: 10,000 units<br>
+        90% Reference: 9,000 units<br>
+        Your Generation: 12,000 units ⚠️<br>
+        Excess: 3,000 units<br><br>
+        
+        <strong>Excess units के लिए क्या होता है?</strong><br>
+        • कम दर पर भुगतान (₹2-3/unit) या<br>
+        • DISCOM को forfeit या<br>
+        • State policy पर depend
+      </div>
+      
+      <div style="background: #cfe2ff; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+        <strong>🔍 Haryana में क्या है?</strong><br><br>
+        कृपया UHBVN से confirm करें।<br>
+        Please confirm with UHBVN.<br><br>
+        
+        <strong>संपर्क / Contact:</strong><br>
+        • HERC Website: https://herc.gov.in<br>
+        • UHBVN: https://www.uhbvn.org.in<br>
+        • या अपने local UHBVN office
+      </div>
+      
+      <div style="background: #f8d7da; padding: 1rem; border-radius: 8px;">
+        <strong>💡 SolarSanchay में:</strong><br><br>
+        • हम आपको inform करते हैं ✓<br>
+        • Annual stats दिखाते हैं ✓<br>
+        • Warning देते हैं ✓<br>
+        • लेकिन automatic calculation नहीं<br>
+        • आप खुद decide करें!
+      </div>
+    </div>
+  `;
+  
+  showModal(
+    '📊',
+    '90% Annual Limit Guide',
+    helpHTML,
+    [{ text: 'समझ गया / Got it!', type: 'primary', action: closeModal }]
+  );
+}
+// ==========================================
+// MARCH RESET HELP MODAL
+// ==========================================
+
+function showMarchResetHelp() {
+  const helpHTML = `
+    <div style="text-align: left;">
+      <h5 style="color: #0b5ed7; margin-bottom: 1rem;">
+        📅 मार्च 31 Carry Forward Reset - Complete Guide
+      </h5>
+      
+      <div style="background: #fff3cd; padding: 1rem; border-radius: 8px; 
+           margin-bottom: 1rem; border-left: 4px solid #ffc107;">
+        <strong>⚠️ महत्वपूर्ण / Important:</strong><br>
+        यह policy हर state में अलग है।<br>
+        This policy varies by state.<br>
+        कृपया अपने DISCOM से confirm करें।<br>
+        Please confirm with your DISCOM.
+      </div>
+      
+      <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+        <strong>Carry Forward Reset क्या है? / What is CF Reset?</strong><br><br>
+        
+        <strong>दो अलग-अलग concepts हैं / Two different concepts:</strong><br><br>
+        
+        <strong>Concept 1: Monthly Carry Forward (लगातार चलती है)</strong><br>
+        • हर महीने: Previous Closing = Next Opening<br>
+        • March → April में भी चलती रहती है<br>
+        • यह monthly billing cycle है<br><br>
+        
+        <strong>Concept 2: Annual Settlement (FY के अंत में)</strong><br>
+        • कुछ states में March 31 को final adjustment<br>
+        • Remaining carry forward zero हो सकती है<br>
+        • या payment at avoided cost rate<br>
+        • या carry to next FY (rare)
+      </div>
+      
+      <div style="background: #d1e7dd; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+        <strong>✓ हमारी समझ / Our Understanding:</strong><br><br>
+        
+        <strong>अधिकतर states में (Most states):</strong><br>
+        • Monthly carry forward चलती रहती है ✓<br>
+        • March → April में भी चलती है ✓<br>
+        • कोई automatic reset नहीं<br><br>
+        
+        <strong>Example:</strong><br>
+        March 31: Closing CF = 130 units<br>
+        April 1: Opening CF = 130 units ✓<br>
+        (Same year billing, continuous)
+      </div>
+      
+      <div style="background: #f8d7da; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+        <strong>⚠️ लेकिन कुछ states में / But some states:</strong><br><br>
+        
+        • March 31 को annual settlement होता है<br>
+        • Carry forward reset to zero<br>
+        • या payment at lower rate<br>
+        • Policy document में clearly mentioned होता है<br><br>
+        
+        <strong>अगर ऐसा है तो / If this applies:</strong><br>
+        March 31: CF = 130 units<br>
+        April 1: CF = 0 ❌ (reset!)<br>
+        Loss: 130 units credit
+      </div>
+      
+      <div style="background: #cfe2ff; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+        <strong>🔍 Haryana UHBVN में क्या है?</strong><br><br>
+        
+        <strong>हमें exact information नहीं है।</strong><br>
+        We don't have exact information.<br><br>
+        
+        <strong>आपको क्या करना चाहिए? / What to do?</strong><br>
+        1. ✓ UHBVN office से पूछें<br>
+        2. ✓ Net Metering agreement पढ़ें<br>
+        3. ✓ HERC regulations check करें<br>
+        4. ✓ Solar installer से confirm करें<br>
+        5. ✓ Existing solar users से पूछें
+      </div>
+      
+      <div style="background: #e7f3ff; padding: 1rem; border-radius: 8px;">
+        <strong>💡 SolarSanchay में हमारा approach:</strong><br><br>
+        
+        • हम assume करते हैं: Monthly CF continuous है ✓<br>
+        • March → April में चलती रहती है<br>
+        • User को full information देते हैं<br>
+        • लेकिन automatic reset नहीं करते<br>
+        • User खुद decide करे!<br><br>
+        
+        <strong>Why?</strong><br>
+        • Policy हर state में अलग<br>
+        • Clear information नहीं मिली<br>
+        • User को empower करना बेहतर<br>
+        • Flexibility maintain रहे
+      </div>
+      
+      <hr style="margin: 1.5rem 0;">
+      
+      <div style="font-size: 0.9rem; color: #6c757d;">
+        <strong>महत्वपूर्ण संपर्क / Important Contacts:</strong><br>
+        • HERC: https://herc.gov.in<br>
+        • UHBVN: https://www.uhbvn.org.in<br>
+        • UHBVN Helpline: 1912<br>
+        • Net Metering Cell: Check local office
+      </div>
+    </div>
+  `;
+  
+  showModal(
+    '📅',
+    'March 31 Carry Forward Reset Guide',
+    helpHTML,
+    [{ text: 'समझ गया / Got it!', type: 'primary', action: closeModal }]
+  );
+}
 </script>
 
 </body>
