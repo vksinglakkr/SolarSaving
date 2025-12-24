@@ -1207,35 +1207,58 @@ if (fromDate && toDate) {
   const savingPercent = parseFloat(bill['Saving Percentage'] || 0);
   const billAmount = parseFloat(bill['Total Bill Amount'] || 0);
   
-      <div class="bill-card" onclick="handleBillCardClick(${index})">
-      <div class="d-flex align-items-center gap-3">
+return `
+  <div class="bill-card" onclick="handleBillCardClick(${index})">
+    <div class="d-flex align-items-center gap-3">
+      
+      <!-- Single Selection Radio (default visible) -->
+      <input type="radio" 
+             name="billSelection" 
+             id="single_${index}"
+             class="single-selector"
+             value="${index}" 
+             style="width: 20px; height: 20px; cursor: pointer;"
+             onchange="selectSingleBill(${index})">
+      
+      <!-- Multi Selection Checkbox (hidden by default) -->
+      <input type="checkbox" 
+             name="billSummary" 
+             id="summary_${index}"
+             class="summary-selector"
+             value="${index}"
+             style="width: 20px; height: 20px; cursor: pointer; display: none;"
+             onchange="updateSummarySelection()">
+      
+      <div class="flex-grow-1">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <div>
+            <div style="font-weight: 700; font-size: 1.1rem; color: #1e3a8a;">
+              Bill #${bill['Bill Number'] || 'N/A'}
+            </div>
+            <div style="font-size: 0.85rem; color: #64748b;">
+              📅 ${billPeriod}
+            </div>
+          </div>
+          <div class="text-end">
+            <div style="font-size: 0.85rem; color: #64748b;">Bill Amount</div>
+            <div style="font-weight: 600; color: #1e3a8a;">₹${billAmount.toFixed(0)}</div>
+          </div>
+        </div>
         
-        <!-- Single Selection Radio (default visible) -->
-        <input type="radio" 
-               name="billSelection" 
-               id="single_${index}"
-               class="single-selector"
-               value="${index}" 
-               style="width: 20px; height: 20px; cursor: pointer;"
-               onchange="selectSingleBill(${index})">
-        
-        <!-- Multi Selection Checkbox (hidden by default) -->
-        <input type="checkbox" 
-               name="billSummary" 
-               id="summary_${index}"
-               class="summary-selector"
-               value="${index}"
-               style="width: 20px; height: 20px; cursor: pointer; display: none;"
-               onchange="updateSummarySelection()">
-        
-        <div class="flex-grow-1">
-          <!-- Rest of bill card content same as before -->
-          ...
+        <div class="row g-2 pt-2" style="border-top: 1px solid #e2e8f0;">
+          <div class="col-6">
+            <div style="font-size: 0.75rem; color: #64748b;">Solar Saving</div>
+            <div style="font-weight: 700; font-size: 1.3rem; color: #10b981;">₹${saving.toFixed(0)}</div>
+          </div>
+          <div class="col-6">
+            <div style="font-size: 0.75rem; color: #64748b;">Saving %</div>
+            <div style="font-weight: 700; font-size: 1.3rem; color: #3b82f6;">${savingPercent.toFixed(1)}%</div>
+          </div>
         </div>
       </div>
     </div>
-  `;
-}
+  </div>
+`;}
 
 function selectBill(index) {
   selectedBillIndex = index;
@@ -1255,6 +1278,134 @@ function selectBill(index) {
       card.classList.remove('selected');
     }
   });
+}
+
+// ==========================================
+// BUTTON ACTION FUNCTIONS
+// ==========================================
+
+// View button - shows bill details
+function viewBill() {
+  if (selectedBillIndex === null) {
+    alert('Please select a bill first.');
+    return;
+  }
+  viewSelectedBill(); // Call existing function
+}
+
+// Edit button - loads bill for editing
+function editBill() {
+  if (selectedBillIndex === null) {
+    alert('Please select a bill first.');
+    return;
+  }
+  
+  const bill = userBills[selectedBillIndex];
+  if (!bill) {
+    alert('Bill data not found.');
+    return;
+  }
+  
+  // Load bill data into form
+  loadBillForEditing(bill);
+  
+  // Show form sections
+  document.getElementById('formCard').style.display = 'block';
+  document.getElementById('dashboardCard').style.display = 'none';
+  
+  // Update button text
+  document.getElementById('calculateBtn').textContent = '💾 Update Bill';
+  
+  // Store that we're editing
+  window.isEditingBill = true;
+  window.editingBillIndex = selectedBillIndex;
+}
+
+// Delete button - removes selected bill
+function deleteBill() {
+  if (selectedBillIndex === null) {
+    alert('Please select a bill first.');
+    return;
+  }
+  
+  const bill = userBills[selectedBillIndex];
+  if (!bill) {
+    alert('Bill data not found.');
+    return;
+  }
+  
+  const billNum = bill['Bill Number'] || bill.billNumber || 'Unknown';
+  
+  if (confirm(`Are you sure you want to delete Bill #${billNum}?`)) {
+    // Remove from array
+    userBills.splice(selectedBillIndex, 1);
+    
+    // Save to Google Sheets / localStorage
+    saveBillsToStorage(userBills);
+    
+    // Reset selection
+    selectedBillIndex = null;
+    
+    // Refresh dashboard
+    renderBillCards(userBills);
+    
+    alert('Bill deleted successfully!');
+  }
+}
+
+// Handle bill card click
+function handleBillCardClick(index) {
+  if (currentSelectionMode === 'single') {
+    selectSingleBill(index);
+  }
+  // In summary mode, let checkbox handle it
+}
+
+// Select single bill (radio button)
+function selectSingleBill(index) {
+  selectedBillIndex = index;
+  
+  // Enable action buttons
+  document.getElementById('viewBtn').disabled = false;
+  document.getElementById('editBtn').disabled = false;
+  document.getElementById('deleteBtn').disabled = false;
+  
+  // Update visual selection
+  document.querySelectorAll('.bill-card').forEach((card, i) => {
+    if (i === index) {
+      card.classList.add('selected');
+    } else {
+      card.classList.remove('selected');
+    }
+  });
+}
+
+// Load bill data into form for editing
+function loadBillForEditing(bill) {
+  // Identity
+  document.getElementById('billNumber').value = bill['Bill Number'] || '';
+  document.getElementById('meter').value = bill['Meter Number'] || '';
+  document.getElementById('accountNum').value = bill['Account Number'] || '';
+  
+  // Dates
+  document.getElementById('billFrom').value = bill['Bill From Date'] || '';
+  document.getElementById('billTo').value = bill['Bill To Date'] || '';
+  
+  // Units
+  document.getElementById('grossUnits').value = bill['Gross Units'] || '';
+  document.getElementById('importUnits').value = bill['Import Units'] || '';
+  document.getElementById('exportUnits').value = bill['Export Units'] || '';
+  
+  // Carry forward
+  const openingCarry = bill['Opening Carry Forward'] || 0;
+  if (openingCarry > 0) {
+    document.getElementById('carryForwardSection').classList.remove('d-none');
+    document.getElementById('carryForwardUnits').value = openingCarry;
+  }
+  
+  // Amounts
+  document.getElementById('fixedCharges').value = bill['Fixed Charges'] || '';
+  document.getElementById('totalBill').value = bill['Total Bill Amount'] || '';
 }
 
 // ==========================================
