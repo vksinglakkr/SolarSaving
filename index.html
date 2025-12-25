@@ -4010,6 +4010,19 @@ function showView(viewName) {
   // Scroll to top
   window.scrollTo(0, 0);
 }
+// Prevent browser back from leaving app
+window.addEventListener('load', function() {
+  // Add dummy entry
+  history.pushState(null, '', window.location.href);
+  
+  // When user presses browser back
+  window.addEventListener('popstate', function() {
+    // Stay in app
+    history.pushState(null, '', window.location.href);
+    // Use app's back logic
+    handleBack();
+  });
+});
 </script>
  </div>
 </body>
