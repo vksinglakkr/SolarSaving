@@ -402,7 +402,7 @@ background: linear-gradient(135deg, #5568d3 0%, #6a3f91 100%);
 }
 /* Carry Forward Warning Styles */
 .carry-warning {
-  padding: 0.75rem;
+  padding: 0.5rem;
   border-radius: 8px;
   margin-top: 0.5rem;
   font-size: 0.9rem;
@@ -3204,7 +3204,7 @@ function displaySummaryModal(summary, bills) {
       <div style="background: linear-gradient(135deg, #fef3c7, #fde68a); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid #f59e0b;">
         <h6 style="color: #92400e; font-weight: 700; margin-bottom: 0.75rem;">📅 PERIOD SUMMARY</h6>
         
-        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0;">
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
           <span style="color: #78350f; font-weight: 600;">Total Days:</span>
           <span style="font-weight: 700; color: #92400e;">${summary.totalDays} days</span>
         </div>
@@ -3214,7 +3214,7 @@ function displaySummaryModal(summary, bills) {
           </div>
         `).join('')}
         
-        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; margin-top: 0.5rem;">
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0; margin-top: 0.5rem;">
           <span style="color: #78350f;">Avg Days/Bill:</span>
           <span style="font-weight: 700; color: #92400e;">${summary.avgDaysPerBill} days</span>
         </div>
@@ -3225,7 +3225,7 @@ function displaySummaryModal(summary, bills) {
         <h6 style="color: #312e81; font-weight: 700; margin-bottom: 0.75rem;">⚡ UNITS SUMMARY</h6>
         
         <!-- Gross Units -->
-        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0;">
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
           <span style="color: #4338ca; font-weight: 600;">Total Gross:</span>
           <span style="font-weight: 700; color: #312e81;">${summary.totalGross.toLocaleString()} units</span>
         </div>
@@ -3236,7 +3236,7 @@ function displaySummaryModal(summary, bills) {
         `).join('')}
         
         <!-- Import Units -->
-        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; margin-top: 0.5rem;">
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0; margin-top: 0.5rem;">
           <span style="color: #4338ca; font-weight: 600;">Total Import:</span>
           <span style="font-weight: 700; color: #312e81;">${summary.totalImport.toLocaleString()} units</span>
         </div>
@@ -3247,7 +3247,7 @@ function displaySummaryModal(summary, bills) {
         `).join('')}
         
         <!-- Export Units -->
-        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; margin-top: 0.5rem;">
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0; margin-top: 0.5rem;">
           <span style="color: #4338ca; font-weight: 600;">Total Export:</span>
           <span style="font-weight: 700; color: #312e81;">${summary.totalExport.toLocaleString()} units</span>
         </div>
@@ -3260,7 +3260,7 @@ function displaySummaryModal(summary, bills) {
         <div style="border-top: 1px solid #a5b4fc; margin: 0.75rem 0;"></div>
         
         <!-- Calculated Values -->
-        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0;">
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
           <span style="color: #4338ca;">Net from Grid:</span>
           <span style="font-weight: 700; color: #312e81;">${summary.netFromGrid.toLocaleString()} units</span>
         </div>
@@ -3268,7 +3268,7 @@ function displaySummaryModal(summary, bills) {
           (Import ${summary.totalImport} - Export ${summary.totalExport})
         </div>
         
-        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; margin-top: 0.3rem;">
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0; margin-top: 0.3rem;">
           <span style="color: #4338ca;">Solar Generated:</span>
           <span style="font-weight: 700; color: #10b981;">${summary.totalSolarGenerated.toLocaleString()} units</span>
         </div>
@@ -3276,7 +3276,7 @@ function displaySummaryModal(summary, bills) {
           (Gross ${summary.totalGross} - Import ${summary.totalImport} + Export ${summary.totalExport})
         </div>
         
-        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; margin-top: 0.3rem;">
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0; margin-top: 0.3rem;">
           <span style="color: #4338ca;">Self Consumed:</span>
           <span style="font-weight: 700; color: #312e81;">${summary.selfConsumption.toLocaleString()} units</span>
         </div>
@@ -3290,7 +3290,7 @@ function displaySummaryModal(summary, bills) {
         <h6 style="color: #14532d; font-weight: 700; margin-bottom: 0.75rem;">💰 FINANCIAL SUMMARY</h6>
         
         <!-- Total Bill Amount -->
-        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0;">
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
           <span style="color: #166534; font-weight: 600;">Total Bill Amount:</span>
           <span style="font-weight: 700; color: #14532d;">₹${summary.totalBillAmount.toLocaleString()}</span>
         </div>
@@ -3301,7 +3301,7 @@ function displaySummaryModal(summary, bills) {
         `).join('')}
         
         <!-- Without Solar -->
-        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; margin-top: 0.5rem;">
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0; margin-top: 0.5rem;">
           <span style="color: #166534; font-weight: 600;">Without Solar:</span>
           <span style="font-weight: 700; color: #14532d;">₹${summary.totalWithoutSolar.toLocaleString()}</span>
         </div>
@@ -3322,7 +3322,7 @@ function displaySummaryModal(summary, bills) {
         <div style="border-top: 2px solid #10b981; margin: 0.75rem 0;"></div>
         
         <!-- Total Savings -->
-        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0;">
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
           <span style="color: #166534; font-weight: 700; font-size: 1rem;">Total Savings:</span>
           <span style="font-weight: 700; color: #10b981; font-size: 1.2rem;">₹${summary.totalSavings.toLocaleString()}</span>
         </div>
@@ -3332,7 +3332,7 @@ function displaySummaryModal(summary, bills) {
           </div>
         `).join('')}
         
-        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; margin-top: 0.3rem;">
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0; margin-top: 0.3rem;">
           <span style="color: #166534;">Avg Saving %:</span>
           <span style="font-weight: 700; color: #10b981; font-size: 1rem;">${summary.avgSavingPercent}%</span>
         </div>
@@ -3382,7 +3382,7 @@ function displaySummaryModal(summary, bills) {
           const savingPct = parseFloat(b['Saving Percentage'] || 0);
           
           return `
-          <div style="padding: 0.75rem; margin-bottom: 0.5rem; background: white; border-radius: 6px; border: 1px solid #d1d5db;">
+          <div style="padding: 0.5rem; margin-bottom: 0.5rem; background: white; border-radius: 6px; border: 1px solid #d1d5db;">
             <div style="font-weight: 700; color: #374151; margin-bottom: 0.5rem;">
               ${idx + 1}. Bill #${billNum} (${formatBillPeriod(b)})
             </div>
@@ -3401,14 +3401,28 @@ function displaySummaryModal(summary, bills) {
     </div>
   `;
   
-  showModal(
-    '📊',
-    'Multi-Bill Summary',
-    modalHTML,
-    [
-      { text: '✕ Close', type: 'secondary', action: closeModal }
-    ]
-  );
+showModal(
+  '📊',
+  'Multi-Bill Summary',
+  modalHTML,
+  [
+    { 
+      text: '📱 Share WhatsApp', 
+      type: 'success', 
+      action: () => shareViaWhatsApp(summary, bills) 
+    },
+    { 
+      text: '📄 Download PDF', 
+      type: 'primary', 
+      action: () => downloadAsPDF(summary, bills) 
+    },
+    { 
+      text: '✕ Close', 
+      type: 'secondary', 
+      action: closeModal 
+    }
+  ]
+);
 }
 
 // Helper function to format bill period
