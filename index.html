@@ -723,10 +723,9 @@ background: linear-gradient(135deg, #5568d3 0%, #6a3f91 100%);
     <button id="showSummaryBtn" class="btn btn-success" onclick="showMultiBillSummary()">
       📊 Show Summary (<span id="selectedCount">0</span> bills)
     </button>
-   <button class="btn btn-info" onclick="generateSolarAnalysis()">
-  🔍 Solar Capacity Analysis
-    </button>
-    <button class="btn btn-secondary" onclick="clearAllSelections()">
+  <button class="btn btn-info" onclick="generateSolarAnalysis()">
+    🔍 Capacity Analysis
+  </button>    <button class="btn btn-secondary" onclick="clearAllSelections()">
       ✕ Clear All
     </button>
     <button class="btn btn-primary" onclick="selectAllBills()">
@@ -3419,6 +3418,7 @@ showModal(
       type: 'primary', 
       action: () => downloadAsPDF(summary, bills) 
     },
+    { text: '🔍 Analysis', type: 'info', action: () => { closeModal(); generateSolarAnalysis(); } },
     { 
       text: '✕ Close', 
       type: 'secondary', 
