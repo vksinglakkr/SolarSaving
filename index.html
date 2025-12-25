@@ -3932,6 +3932,84 @@ function goHome() {
 function setPageTitle(title) {
   document.getElementById('pageTitle').textContent = title;
 }
+function handleBack() {
+  // Prevent going to external sites
+  // Navigate within app only
+  
+  if (currentView === 'dashboardView') {
+    // From Dashboard → Go to Form
+    showView('formView');
+  } else if (currentView === 'formView') {
+    // From Form → Go to Dashboard (not login)
+    showView('dashboardView');
+  } else {
+    // Default: go to dashboard
+    showView('dashboardView');
+  }
+}
+function handleHome() {
+  // Always go to Dashboard (not login)
+  showView('dashboardView');
+}
+function updateNavigation(viewName) {
+  const navbar = document.getElementById('mainNavbar');
+  const backBtn = document.getElementById('backBtn');
+  const homeBtn = document.getElementById('homeBtn');
+  const pageTitle = document.getElementById('pageTitle');
+  
+  // Update current view tracker
+  currentView = viewName;
+  
+  if (viewName === 'loginView') {
+    // Hide entire navbar on login page
+    navbar.style.display = 'none';
+    
+  } else if (viewName === 'formView') {
+    // Show navbar on form
+    navbar.style.display = 'block';
+    backBtn.style.display = 'inline-block';
+    homeBtn.style.display = 'inline-block';
+    pageTitle.textContent = 'Add New Bill';
+    
+  } else if (viewName === 'dashboardView') {
+    // Show navbar on dashboard
+    navbar.style.display = 'block';
+    backBtn.style.display = 'inline-block';
+    homeBtn.style.display = 'none'; // Hide home when already on dashboard
+    pageTitle.textContent = 'My Dashboard';
+    
+  } else {
+    // Default
+    navbar.style.display = 'block';
+    backBtn.style.display = 'inline-block';
+    homeBtn.style.display = 'inline-block';
+    pageTitle.textContent = 'SolarSanchay';
+  }
+}
+function showView(viewName) {
+  console.log('Switching to view:', viewName);
+  
+  // Hide all views
+  const views = ['loginView', 'formView', 'dashboardView'];
+  views.forEach(view => {
+    const element = document.getElementById(view);
+    if (element) {
+      element.style.display = 'none';
+    }
+  });
+  
+  // Show selected view
+  const targetView = document.getElementById(viewName);
+  if (targetView) {
+    targetView.style.display = 'block';
+  }
+  
+  // ✅ UPDATE NAVIGATION BAR
+  updateNavigation(viewName);
+  
+  // Scroll to top
+  window.scrollTo(0, 0);
+}
 </script>
  </div>
 </body>
