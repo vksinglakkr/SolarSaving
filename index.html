@@ -3207,9 +3207,9 @@ function displaySummaryModal(summary, bills) {
         <div style="font-weight: 700; color: #1e3a8a; margin-bottom: 0.5rem;">
           Selected Bills: ${summary.count}
         </div>
-        ${bills.map(b => `
+        ${bills.map((b, idx) => `
           <div style="padding: 0.25rem 0; color: #1e40af;">
-            • Bill #${b['Bill Number'] || b.billNumber} 
+            ${idx + 1}. Bill #${b['Bill Number'] || b.billNumber} 
             <span style="color: #64748b; font-size: 0.9rem;">
               (${formatBillPeriod(b)})
             </span>
@@ -3220,11 +3220,18 @@ function displaySummaryModal(summary, bills) {
       <!-- Period Summary -->
       <div style="background: linear-gradient(135deg, #fef3c7, #fde68a); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid #f59e0b;">
         <h6 style="color: #92400e; font-weight: 700; margin-bottom: 0.75rem;">📅 PERIOD SUMMARY</h6>
+        
         <div style="display: flex; justify-content: space-between; padding: 0.4rem 0;">
-          <span style="color: #78350f;">Total Days:</span>
+          <span style="color: #78350f; font-weight: 600;">Total Days:</span>
           <span style="font-weight: 700; color: #92400e;">${summary.totalDays} days</span>
         </div>
-        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0;">
+        ${bills.map((b, idx) => `
+          <div style="padding-left: 1rem; font-size: 0.85rem; color: #78350f; padding: 0.2rem 0;">
+            ↳ Bill ${idx + 1}: ${parseInt(b['Days in Bill Period'] || b.days || 30)} days
+          </div>
+        `).join('')}
+        
+        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; margin-top: 0.5rem;">
           <span style="color: #78350f;">Avg Days/Bill:</span>
           <span style="font-weight: 700; color: #92400e;">${summary.avgDaysPerBill} days</span>
         </div>
@@ -3233,50 +3240,116 @@ function displaySummaryModal(summary, bills) {
       <!-- Units Summary -->
       <div style="background: linear-gradient(135deg, #e0e7ff, #c7d2fe); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid #6366f1;">
         <h6 style="color: #312e81; font-weight: 700; margin-bottom: 0.75rem;">⚡ UNITS SUMMARY</h6>
+        
+        <!-- Gross Units -->
         <div style="display: flex; justify-content: space-between; padding: 0.4rem 0;">
-          <span style="color: #4338ca;">Total Gross:</span>
+          <span style="color: #4338ca; font-weight: 600;">Total Gross:</span>
           <span style="font-weight: 700; color: #312e81;">${summary.totalGross.toLocaleString()} units</span>
         </div>
-        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0;">
-          <span style="color: #4338ca;">Total Import:</span>
+        ${bills.map((b, idx) => `
+          <div style="padding-left: 1rem; font-size: 0.85rem; color: #4338ca; padding: 0.2rem 0;">
+            ↳ Bill ${idx + 1}: ${parseFloat(b['Gross Units'] || 0).toLocaleString()} units
+          </div>
+        `).join('')}
+        
+        <!-- Import Units -->
+        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; margin-top: 0.5rem;">
+          <span style="color: #4338ca; font-weight: 600;">Total Import:</span>
           <span style="font-weight: 700; color: #312e81;">${summary.totalImport.toLocaleString()} units</span>
         </div>
-        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0;">
-          <span style="color: #4338ca;">Total Export:</span>
+        ${bills.map((b, idx) => `
+          <div style="padding-left: 1rem; font-size: 0.85rem; color: #4338ca; padding: 0.2rem 0;">
+            ↳ Bill ${idx + 1}: ${parseFloat(b['Import Units'] || 0).toLocaleString()} units
+          </div>
+        `).join('')}
+        
+        <!-- Export Units -->
+        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; margin-top: 0.5rem;">
+          <span style="color: #4338ca; font-weight: 600;">Total Export:</span>
           <span style="font-weight: 700; color: #312e81;">${summary.totalExport.toLocaleString()} units</span>
         </div>
-        <div style="border-top: 1px solid #a5b4fc; margin: 0.5rem 0;"></div>
+        ${bills.map((b, idx) => `
+          <div style="padding-left: 1rem; font-size: 0.85rem; color: #4338ca; padding: 0.2rem 0;">
+            ↳ Bill ${idx + 1}: ${parseFloat(b['Export Units'] || 0).toLocaleString()} units
+          </div>
+        `).join('')}
+        
+        <div style="border-top: 1px solid #a5b4fc; margin: 0.75rem 0;"></div>
+        
+        <!-- Calculated Values -->
         <div style="display: flex; justify-content: space-between; padding: 0.4rem 0;">
           <span style="color: #4338ca;">Net from Grid:</span>
           <span style="font-weight: 700; color: #312e81;">${summary.netFromGrid.toLocaleString()} units</span>
         </div>
-        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0;">
+        <div style="padding-left: 1rem; font-size: 0.8rem; color: #6366f1; padding: 0.2rem 0;">
+          (Import ${summary.totalImport} - Export ${summary.totalExport})
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; margin-top: 0.3rem;">
           <span style="color: #4338ca;">Solar Generated:</span>
           <span style="font-weight: 700; color: #10b981;">${summary.totalSolarGenerated.toLocaleString()} units</span>
         </div>
-        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0;">
+        <div style="padding-left: 1rem; font-size: 0.8rem; color: #6366f1; padding: 0.2rem 0;">
+          (Gross ${summary.totalGross} - Import ${summary.totalImport} + Export ${summary.totalExport})
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; margin-top: 0.3rem;">
           <span style="color: #4338ca;">Self Consumed:</span>
           <span style="font-weight: 700; color: #312e81;">${summary.selfConsumption.toLocaleString()} units</span>
+        </div>
+        <div style="padding-left: 1rem; font-size: 0.8rem; color: #6366f1; padding: 0.2rem 0;">
+          (Gross ${summary.totalGross} - Import ${summary.totalImport})
         </div>
       </div>
       
       <!-- Financial Summary -->
       <div style="background: linear-gradient(135deg, #dcfce7, #bbf7d0); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid #10b981;">
         <h6 style="color: #14532d; font-weight: 700; margin-bottom: 0.75rem;">💰 FINANCIAL SUMMARY</h6>
+        
+        <!-- Total Bill Amount -->
         <div style="display: flex; justify-content: space-between; padding: 0.4rem 0;">
-          <span style="color: #166534;">Total Bill Amount:</span>
+          <span style="color: #166534; font-weight: 600;">Total Bill Amount:</span>
           <span style="font-weight: 700; color: #14532d;">₹${summary.totalBillAmount.toLocaleString()}</span>
         </div>
-        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0;">
-          <span style="color: #166534;">Without Solar:</span>
+        ${bills.map((b, idx) => `
+          <div style="padding-left: 1rem; font-size: 0.85rem; color: #166534; padding: 0.2rem 0;">
+            ↳ Bill ${idx + 1}: ₹${parseFloat(b['Total Bill Amount'] || 0).toLocaleString()}
+          </div>
+        `).join('')}
+        
+        <!-- Without Solar -->
+        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; margin-top: 0.5rem;">
+          <span style="color: #166534; font-weight: 600;">Without Solar:</span>
           <span style="font-weight: 700; color: #14532d;">₹${summary.totalWithoutSolar.toLocaleString()}</span>
         </div>
-        <div style="border-top: 2px solid #10b981; margin: 0.5rem 0;"></div>
+        ${bills.map((b, idx) => {
+          const withoutSolar = parseFloat(
+            b['Without Solar Amount'] || 
+            b['withoutSolarAmount'] || 
+            b['Estimated Bill Without Solar'] || 
+            b['Without Solar Bill'] ||
+            0
+          );
+          return `
+          <div style="padding-left: 1rem; font-size: 0.85rem; color: #166534; padding: 0.2rem 0;">
+            ↳ Bill ${idx + 1}: ₹${withoutSolar.toLocaleString()}
+          </div>
+        `}).join('')}
+        
+        <div style="border-top: 2px solid #10b981; margin: 0.75rem 0;"></div>
+        
+        <!-- Total Savings -->
         <div style="display: flex; justify-content: space-between; padding: 0.4rem 0;">
           <span style="color: #166534; font-weight: 700; font-size: 1rem;">Total Savings:</span>
           <span style="font-weight: 700; color: #10b981; font-size: 1.2rem;">₹${summary.totalSavings.toLocaleString()}</span>
         </div>
-        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0;">
+        ${bills.map((b, idx) => `
+          <div style="padding-left: 1rem; font-size: 0.85rem; color: #166534; padding: 0.2rem 0;">
+            ↳ Bill ${idx + 1}: ₹${parseFloat(b['Solar Saving Amount'] || 0).toLocaleString()}
+          </div>
+        `).join('')}
+        
+        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; margin-top: 0.3rem;">
           <span style="color: #166534;">Avg Saving %:</span>
           <span style="font-weight: 700; color: #10b981; font-size: 1rem;">${summary.avgSavingPercent}%</span>
         </div>
@@ -3290,31 +3363,56 @@ function displaySummaryModal(summary, bills) {
             <span style="color: #166534; font-size: 0.9rem;">• With Solar:</span>
             <span style="font-weight: 600; color: #14532d;">₹${summary.perDayWithSolar}/day</span>
           </div>
-          <div style="display: flex; justify-content: space-between; padding: 0.3rem 0;">
+          <div style="padding-left: 1.5rem; font-size: 0.75rem; color: #6b7280;">
+            (₹${summary.totalBillAmount.toLocaleString()} ÷ ${summary.totalDays} days)
+          </div>
+          
+          <div style="display: flex; justify-content: space-between; padding: 0.3rem 0; margin-top: 0.3rem;">
             <span style="color: #166534; font-size: 0.9rem;">• Without Solar:</span>
             <span style="font-weight: 600; color: #14532d;">₹${summary.perDayWithoutSolar}/day</span>
           </div>
-          <div style="display: flex; justify-content: space-between; padding: 0.3rem 0;">
+          <div style="padding-left: 1.5rem; font-size: 0.75rem; color: #6b7280;">
+            (₹${summary.totalWithoutSolar.toLocaleString()} ÷ ${summary.totalDays} days)
+          </div>
+          
+          <div style="display: flex; justify-content: space-between; padding: 0.3rem 0; margin-top: 0.3rem;">
             <span style="color: #166534; font-size: 0.9rem;">• Daily Saving:</span>
             <span style="font-weight: 700; color: #10b981;">₹${summary.perDaySaving}/day</span>
+          </div>
+          <div style="padding-left: 1.5rem; font-size: 0.75rem; color: #6b7280;">
+            (₹${summary.totalSavings.toLocaleString()} ÷ ${summary.totalDays} days)
           </div>
         </div>
       </div>
       
-      <!-- Bill-wise Breakdown -->
+      <!-- Bill-wise Summary -->
       <div style="background: linear-gradient(135deg, #f3f4f6, #e5e7eb); padding: 1rem; border-radius: 8px; border-left: 4px solid #6b7280;">
-        <h6 style="color: #1f2937; font-weight: 700; margin-bottom: 0.75rem;">📈 BILL-WISE BREAKDOWN</h6>
-        ${summary.monthlyBreakdown.map(m => `
-          <div style="padding: 0.5rem 0; border-bottom: 1px solid #d1d5db;">
-            <div style="font-weight: 600; color: #374151;">
-              ${m.billNumber}
+        <h6 style="color: #1f2937; font-weight: 700; margin-bottom: 0.75rem;">📈 BILL-WISE SUMMARY</h6>
+        ${bills.map((b, idx) => {
+          const billNum = b['Bill Number'] || b.billNumber;
+          const days = parseInt(b['Days in Bill Period'] || b.days || 30);
+          const gross = parseFloat(b['Gross Units'] || 0);
+          const imp = parseFloat(b['Import Units'] || 0);
+          const exp = parseFloat(b['Export Units'] || 0);
+          const billAmt = parseFloat(b['Total Bill Amount'] || 0);
+          const saving = parseFloat(b['Solar Saving Amount'] || 0);
+          const savingPct = parseFloat(b['Saving Percentage'] || 0);
+          
+          return `
+          <div style="padding: 0.75rem; margin-bottom: 0.5rem; background: white; border-radius: 6px; border: 1px solid #d1d5db;">
+            <div style="font-weight: 700; color: #374151; margin-bottom: 0.5rem;">
+              ${idx + 1}. Bill #${billNum} (${formatBillPeriod(b)})
             </div>
-            <div style="font-size: 0.9rem; color: #6b7280; margin-top: 0.2rem;">
-              Saving: <span style="color: #10b981; font-weight: 600;">₹${m.saving.toLocaleString()}</span>
-              (${m.savingPercent.toFixed(1)}%)
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.3rem; font-size: 0.85rem;">
+              <div style="color: #6b7280;">Days: <span style="font-weight: 600; color: #374151;">${days}</span></div>
+              <div style="color: #6b7280;">Gross: <span style="font-weight: 600; color: #374151;">${gross} units</span></div>
+              <div style="color: #6b7280;">Import: <span style="font-weight: 600; color: #374151;">${imp} units</span></div>
+              <div style="color: #6b7280;">Export: <span style="font-weight: 600; color: #374151;">${exp} units</span></div>
+              <div style="color: #6b7280;">Bill Amt: <span style="font-weight: 600; color: #374151;">₹${billAmt.toLocaleString()}</span></div>
+              <div style="color: #10b981; font-weight: 600;">Saving: ₹${saving.toLocaleString()} (${savingPct.toFixed(1)}%)</div>
             </div>
           </div>
-        `).join('')}
+        `}).join('')}
       </div>
       
     </div>
