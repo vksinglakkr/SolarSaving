@@ -3113,81 +3113,64 @@ function calculateMultiBillSummary(bills) {
   };
   
   bills.forEach(bill => {
-    // Days
-    const days = parseInt(bill['Days in Bill Period'] || bill.days || 30);
+    // === DAYS ===
+    const days = parseInt(bill['Days in Bill Period'] || 30);
     summary.totalDays += days;
     
-    // Units
-    summary.totalGross += parseFloat(bill['Gross Units'] || bill.grossUnits || 0);
-    summary.totalImport += parseFloat(bill['Import Units'] || bill.importUnits || 0);
-    summary.totalExport += parseFloat(bill['Export Units'] || bill.exportUnits || 0);
+    // === UNITS ===
+    const gross = parseFloat(bill['Gross Units'] || 0);
+    const imp = parseFloat(bill['Import Units'] || 0);
+    const exp = parseFloat(bill['Export Units'] || 0);
     
-    // Financial - TRY MULTIPLE FIELD NAMES
-    const billAmount = parseFloat(
-      bill['Total Bill Amount'] || 
-      bill['totalBillAmount'] || 
-      bill['Bill Amount'] || 
-      0
-    );
+    summary.totalGross += gross;
+    summary.totalImport += imp;
+    summary.totalExport += exp;
     
-    const withoutSolar = parseFloat(
-      bill['Without Solar Amount'] || 
-      bill['withoutSolarAmount'] || 
-      bill['Without Solar Bill'] ||
-      bill['Estimated Bill Without Solar'] ||
-      0
-    );
+    // === MONEY ===
+    const billAmount = parseFloat(bill['Total Bill Amount'] || 0);
+    const savings = parseFloat(bill['Solar Saving Amount'] || 0);
     
-    const savings = parseFloat(
-      bill['Solar Saving Amount'] || 
-      bill['totalSavings'] || 
-      bill['Saving Amount'] ||
-      bill['Solar Savings'] ||
-      0
-    );
+    // TRY TO GET "Without Solar" - यह 0 दिखा रहा है
+    let withoutSolar = parseFloat(bill['Without Solar Amount'] || 0);
+    
+    // ✅ FIX: If Without Solar is 0, calculate it!
+    if (withoutSolar === 0 && savings > 0) {
+      // Without Solar = Bill Amount + Savings
+      // Example: ₹2,477 + ₹3,847 = ₹6,324
+      withoutSolar = billAmount + savings;
+    }
     
     summary.totalBillAmount += billAmount;
     summary.totalWithoutSolar += withoutSolar;
     summary.totalSavings += savings;
     
-    console.log('Bill:', bill['Bill Number'], 
-                'Without Solar:', withoutSolar, 
-                'Savings:', savings); // DEBUG
-    
-    // Monthly breakdown
+    // === BREAKDOWN ===
     summary.monthlyBreakdown.push({
-      billNumber: bill['Bill Number'] || bill.billNumber,
-      period: `${bill['Bill From Date'] || ''} - ${bill['Bill To Date'] || ''}`,
+      billNumber: bill['Bill Number'],
       saving: savings,
       savingPercent: parseFloat(bill['Saving Percentage'] || 0)
     });
   });
   
-  // Calculate derived values
+  // === CALCULATED VALUES ===
   summary.netFromGrid = summary.totalImport - summary.totalExport;
   summary.totalSolarGenerated = summary.totalGross - summary.totalImport + summary.totalExport;
   summary.selfConsumption = summary.totalGross - summary.totalImport;
   
-  // SAFE DIVISION - Avoid Infinity
+  // === AVERAGES ===
+  summary.avgDaysPerBill = (summary.totalDays / bills.length).toFixed(1);
+  
+  // Safe division to avoid Infinity
   if (summary.totalWithoutSolar > 0) {
     summary.avgSavingPercent = (summary.totalSavings / summary.totalWithoutSolar * 100).toFixed(1);
   } else {
-    // Calculate from bill percentage if available
-    const avgPercent = summary.monthlyBreakdown.reduce((sum, b) => sum + b.savingPercent, 0) / summary.count;
-    summary.avgSavingPercent = avgPercent.toFixed(1);
+    summary.avgSavingPercent = '0.0';
   }
   
-  summary.avgDaysPerBill = (summary.totalDays / bills.length).toFixed(1);
-  
-  // Per day calculations - SAFE DIVISION
-  summary.perDayWithSolar = summary.totalDays > 0 ? 
-    (summary.totalBillAmount / summary.totalDays).toFixed(0) : 0;
-  summary.perDayWithoutSolar = summary.totalDays > 0 ? 
-    (summary.totalWithoutSolar / summary.totalDays).toFixed(0) : 0;
-  summary.perDaySaving = summary.totalDays > 0 ? 
-    (summary.totalSavings / summary.totalDays).toFixed(0) : 0;
-  
-  console.log('Summary calculated:', summary); // DEBUG
+  // Per day
+  summary.perDayWithSolar = (summary.totalBillAmount / summary.totalDays).toFixed(0);
+  summary.perDayWithoutSolar = (summary.totalWithoutSolar / summary.totalDays).toFixed(0);
+  summary.perDaySaving = (summary.totalSavings / summary.totalDays).toFixed(0);
   
   return summary;
 }
