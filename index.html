@@ -443,34 +443,36 @@ background: linear-gradient(135deg, #5568d3 0%, #6a3f91 100%);
 [title] {
   position: relative;
 }
+#simpleHomeBtn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+}
+
+#simpleHomeBtn:active {
+  transform: scale(0.95);
+}
 </style>
 </head>
 
 <body>
-  <!-- ✅ Navigation Bar -->
-<!-- Smart Navigation Bar -->
-<nav id="mainNavbar" style="display: none; background: linear-gradient(135deg, #0b5ed7, #0d6efd); color: white; padding: 0.75rem 1rem; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-  <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;">
-    
-    <!-- Back Button - Will be hidden on certain pages -->
-    <button id="backBtn" onclick="handleBack()" class="btn btn-sm" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3);">
-      ⬅️ Back
-    </button>
-    
-    <!-- Page Title -->
-    <div style="font-weight: 600; font-size: 1.1rem;" id="pageTitle">
-      SolarSanchay - Haryana
-    </div>
-    
-    <!-- Home Button -->
-    <button id="homeBtn" onclick="handleHome()" class="btn btn-sm" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3);">
-      🏠 Dashboard
-    </button>
-    
-  </div>
-</nav>
-  
-  <!-- Rest of your page -->
+<button id="simpleHomeBtn" 
+        onclick="goToHome()" 
+        style="position: fixed; 
+               bottom: 15px; 
+               right: 15px; 
+               width: 55px; 
+               height: 55px; 
+               border-radius: 50%; 
+               background: linear-gradient(135deg, #0d6efd, #0b5ed7); 
+               color: white; 
+               border: none; 
+               font-size: 1.3rem; 
+               box-shadow: 0 4px 12px rgba(0,0,0,0.3); 
+               cursor: pointer; 
+               z-index: 9999;
+               display: none;">
+  🏠
+</button>
   <div class="container">  
 <!-- HEADER -->
 <div class="header">
@@ -921,7 +923,6 @@ oninput="handleNumericInput(this)">
 // ==========================================
 let entryMode = "one";
 let currentUser = null;
-let currentView = 'intentSection';
 // Initialize and synchronize userBills
 let userBills = [];
 
@@ -1010,28 +1011,26 @@ function selectIntent(type){
 
     actionBtn.classList.remove("d-none");
   }
-   if (type === 'one' || type === 'save') {
+if (type === 'one' || type === 'save') {
     // Show consumption section
     consumptionSection.classList.remove('d-none');
     intentSection.style.display = 'none';
     
-    // ✅ ADD THIS
-    updateNavigation('consumptionSection');
+    showHomeButton(); // ✅ ADD THIS
     
   } else if (type === 'dashboard') {
-    // Show auth or dashboard
     if (currentUser) {
       dashboardSection.classList.remove('d-none');
       intentSection.style.display = 'none';
       
-      // ✅ ADD THIS
-      updateNavigation('dashboardSection');
+      showHomeButton(); // ✅ ADD THIS
+      
+      displayBillsList();
     } else {
       authSection.classList.remove('d-none');
       intentSection.style.display = 'none';
       
-      // ✅ ADD THIS
-      updateNavigation('authSection');
+      showHomeButton(); // ✅ ADD THIS
     }
   }
 }
@@ -1130,7 +1129,9 @@ function showDashboard() {
   document.getElementById('authSection').classList.add('d-none');
   document.getElementById('dashboardSection').classList.remove('d-none');
   document.getElementById('userInfo').textContent = `Meter: ${currentUser.meter} | Account: ${currentUser.account}`;
-  updateNavigation('dashboardSection'); // ✅ ADD THIS LINE
+  
+  showHomeButton(); // ✅ ADD THIS
+  
   displayBillsList();
 }
 
@@ -3935,90 +3936,10 @@ function showIntentSection() {
   // Scroll to top
   window.scrollTo(0, 0);
 }
-function handleBack() {
-  // Navigate within app based on actual sections
-  
-  if (currentView === 'dashboardSection') {
-    // From Dashboard → Go to Intent Selection
-    showIntentSection();
-  } else if (currentView === 'consumptionSection') {
-    // From Form → Go back to Intent Selection
-    showIntentSection();
-  } else if (currentView === 'authSection') {
-    // From Auth → Go to Intent Selection
-    showIntentSection();
-  } else {
-    // Default: go to Intent Selection (home)
-    showIntentSection();
-  }
-}
-function handleHome() {
-  // Go to Intent Selection (home page)
-  showIntentSection();
-}
-function updateNavigation(viewName) {
-  const navbar = document.getElementById('mainNavbar');
-  const backBtn = document.getElementById('backBtn');
-  const homeBtn = document.getElementById('homeBtn');
-  const pageTitle = document.getElementById('pageTitle');
-  
-  // Update current view tracker
-  currentView = viewName;
-  
-  if (viewName === 'intentSection') {
-    // Hide navbar on intent selection (home page)
-    navbar.style.display = 'none';
-    
-  } else if (viewName === 'consumptionSection') {
-    // Show navbar on form
-    navbar.style.display = 'block';
-    backBtn.style.display = 'inline-block';
-    homeBtn.style.display = 'inline-block';
-    pageTitle.textContent = 'Add New Bill';
-    
-  } else if (viewName === 'dashboardSection') {
-    // Show navbar on dashboard
-    navbar.style.display = 'block';
-    backBtn.style.display = 'inline-block';
-    homeBtn.style.display = 'inline-block';
-    pageTitle.textContent = 'My Dashboard';
-    
-  } else if (viewName === 'authSection') {
-    // Show navbar on auth
-    navbar.style.display = 'block';
-    backBtn.style.display = 'inline-block';
-    homeBtn.style.display = 'inline-block';
-    pageTitle.textContent = 'Login';
-    
-  } else {
-    // Default - hide navbar
-    navbar.style.display = 'none';
-  }
-}
-function showView(viewName) {
-  console.log('Switching to view:', viewName);
-  
-  // Hide all views
-  const views = ['loginView', 'formView', 'dashboardView'];
-  views.forEach(view => {
-    const element = document.getElementById(view);
-    if (element) {
-      element.style.display = 'none';
-    }
-  });
-  
-  // Show selected view
-  const targetView = document.getElementById(viewName);
-  if (targetView) {
-    targetView.style.display = 'block';
-  }
-  
-  // ✅ UPDATE NAVIGATION BAR
-  updateNavigation(viewName);
-  
-  // Scroll to top
-  window.scrollTo(0, 0);
-}
+
+
+
+
 // Prevent browser back from leaving app
 window.addEventListener('load', function() {
   // Add dummy entry
@@ -4032,6 +3953,51 @@ window.addEventListener('load', function() {
     handleBack();
   });
 });
+// ==========================================
+// SIMPLE HOME BUTTON
+// ==========================================
+
+function goToHome() {
+  // Hide all sections
+  const sections = ['consumptionSection', 'dashboardSection', 'authSection'];
+  sections.forEach(id => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.classList.add('d-none');
+    }
+  });
+  
+  // Show intent section (home)
+  const intentSection = document.getElementById('intentSection');
+  if (intentSection) {
+    intentSection.style.display = 'block';
+  }
+  
+  // Hide home button on home page
+  const homeBtn = document.getElementById('simpleHomeBtn');
+  if (homeBtn) {
+    homeBtn.style.display = 'none';
+  }
+  
+  // Scroll to top
+  window.scrollTo(0, 0);
+}
+
+// Show home button when not on home page
+function showHomeButton() {
+  const homeBtn = document.getElementById('simpleHomeBtn');
+  if (homeBtn) {
+    homeBtn.style.display = 'block';
+  }
+}
+
+// Hide home button on home page
+function hideHomeButton() {
+  const homeBtn = document.getElementById('simpleHomeBtn');
+  if (homeBtn) {
+    homeBtn.style.display = 'none';
+  }
+}
 </script>
  </div>
 </body>
