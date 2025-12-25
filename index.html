@@ -3958,28 +3958,25 @@ window.addEventListener('load', function() {
 // ==========================================
 
 function goToHome() {
-  // Hide all sections
-  const sections = ['consumptionSection', 'dashboardSection', 'authSection'];
-  sections.forEach(id => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.classList.add('d-none');
-    }
-  });
+  console.log('🏠 Going to home...');
   
-  // Show intent section (home)
+  // Hide all sections
+  document.getElementById('consumptionSection')?.classList.add('d-none');
+  document.getElementById('dashboardSection')?.classList.add('d-none');
+  document.getElementById('authSection')?.classList.add('d-none');
+  
+  // Show intent section - FORCE IT!
   const intentSection = document.getElementById('intentSection');
   if (intentSection) {
-    intentSection.style.display = 'block';
+    intentSection.classList.remove('d-none'); // Remove Bootstrap hide
+    intentSection.style.display = 'block';    // Force show
+  } else {
+    console.error('ERROR: intentSection not found!');
   }
   
-  // Hide home button on home page
-  const homeBtn = document.getElementById('simpleHomeBtn');
-  if (homeBtn) {
-    homeBtn.style.display = 'none';
-  }
+  // Hide home button
+  document.getElementById('simpleHomeBtn').style.display = 'none';
   
-  // Scroll to top
   window.scrollTo(0, 0);
 }
 
