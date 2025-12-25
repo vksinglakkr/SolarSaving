@@ -400,6 +400,49 @@ background: linear-gradient(135deg, #5568d3 0%, #6a3f91 100%);
     padding: 0.35rem 0.8rem;
   }
 }
+/* Carry Forward Warning Styles */
+.carry-warning {
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  border-left: 4px solid;
+  animation: slideIn 0.3s ease-out;
+}
+
+.carry-warning-info {
+  background-color: #cff4fc;
+  border-color: #0dcaf0;
+  color: #055160;
+}
+
+.carry-warning-april {
+  background-color: #fff3cd;
+  border-color: #ffc107;
+  color: #664d03;
+}
+
+.carry-warning-success {
+  background-color: #d1e7dd;
+  border-color: #198754;
+  color: #0f5132;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Tooltip enhancement */
+[title] {
+  position: relative;
+}
 </style>
 </head>
 
@@ -462,7 +505,119 @@ background: linear-gradient(135deg, #5568d3 0%, #6a3f91 100%);
     </div>
   </div>
 </div>
-<!-- HELPFUL LINKS -->
+<!-- COLLAPSIBLE POLICY INFORMATION -->
+<div style="margin: 1rem 0;">
+  <!-- Collapsed View (Default) -->
+  <div id="policyInfoCollapsed" 
+       style="display: flex; align-items: center; justify-content: space-between; 
+              padding: 0.75rem 1rem; background: #e7f3ff; border-radius: 8px; 
+              border-left: 4px solid #0d6efd; cursor: pointer;"
+       onclick="togglePolicyInfo()">
+    <div>
+      <strong style="color: #084298;">
+        ℹ️ महत्वपूर्ण नीति जानकारी / Important Policy Information
+      </strong>
+      <small style="display: block; color: #6c757d; margin-top: 0.25rem;">
+        90% सीमा और March Reset के बारे में जानें
+      </small>
+    </div>
+    <button class="btn btn-sm btn-outline-primary" 
+            style="white-space: nowrap;"
+            onclick="togglePolicyInfo(); event.stopPropagation();">
+      📚 Show Info
+    </button>
+  </div>
+  
+  <!-- Expanded View (Hidden by default) -->
+  <div id="policyInfoExpanded" 
+       class="alert alert-info" 
+       style="display: none; margin-top: 0.5rem; margin-bottom: 0;">
+    
+    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+      <h6 style="margin: 0; color: #055160;">
+        ℹ️ महत्वपूर्ण नीति जानकारी / Important Policy Information
+      </h6>
+      <button class="btn btn-sm btn-outline-secondary" 
+              onclick="togglePolicyInfo()"
+              style="padding: 0.25rem 0.5rem; line-height: 1;">
+        ✕ Hide
+      </button>
+    </div>
+    
+    <!-- 90% Limit Info -->
+    <div style="margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid #0dcaf0;">
+      <strong style="color: #055160;">1️⃣ 90% वार्षिक सीमा:</strong>
+      <p style="font-size: 0.9rem; margin: 0.5rem 0 0 0;">
+        कुछ राज्यों में वार्षिक solar generation की 90% सीमा हो सकती है। 
+        अतिरिक्त units का भुगतान कम दर पर हो सकता है।<br>
+        <small>Some states may have 90% annual limit. Excess may be paid at lower rate.</small>
+        <a href="#" onclick="show90LimitHelp(); return false;" style="margin-left: 0.5rem;">
+          📚 Learn more
+        </a>
+      </p>
+    </div>
+    
+    <!-- March Reset Info -->
+    <div>
+      <strong style="color: #055160;">2️⃣ मार्च के बाद Carry Forward Reset:</strong>
+      <p style="font-size: 0.9rem; margin: 0.5rem 0 0 0;">
+        हरियाणा में 31 मार्च (वित्तीय वर्ष के अंत) में carry forward शून्य हो जाती है।<br>
+        <small>In Haryana, carry forward resets to zero on March 31 (FY end).</small>
+        <a href="#" onclick="showMarchResetHelp(); return false;" style="margin-left: 0.5rem;">
+          📚 Learn more
+        </a>
+      </p>
+    </div>
+    
+    <!-- Important Note -->
+    <div style="margin-top: 0.75rem; padding: 0.5rem; background: #fff3cd; border-radius: 6px; border-left: 3px solid #ffc107;">
+      <strong style="color: #664d03;">⚠️ महत्वपूर्ण:</strong><br>
+      <small style="color: #664d03;">
+        April में Opening Carry Forward = 0 भरें (नए FY के लिए)।<br>
+        In April, enter Opening Carry Forward = 0 (for new FY).
+      </small>
+    </div>
+  </div>
+</div>
+<!-- ANNUAL STATISTICS CARD -->
+<div class="card mb-3" id="annualStatsCard" style="display: none;">
+  <div class="card-header">
+    <h6 style="margin: 0;">
+      📊 वार्षिक सांख्यिकी / Annual Statistics (Current FY)
+    </h6>
+  </div>
+  <div class="card-body">
+    <div class="row text-center">
+      <div class="col-6 col-md-3 mb-2">
+        <small class="text-muted">Total Consumption</small>
+        <h5 id="statTotalConsumption">—</h5>
+        <small>units</small>
+      </div>
+      
+      <div class="col-6 col-md-3 mb-2">
+        <small class="text-muted">Total Generation</small>
+        <h5 id="statTotalGeneration">—</h5>
+        <small>units</small>
+      </div>
+      
+      <div class="col-6 col-md-3 mb-2">
+        <small class="text-muted">Generation Ratio</small>
+        <h5 id="statRatio">—</h5>
+        <small>%</small>
+      </div>
+      
+      <div class="col-6 col-md-3 mb-2">
+        <small class="text-muted">90% Reference</small>
+        <h5 id="stat90Limit">—</h5>
+        <small>units</small>
+      </div>
+    </div>
+    
+    <!-- Warning area -->
+    <div id="limitWarningBox" style="margin-top: 1rem;"></div>
+  </div>
+</div>
+  <!-- HELPFUL LINKS -->
 <div id="helperCards"
      class="mt-4 p-3 rounded helper-wrapper">
 
@@ -534,7 +689,52 @@ background: linear-gradient(135deg, #5568d3 0%, #6a3f91 100%);
     <h6 class="mb-0">📊 My Dashboard</h6>
     <div id="userInfo" class="text-muted small"></div>
   </div>
-  <div id="billsList"></div>
+  <!-- Mode Selection -->
+<div class="mb-3 d-flex gap-2">
+  <button id="singleModeBtn" class="btn btn-primary" onclick="switchMode('single')">
+    📊 Single Selection
+  </button>
+  <button id="summaryModeBtn" class="btn btn-outline-primary" onclick="switchMode('summary')">
+    📈 Multi-Bill Summary
+  </button>
+</div>
+<!-- Mode Info Alert -->
+<div id="modeInfo" class="alert alert-info py-2 mb-3" style="font-size: 0.9rem;">
+  <strong>Single Selection Mode:</strong> Select one bill to View, Edit, or Delete.
+</div>
+<!-- Single Mode Buttons (Current) -->
+<!-- Dynamic Action Buttons -->
+<div class="mb-3">
+  <!-- Single Mode Actions (Current) -->
+  <div id="singleModeActions" class="gap-2" style="display: flex;">
+    <button id="viewBtn" class="btn btn-primary" disabled onclick="viewBill()">
+      📄 View
+    </button>
+    <button id="editBtn" class="btn btn-warning" disabled onclick="editBill()">
+      ✏️ Edit
+    </button>
+    <button id="deleteBtn" class="btn btn-danger" disabled onclick="deleteBill()">
+      🗑️ Delete
+    </button>
+  </div>
+  
+  <!-- Summary Mode Actions (NEW) -->
+ <div id="summaryModeActions" class="gap-2" style="display: none;">
+    <button id="showSummaryBtn" class="btn btn-success" onclick="showMultiBillSummary()">
+      📊 Show Summary (<span id="selectedCount">0</span> bills)
+    </button>
+    <button class="btn btn-secondary" onclick="clearAllSelections()">
+      ✕ Clear All
+    </button>
+    <button class="btn btn-primary" onclick="selectAllBills()">
+      ☑ Select All
+    </button>
+  </div>
+</div>
+
+
+<!-- Summary Mode Buttons (NEW) -->
+ <div id="billsList"></div>
   <button class="btn btn-secondary w-100 mt-3" onclick="logout()">Logout</button>
 </div>
 
@@ -611,18 +811,37 @@ onblur="validateUnits()">
     +
   </button>
 </div>
-<!-- Opening Carry Forward (Save mode only) -->
+<!-- ==========================================
+     ENHANCED OPENING CARRY FORWARD FIELD
+     With Smart Hints, Tooltips, and Warnings
+     Replace lines 615-627 in your HTML
+     ========================================== -->
+
 <div id="carryForwardSection" class="mb-2 d-none">
-  <label>
+  <label style="display: flex; align-items: center; gap: 0.5rem;">
     Opening Carry Forward Units
-    <small class="text-muted">(from previous bills)</small>
+    <small class="text-muted">(from previous bill)</small>
+    <!-- Info icon with tooltip -->
+    <span style="cursor: help; color: #0d6efd;" 
+          title="Enter the 'Closing Carry Forward' from your previous month's bill. This will reduce your current month's billing."
+          onclick="showCarryForwardHelp()">
+      ℹ️
+    </span>
   </label>
+  
   <input id="openingCarry"
          class="form-control"
          inputmode="numeric"
-         oninput="handleNumericInput(this)">
-  <small class="text-muted">
-    Will be reset automatically at the start of financial year (April)
+         oninput="handleNumericInput(this); checkCarryForwardWarnings()">
+  
+  <!-- Dynamic hint based on month -->
+  <div id="carryForwardHint" style="margin-top: 0.5rem;">
+    <!-- This will be populated by JavaScript -->
+  </div>
+  
+  <!-- Static help text (always visible) -->
+  <small class="text-muted d-block" style="margin-top: 0.25rem;">
+    💡 <strong>Tip:</strong> Find this value in previous bill's "Closing Carry Forward"
   </small>
 </div>
 
@@ -714,7 +933,18 @@ oninput="handleNumericInput(this)">
 // ==========================================
 let entryMode = "one";
 let currentUser = null;
+// Initialize and synchronize userBills
 let userBills = [];
+
+// Create two-way binding with window.userBills
+Object.defineProperty(window, 'userBills', {
+  get: function() { return userBills; },
+  set: function(value) { 
+    userBills = value;
+    console.log('userBills updated:', value ? value.length : 0, 'bills');
+  },
+  configurable: true
+});
 let selectedBillIndex = null;
 
 // Elements
@@ -928,24 +1158,6 @@ function displayBillsList() {
       </div>
     </div>
 
-    <div class="row g-2 mb-3">
-      <div class="col-md-4">
-        <button class="btn btn-primary w-100" onclick="viewSelectedBill()" id="viewBtn" disabled>
-          📄 View
-        </button>
-      </div>
-      <div class="col-md-4">
-        <button class="btn btn-warning w-100" onclick="editSelectedBill()" id="editBtn" disabled>
-          ✏️ Edit
-        </button>
-      </div>
-      <div class="col-md-4">
-        <button class="btn btn-danger w-100" onclick="deleteSelectedBill()" id="deleteBtn" disabled>
-          🗑️ Delete
-        </button>
-      </div>
-    </div>
-
     <div id="billCards">
       ${userBills.map((bill, index) => createBillCard(bill, index)).join('')}
     </div>
@@ -953,49 +1165,93 @@ function displayBillsList() {
 }
 
 function createBillCard(bill, index) {
-  const billDate = bill['Entry DateTime'] ? new Date(bill['Entry DateTime']).toLocaleDateString('en-IN') : 'N/A';
+ // Show bill period instead of entry date
+let billPeriod = 'N/A';
+const fromDate = bill['Bill From Date'] || bill.billPeriod?.from;
+const toDate = bill['Bill To Date'] || bill.billPeriod?.to;
+
+if (fromDate && toDate) {
+  try {
+    const from = new Date(fromDate);
+    const to = new Date(toDate);
+    
+    if (!isNaN(from.getTime()) && !isNaN(to.getTime())) {
+      // Format: "1 Apr - 30 Apr 2025" (concise and clear)
+      const fromDay = from.getDate();
+      const toDay = to.getDate();
+      const month = from.toLocaleDateString('en-IN', { month: 'short' });
+      const year = from.getFullYear();
+      
+      // Same month
+      if (from.getMonth() === to.getMonth()) {
+        billPeriod = `${fromDay}-${toDay} ${month} ${year}`;
+      } 
+      // Different months
+      else {
+        const toMonth = to.toLocaleDateString('en-IN', { month: 'short' });
+        billPeriod = `${fromDay} ${month} - ${toDay} ${toMonth} ${year}`;
+      }
+    }
+  } catch (e) {
+    billPeriod = 'N/A';
+  }
+}
   const saving = parseFloat(bill['Solar Saving Amount'] || 0);
   const savingPercent = parseFloat(bill['Saving Percentage'] || 0);
   const billAmount = parseFloat(bill['Total Bill Amount'] || 0);
   
-  return `
-    <div class="bill-card" onclick="selectBill(${index})">
-      <div class="d-flex align-items-center gap-3">
-        <input type="radio" name="billSelection" value="${index}" 
-               style="width: 20px; height: 20px; cursor: pointer;"
-               onchange="selectBill(${index})">
-        
-        <div class="flex-grow-1">
-          <div class="d-flex justify-content-between align-items-start mb-2">
-            <div>
-              <div style="font-weight: 700; font-size: 1.1rem; color: #1e3a8a;">
-                Bill #${bill['Bill Number'] || 'N/A'}
-              </div>
-              <div style="font-size: 0.85rem; color: #64748b;">
-                📅 ${billDate}
-              </div>
+return `
+  <div class="bill-card" onclick="handleBillCardClick(${index})">
+    <div class="d-flex align-items-center gap-3">
+      
+      <!-- Single Selection Radio (default visible) -->
+      <input type="radio" 
+             name="billSelection" 
+             id="single_${index}"
+             class="single-selector"
+             value="${index}" 
+             style="width: 20px; height: 20px; cursor: pointer;"
+             onchange="selectSingleBill(${index})">
+      
+      <!-- Multi Selection Checkbox (hidden by default) -->
+      <input type="checkbox" 
+             name="billSummary" 
+             id="summary_${index}"
+             class="summary-selector"
+             value="${index}"
+             style="width: 20px; height: 20px; cursor: pointer; display: none;"
+             onchange="updateSummarySelection()">
+      
+      <div class="flex-grow-1">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <div>
+            <div style="font-weight: 700; font-size: 1.1rem; color: #1e3a8a;">
+              Bill #${bill['Bill Number'] || 'N/A'}
             </div>
-            <div class="text-end">
-              <div style="font-size: 0.85rem; color: #64748b;">Bill Amount</div>
-              <div style="font-weight: 600; color: #1e3a8a;">₹${billAmount.toFixed(0)}</div>
+            <div style="font-size: 0.85rem; color: #64748b;">
+              📅 ${billPeriod}
             </div>
           </div>
-          
-          <div class="row g-2 pt-2" style="border-top: 1px solid #e2e8f0;">
-            <div class="col-6">
-              <div style="font-size: 0.75rem; color: #64748b;">Solar Saving</div>
-              <div style="font-weight: 700; font-size: 1.3rem; color: #10b981;">₹${saving.toFixed(0)}</div>
-            </div>
-            <div class="col-6">
-              <div style="font-size: 0.75rem; color: #64748b;">Saving %</div>
-              <div style="font-weight: 700; font-size: 1.3rem; color: #3b82f6;">${savingPercent.toFixed(1)}%</div>
-            </div>
+          <div class="text-end">
+            <div style="font-size: 0.85rem; color: #64748b;">Bill Amount</div>
+            <div style="font-weight: 600; color: #1e3a8a;">₹${billAmount.toFixed(0)}</div>
+          </div>
+        </div>
+        
+        <div class="row g-2 pt-2" style="border-top: 1px solid #e2e8f0;">
+          <div class="col-6">
+            <div style="font-size: 0.75rem; color: #64748b;">Solar Saving</div>
+            <div style="font-weight: 700; font-size: 1.3rem; color: #10b981;">₹${saving.toFixed(0)}</div>
+          </div>
+          <div class="col-6">
+            <div style="font-size: 0.75rem; color: #64748b;">Saving %</div>
+            <div style="font-weight: 700; font-size: 1.3rem; color: #3b82f6;">${savingPercent.toFixed(1)}%</div>
           </div>
         </div>
       </div>
     </div>
-  `;
-}
+  </div>
+`;}
 
 function selectBill(index) {
   selectedBillIndex = index;
@@ -1015,6 +1271,170 @@ function selectBill(index) {
       card.classList.remove('selected');
     }
   });
+}
+
+// ==========================================
+// BUTTON ACTION FUNCTIONS
+// ==========================================
+
+// View button - shows bill details
+function viewBill() {
+  if (selectedBillIndex === null) {
+    alert('Please select a bill first.');
+    return;
+  }
+  viewSelectedBill(); // Call existing function
+}
+
+// Edit button - loads bill for editing
+function editBill() {
+  if (selectedBillIndex === null || selectedBillIndex === undefined) {
+    alert('Please select a bill first.');
+    return;
+  }
+  
+  const bills = window.userBills || [];
+  const bill = bills[selectedBillIndex];
+  
+  if (!bill) {
+    alert('Bill not found.');
+    return;
+  }
+  
+  // Load bill data into form
+  loadBillForEditing(bill);
+  
+  // Switch to form view
+  const formCard = document.getElementById('formCard');
+  const dashboardCard = document.getElementById('dashboardCard');
+  
+  if (formCard) formCard.style.display = 'block';
+  if (dashboardCard) dashboardCard.style.display = 'none';
+  
+  // Update save button text
+  const calculateBtn = document.getElementById('calculateBtn');
+  if (calculateBtn) {
+    calculateBtn.textContent = '💾 Update Bill';
+  }
+  
+  // Store editing state
+  window.isEditingBill = true;
+  window.editingBillIndex = selectedBillIndex;
+  
+  // Scroll to top
+  window.scrollTo(0, 0);
+}
+
+// Delete button - removes selected bill
+function deleteBill() {
+  if (selectedBillIndex === null || selectedBillIndex === undefined) {
+    alert('Please select a bill first.');
+    return;
+  }
+  
+  const bills = window.userBills || [];
+  const bill = bills[selectedBillIndex];
+  
+  if (!bill) {
+    alert('Bill not found.');
+    return;
+  }
+  
+  const billNum = bill['Bill Number'] || bill.billNumber || 'Unknown';
+  
+  if (confirm(`Are you sure you want to delete Bill #${billNum}?`)) {
+    // Remove from array
+    bills.splice(selectedBillIndex, 1);
+    
+    // Save to storage
+    saveBillsToStorage(bills);
+    
+    // Reset selection
+    selectedBillIndex = null;
+    
+    // Disable buttons
+    document.getElementById('viewBtn').disabled = true;
+    document.getElementById('editBtn').disabled = true;
+    document.getElementById('deleteBtn').disabled = true;
+    
+    // Refresh dashboard
+    renderBillCards(bills);
+    
+    alert('Bill deleted successfully!');
+  }
+}
+// Handle bill card click
+function handleBillCardClick(index) {
+  if (currentSelectionMode === 'single') {
+    selectSingleBill(index);
+  }
+  // In summary mode, let checkbox handle it
+}
+
+// Select single bill (radio button)
+function selectSingleBill(index) {
+  selectedBillIndex = index;
+  
+  // Enable action buttons
+  document.getElementById('viewBtn').disabled = false;
+  document.getElementById('editBtn').disabled = false;
+  document.getElementById('deleteBtn').disabled = false;
+  
+  // Update visual selection
+  document.querySelectorAll('.bill-card').forEach((card, i) => {
+    if (i === index) {
+      card.classList.add('selected');
+    } else {
+      card.classList.remove('selected');
+    }
+  });
+}
+
+// Load bill data into form for editing
+function loadBillForEditing(bill) {
+  // Identity fields
+  const billNumber = document.getElementById('billNumber');
+  const meter = document.getElementById('meter');
+  const accountNum = document.getElementById('accountNum');
+  
+  if (billNumber) billNumber.value = bill['Bill Number'] || bill.billNumber || '';
+  if (meter) meter.value = bill['Meter Number'] || bill.meterNumber || '';
+  if (accountNum) accountNum.value = bill['Account Number'] || bill.accountNumber || '';
+  
+  // Date fields
+  const billFrom = document.getElementById('billFrom');
+  const billTo = document.getElementById('billTo');
+  
+  if (billFrom) billFrom.value = bill['Bill From Date'] || bill.billFromDate || '';
+  if (billTo) billTo.value = bill['Bill To Date'] || bill.billToDate || '';
+  
+  // Units fields
+  const grossUnits = document.getElementById('grossUnits');
+  const importUnits = document.getElementById('importUnits');
+  const exportUnits = document.getElementById('exportUnits');
+  
+  if (grossUnits) grossUnits.value = bill['Gross Units'] || bill.grossUnits || '';
+  if (importUnits) importUnits.value = bill['Import Units'] || bill.importUnits || '';
+  if (exportUnits) exportUnits.value = bill['Export Units'] || bill.exportUnits || '';
+  
+  // Carry forward
+  const carryForwardUnits = document.getElementById('carryForwardUnits');
+  const carryForwardSection = document.getElementById('carryForwardSection');
+  const openingCarry = bill['Opening Carry Forward'] || bill.openingCarryForward || 0;
+  
+  if (carryForwardUnits) carryForwardUnits.value = openingCarry;
+  if (carryForwardSection && openingCarry > 0) {
+    carryForwardSection.classList.remove('d-none');
+  }
+  
+  // Amount fields
+  const fixedCharges = document.getElementById('fixedCharges');
+  const totalBill = document.getElementById('totalBill');
+  
+  if (fixedCharges) fixedCharges.value = bill['Fixed Charges'] || bill.fixedCharges || '';
+  if (totalBill) totalBill.value = bill['Total Bill Amount'] || bill.totalBillAmount || '';
+  
+  console.log('Bill loaded for editing:', bill['Bill Number'] || bill.billNumber);
 }
 
 // ==========================================
@@ -1483,9 +1903,10 @@ function markError(el,msg){
 }
 
 // ==========================================
-// UPDATED calculate() FUNCTION
-// Shows results in MODAL instead of below button
-// Replace your existing calculate() function
+// COMPLETE FIXED calculate() FUNCTION
+// With: 1) Surplus unit rate fix
+//       2) Days calculation fix
+//       3) PROMINENT CARRY FORWARD DISPLAY
 // ==========================================
 
 async function calculate() {
@@ -1506,6 +1927,7 @@ async function calculate() {
   let billableUnits = 0;
 
   let unitRate = 0;
+  let estimatedRate = 0;
   let without = 0;
   let saving = 0;
   let savingPercent = 0;
@@ -1540,7 +1962,7 @@ async function calculate() {
     to   = new Date(billToEl.value);
     const diffMs = to - from;
     if (diffMs > 0) {
-      days = Math.round(diffMs / (1000 * 60 * 60 * 24));
+      days = Math.round(diffMs / (1000 * 60 * 60 * 24)) + 1;
     }
   }
 
@@ -1550,12 +1972,17 @@ async function calculate() {
   if (entryMode === "one") {
 
     if (netGridUnits <= 0) {
-      alert("Net export detected. Saving cannot be estimated accurately in one-time mode.");
+      alert("This month has surplus solar generation.\n\nPlease use 'Save for future reference' to track carry-forward benefits.");
       return;
     }
 
     billableUnits = netGridUnits;
     unitRate = (t - f) / billableUnits;
+    estimatedRate = unitRate;
+    
+    without = (g * estimatedRate) + f;
+    saving = without - t;
+    savingPercent = without > 0 ? (saving / without) * 100 : 0;
   }
 
   // =================================================
@@ -1563,9 +1990,17 @@ async function calculate() {
   // =================================================
   if (entryMode === "save") {
 
+    const billNum = document.getElementById("billNumber")?.value;
+    const meter = document.getElementById("meter")?.value;
+    const accountNum = document.getElementById("accountNum")?.value;
+
+    if (!billNum || !meter || !accountNum) {
+      alert("Please fill Bill Number, Meter Number, and Account Number");
+      return;
+    }
+
     openingCarry = Number(document.getElementById("openingCarry")?.value || 0);
 
-    // Financial year reset (April)
     if (billFromEl?.value) {
       const month = new Date(billFromEl.value).getMonth();
       if (month === 3) openingCarry = 0;
@@ -1575,6 +2010,7 @@ async function calculate() {
 
     if (adjustedNet > 0) {
       billableUnits = adjustedNet;
+      closingCarryForward = 0;
     } else {
       billableUnits = 0;
       closingCarryForward = Math.abs(adjustedNet);
@@ -1582,22 +2018,13 @@ async function calculate() {
 
     if (billableUnits > 0) {
       unitRate = (t - f) / billableUnits;
+      estimatedRate = unitRate;
+    } else {
+      unitRate = 0;
+      estimatedRate = 6.50;
     }
 
-    // ========================================
-    // SAVE TO n8n WORKFLOW (if save mode)
-    // ========================================
-    const billNum = document.getElementById("billNumber").value;
-    const meter = document.getElementById("meter").value;
-    const accountNum = document.getElementById("accountNum").value;
-
-    if (!billNum || !meter || !accountNum) {
-      alert("Please fill Bill Number, Meter Number, and Account Number");
-      return;
-    }
-
-    // Calculate final values
-    without = (g * unitRate) + f;
+    without = (g * estimatedRate) + f;
     saving = without - t;
     savingPercent = without > 0 ? (saving / without) * 100 : 0;
 
@@ -1606,8 +2033,8 @@ async function calculate() {
       meterNumber: meter,
       accountNumber: accountNum,
       billPeriod: {
-        from: billFromEl.value,
-        to: billToEl.value,
+        from: billFromEl?.value || null,
+        to: billToEl?.value || null,
         days: days
       },
       consumption: {
@@ -1620,7 +2047,8 @@ async function calculate() {
         fixedCharges: f,
         totalBillAmount: t,
         arrears: a,
-        perUnitRate: parseFloat(unitRate.toFixed(2))
+        perUnitRate: unitRate ? parseFloat(unitRate.toFixed(2)) : 0,
+        estimatedRate: parseFloat(estimatedRate.toFixed(2))
       },
       calculation: {
         billWithSolar: t,
@@ -1629,39 +2057,49 @@ async function calculate() {
         savingPercentage: parseFloat(savingPercent.toFixed(2)),
         savingPerDay: days > 0 ? parseFloat((saving / days).toFixed(2)) : null,
         annualSaving: days > 0 ? parseFloat(((saving / days) * 365).toFixed(2)) : null
+      },
+      carryForward: {
+        openingCarry: openingCarry,
+        closingCarryForward: closingCarryForward,
+        netGridUnits: netGridUnits,
+        billableUnits: billableUnits
       }
     };
+
+    console.log("Sending to webhook:", webhookData);
 
     try {
       const response = await fetch('https://n8n-workflow-test.duckdns.org/webhook/solar-saving', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify(webhookData)
       });
 
+      console.log("Response status:", response.status);
+
       if (response.ok) {
         const data = await response.json().catch(() => ({ status: 'success' }));
+        console.log("Response data:", data);
 
         if (data.status === 'error' && data.code === 'DUPLICATE_FOUND') {
           alert('⚠️ Duplicate bill found! This bill already exists.');
-          return; // Don't show results if duplicate
+          return;
         }
+        
+        console.log("✅ Bill saved successfully");
+        
       } else {
-        throw new Error('Server error');
+        throw new Error('Server returned error status: ' + response.status);
       }
     } catch (error) {
-      console.error(error);
-      alert('⚠️ Failed to save. Showing results anyway.');
+      console.error("Webhook error:", error);
+      alert('⚠️ Failed to save to server: ' + error.message + '\n\nShowing results anyway.');
     }
   }
 
-  // ---------- FINAL CALCULATIONS (for one-time mode) ----------
-  if (entryMode === "one") {
-    without = (g * unitRate) + f;
-    saving = without - t;
-    savingPercent = without > 0 ? (saving / without) * 100 : 0;
-  }
-
+  // ---------- DAILY/ANNUAL CALCULATIONS ----------
   const withPerDay = days !== null && days > 0 ? (t / days) : null;
   const withoutPerDay = days !== null && days > 0 ? (without / days) : null;
   let savingPerDay = null;
@@ -1673,13 +2111,13 @@ async function calculate() {
   }
 
   // ========================================
-  // BUILD MODAL CONTENT (Same as viewSelectedBill)
+  // BUILD MODAL CONTENT - WITH CARRY FORWARD!
   // ========================================
   const modalContent = `
     <div style="text-align: left;">
       <div style="background: #f8fafc; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid #0b5ed7;">
         <div style="font-size: 0.85rem; color: #64748b;">
-          <strong>${entryMode === "one" ? "Quick Calculator" : "Save & Track"}</strong> Result
+          <strong>${entryMode === "one" ? "Quick Calculator" : "💾 Bill Saved Successfully"}</strong>
         </div>
       </div>
       
@@ -1703,11 +2141,62 @@ async function calculate() {
         <b>Fixed Charges:</b> ₹${f}<br>
         <b>Total Bill Amount:</b> ₹${t}<br>
 
-        <b>Per-Unit Rate:</b> ₹${unitRate ? unitRate.toFixed(2) : "—"}  
-        <i class="text-muted">
-          = (Total Bill − Fixed Charges) ÷ (Import − Export)
-        </i>
+        <b>Per-Unit Rate:</b> ${unitRate > 0 ? '₹' + unitRate.toFixed(2) : 'N/A (no energy charges)'}
+        ${billableUnits === 0 ? '<br><b>Estimated Rate Used:</b> ₹' + estimatedRate.toFixed(2) + ' <i class="text-muted">(for savings comparison)</i>' : ''}
+        ${billableUnits > 0 ? '<br><i class="text-muted">= (Total Bill − Fixed Charges) ÷ Billable Units</i>' : ''}
       </div>
+
+      <!-- GRID SUPPLY & CARRY FORWARD -->
+      ${entryMode === "save" ? `
+      <div class="result-box" style="background: ${closingCarryForward > 0 ? '#f0fdf4' : '#f8fafc'}; border-left: 4px solid ${closingCarryForward > 0 ? '#22c55e' : '#94a3b8'};">
+        <h6>⚡ Grid Supply & Carry Forward</h6>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 0.5rem;">
+          <div>
+            <b>Import from Grid:</b> ${i} units<br>
+            <b>Export to Grid:</b> ${e} units
+          </div>
+          <div>
+            <b>Net Grid Units:</b> ${netGridUnits} units<br>
+            <i class="text-muted small">(Import − Export)</i>
+          </div>
+        </div>
+
+        <hr>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div>
+            <b>Opening Carry:</b> ${openingCarry} units<br>
+            <i class="text-muted small">(From previous month)</i>
+          </div>
+          <div>
+            <b>Billable Units:</b> ${billableUnits} units<br>
+            <i class="text-muted small">(What you pay for)</i>
+          </div>
+        </div>
+
+        ${closingCarryForward > 0 ? `
+        <div style="background: #dcfce7; padding: 1rem; border-radius: 8px; margin-top: 1rem; border: 2px solid #22c55e;">
+          <div style="text-align: center;">
+            <h5 style="color: #15803d; margin-bottom: 0.5rem;">
+              🎉 Surplus Generation!
+            </h5>
+            <div style="font-size: 2rem; font-weight: bold; color: #15803d;">
+              ${closingCarryForward} units
+            </div>
+            <div style="font-size: 0.9rem; color: #166534; margin-top: 0.5rem;">
+              <strong>Closing Carry Forward</strong><br>
+              Credit for next month's bill
+            </div>
+            <div style="font-size: 0.85rem; color: #65a30d; margin-top: 0.75rem; padding: 0.5rem; background: rgba(255,255,255,0.5); border-radius: 6px;">
+              💡 These ${closingCarryForward} units will reduce your next month's billing!<br>
+              Estimated value: ₹${(closingCarryForward * estimatedRate).toFixed(0)} @ ₹${estimatedRate.toFixed(2)}/unit
+            </div>
+          </div>
+        </div>
+        ` : ''}
+      </div>
+      ` : ''}
 
       <!-- COMPARISON -->
       <div class="result-box">
@@ -1720,7 +2209,7 @@ async function calculate() {
             <b style="font-size: 1.5rem;">₹${without.toFixed(0)}</b><br>
 
             <i class="text-muted small">
-              (${g} × ₹${unitRate.toFixed(2)}) + ₹${f}
+              (${g} × ₹${estimatedRate.toFixed(2)}) + ₹${f}
             </i><br>
 
             ${withoutPerDay !== null
@@ -1758,6 +2247,13 @@ async function calculate() {
           ? `<b>Estimated Yearly Saving:</b> ₹${annualSaving.toFixed(0)} / year 
              <i class="text-muted small">Based on current bill's daily saving × 365 days</i>` 
           : ``}
+        
+        ${closingCarryForward > 0
+          ? `<br><br><div class="alert alert-success" style="font-size: 0.9rem; margin-top: 1rem;">
+             <strong>🌟 Bonus Benefit:</strong> Your ${closingCarryForward} units carry forward 
+             will provide additional savings of approximately ₹${(closingCarryForward * estimatedRate).toFixed(0)} in next month's bill!
+             </div>` 
+          : ''}
       </div>
     </div>
   `;
@@ -1766,7 +2262,6 @@ async function calculate() {
   // SHOW MODAL WITH RESULTS
   // ========================================
   
-  // Store calculation data for WhatsApp sharing
   window.lastCalculation = {
     gross: g,
     importU: i,
@@ -1779,7 +2274,7 @@ async function calculate() {
 
   showModal(
     '📊', 
-    entryMode === "one" ? "Quick Calculator Result" : "Bill Saved Successfully", 
+    entryMode === "one" ? "Quick Calculator Result" : "✅ Bill Saved Successfully!", 
     modalContent, 
     [
       { text: 'Share on WhatsApp', type: 'success', action: () => { shareWhatsApp(window.lastCalculation); closeModal(); } },
@@ -1787,7 +2282,6 @@ async function calculate() {
     ]
   );
 }
-
 
 function shareWhatsApp(data){
   const msg = encodeURIComponent(
@@ -1808,6 +2302,1160 @@ Estimated Bill Without Solar: ₹${data.withoutSolar}
 
 document.getElementById("lastModified").innerText =
   new Date(document.lastModified).toLocaleString("en-IN");
+
+// ========================================
+// Check Carry Forward Warnings (Dynamic Hints)
+// ========================================
+function checkCarryForwardWarnings() {
+  const billFromEl = document.getElementById("billFrom");
+  const openingCarryEl = document.getElementById("openingCarry");
+  const hintDiv = document.getElementById("carryForwardHint");
+  
+  if (!billFromEl?.value || !hintDiv) return;
+  
+  const billDate = new Date(billFromEl.value);
+  const month = billDate.getMonth(); // 0-11 (0=Jan, 3=Apr)
+  const year = billDate.getFullYear();
+  const openingCarryValue = Number(openingCarryEl.value || 0);
+  
+  let hintHTML = '';
+  
+  // CASE 1: April (Financial Year Start)
+  if (month === 3) {
+    if (openingCarryValue > 0) {
+      // User entered carry forward in April - might be same FY
+      hintHTML = `
+        <div class="carry-warning carry-warning-april">
+          <strong>⚠️ Financial Year Alert:</strong><br>
+          April marks the start of India's Financial Year (FY ${year}-${year+1}).<br><br>
+          
+          <strong>You entered ${openingCarryValue} units carry forward.</strong><br><br>
+          
+          <strong>Is this correct?</strong><br>
+          </div>
+      `;
+    } else {
+      // User entered 0 in April - this is expected for new FY
+      hintHTML = `
+        <div class="carry-warning carry-warning-success">
+          <strong>✓ Correct for New Financial Year</strong><br>
+          You've correctly reset carry forward to 0 for FY ${year}-${year+1}.<br>
+          Any surplus from this month will create new carry forward.
+        </div>
+      `;
+    }
+  }
+  
+  // CASE 2: Other months with carry forward
+  else if (openingCarryValue > 0) {
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const prevMonth = month === 0 ? 11 : month - 1;
+    const prevMonthName = monthNames[prevMonth];
+    const prevYear = month === 0 ? year - 1 : year;
+    
+    hintHTML = `
+      <div class="carry-warning carry-warning-success">
+        <strong>✓ Using Carry Forward from Previous Bill</strong><br>
+        You have ${openingCarryValue} units credit from ${prevMonthName} ${prevYear}.<br>
+        This will reduce your billable units this month! 💰
+      </div>
+    `;
+  }
+  
+  // CASE 3: Other months with no carry forward
+  else {
+    hintHTML = `
+      <div class="carry-warning carry-warning-info">
+        <strong>ℹ️ No Carry Forward</strong><br>
+        Starting fresh this month. If previous month had surplus generation,<br>
+        enter the "Closing Carry Forward" value here.
+      </div>
+    `;
+  }
+  
+  hintDiv.innerHTML = hintHTML;
+}
+
+// ========================================
+// Show Detailed Carry Forward Help (Modal)
+// ========================================
+function showCarryForwardHelp() {
+  const helpContent = `
+    <div style="text-align: left;">
+      <h5 style="color: #0b5ed7; margin-bottom: 1rem;">
+        📚 Understanding Opening Carry Forward
+      </h5>
+      
+      <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+        <strong>What is Carry Forward?</strong><br>
+        When your solar exports MORE units than you import in a month,
+        the surplus units are "carried forward" as credit for the next month.
+      </div>
+      
+      <div style="background: #d1e7dd; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+        <strong>✓ How to Use This Field:</strong><br>
+        1. Check your <strong>previous month's bill</strong><br>
+        2. Look for "Closing Carry Forward" value<br>
+        3. Enter that value here as "Opening Carry Forward"<br>
+        4. This will reduce your current month's billing!
+      </div>
+      
+      <div style="background: #cfe2ff; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+        <strong>💡 Example Scenario:</strong><br><br>
+        
+        <strong>Month 1 (Surplus Generated):</strong><br>
+        • Import: 320 units, Export: 450 units<br>
+        • Net: -130 units (surplus!)<br>
+        • Closing Carry Forward: 130 units<br><br>
+        
+        <strong>Month 2 (Using Carry Forward):</strong><br>
+        • Opening Carry Forward: <strong>130 units</strong> ← Enter from previous bill!<br>
+        • Import: 480 units, Export: 310 units<br>
+        • Net: 170 units<br>
+        • After carry forward: 170 - 130 = <strong>40 units</strong><br>
+        • You only pay for 40 units! 💰<br>
+        • Savings from carry: 130 × ₹6.50 = ₹845
+      </div>
+      
+      <div style="background: #fff3cd; padding: 1rem; border-radius: 8px; border-left: 4px solid #ffc107;">
+        <strong>⚠️ Important Policy Note:</strong><br>
+        Different states have different policies regarding carry forward,
+        especially at Financial Year end (March 31).<br><br>
+        
+        <strong>Please check:</strong><br>
+        • Your state's Net Metering Policy<br>
+        • DISCOM regulations<br>
+        • Policy information shown at the top of this page<br><br>
+        
+        <a href="#" onclick="closeModal(); setTimeout(() => showMarchResetHelp(), 300); return false;">
+          📅 Learn about March 31 Reset Policy →
+        </a>
+      </div>
+      
+      <hr style="margin: 1.5rem 0;">
+      
+      <div style="font-size: 0.9rem; color: #6c757d;">
+        <strong>Need more help?</strong><br>
+        • 📊 <a href="#" onclick="closeModal(); setTimeout(() => show90LimitHelp(), 300); return false;">
+          90% Annual Limit Guide</a><br>
+        • 📞 Contact your DISCOM for policy details
+      </div>
+    </div>
+  `;
+  
+  showModal(
+    '📚',
+    'Carry Forward Help Guide',
+    helpContent,
+    [
+      { text: 'Got it!', type: 'primary', action: closeModal }
+    ]
+  );
+}
+
+// ========================================
+// Trigger warnings when bill date changes
+// ========================================
+document.getElementById("billFrom")?.addEventListener("change", checkCarryForwardWarnings);
+document.getElementById("openingCarry")?.addEventListener("blur", checkCarryForwardWarnings);
+
+// Initial check when page loads
+if (document.getElementById("carryForwardSection")) {
+  setTimeout(checkCarryForwardWarnings, 500);
+}
+
+// ==========================================
+// 90% LIMIT AWARENESS - SIMPLE VERSION
+// ==========================================
+
+// Update annual statistics on dashboard load
+function updateAnnualStats() {
+  const bills = window.userBills || [];
+  const currentFY = getCurrentFinancialYear();
+  const fyBills = bills.filter(bill => {
+    const billDate = bill['Bill From Date'] || bill.billFromDate;
+    if (!billDate) return false;
+    return isInFinancialYear(billDate, currentFY);
+  });
+  
+  if (fyBills.length === 0) {
+    const statsCard = document.getElementById('annualStatsCard');
+    if (statsCard) statsCard.style.display = 'none';
+    return;
+  }
+  
+  // Calculate totals
+  let totalConsumption = 0;
+  let totalGeneration = 0;
+  
+  fyBills.forEach(bill => {
+    totalConsumption += parseFloat(bill['Gross Units'] || bill.grossUnits || 0);
+    const imp = parseFloat(bill['Import Units'] || bill.importUnits || 0);
+    const exp = parseFloat(bill['Export Units'] || bill.exportUnits || 0);
+    const gross = parseFloat(bill['Gross Units'] || bill.grossUnits || 0);
+    totalGeneration += (gross - imp) + exp;
+  });
+  
+  const ratio = totalConsumption > 0 ? (totalGeneration / totalConsumption * 100) : 0;
+  const referenceLimit = totalConsumption * 0.9;
+  
+  // Update display
+  const statsCard = document.getElementById('annualStatsCard');
+  if (statsCard) {
+    statsCard.style.display = 'block';
+    
+    document.getElementById('statConsumption').textContent = totalConsumption.toFixed(0);
+    document.getElementById('statGeneration').textContent = totalGeneration.toFixed(0);
+    document.getElementById('statRatio').textContent = ratio.toFixed(1) + '%';
+    document.getElementById('stat90Ref').textContent = referenceLimit.toFixed(0);
+    
+    // Warning color
+    const warningBox = document.getElementById('limitWarning');
+    if (warningBox) {
+      if (ratio >= 90) {
+        warningBox.style.background = '#fee2e2';
+        warningBox.style.borderColor = '#ef4444';
+      } else if (ratio >= 80) {
+        warningBox.style.background = '#fef3c7';
+        warningBox.style.borderColor = '#f59e0b';
+      } else {
+        warningBox.style.background = '#dcfce7';
+        warningBox.style.borderColor = '#22c55e';
+      }
+    }
+  }
+}
+function isInFinancialYear(dateStr, fy) {
+  const date = new Date(dateStr);
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  
+  if (month >= 3) {
+    return year === fy.start;
+  } else {
+    return year === fy.end;
+  }
+}
+function getCurrentFinancialYear() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth(); // 0-11
+  
+  // FY starts April (month 3)
+  if (month >= 3) {
+    return { start: year, end: year + 1 };
+  } else {
+    return { start: year - 1, end: year };
+  }
+}
+// Helper: Get current FY bills
+function filterCurrentFYBills(bills) {
+  const today = new Date();
+  const currentYear = today.getFullYear();
+  const currentMonth = today.getMonth(); // 0-11
+  
+  // Determine FY start year
+  const fyStartYear = currentMonth < 3 ? currentYear - 1 : currentYear;
+  const fyStart = new Date(fyStartYear, 3, 1); // April 1
+  const fyEnd = new Date(fyStartYear + 1, 2, 31); // March 31
+  
+  return bills.filter(bill => {
+    if (!bill.billPeriod || !bill.billPeriod.from) return false;
+    const billDate = new Date(bill.billPeriod.from);
+    return billDate >= fyStart && billDate <= fyEnd;
+  });
+}
+
+// Show warning message based on ratio
+function showLimitWarning(ratio, generation, limit90) {
+  const warningBox = document.getElementById('limitWarningBox');
+  if (!warningBox) return;
+  
+  let html = '';
+  
+  if (ratio >= 90) {
+    // Exceeded 90%
+    const excess = generation - limit90;
+    html = `
+      <div class="alert alert-danger" style="margin: 0;">
+        <strong>⚠️ संभावित सीमा पार / Potential Limit Exceeded</strong><br>
+        <small>
+          Generation ${ratio}% of consumption है। Excess: ${excess.toLocaleString()} units<br>
+          कृपया UHBVN से confirm करें। Please check with UHBVN.
+          <a href="#" onclick="show90LimitHelp(); return false;">Learn more →</a>
+        </small>
+      </div>
+    `;
+  } else if (ratio >= 80) {
+    // Approaching 90%
+    html = `
+      <div class="alert alert-warning" style="margin: 0;">
+        <strong>⚠️ सीमा के पास / Approaching Limit</strong><br>
+        <small>
+          Generation ${ratio}% है। 90% के पास पहुंच रहे हैं।<br>
+          कुछ states में limit हो सकती है। Some states may have limit.
+          <a href="#" onclick="show90LimitHelp(); return false;">Learn more →</a>
+        </small>
+      </div>
+    `;
+  } else {
+    // Safe
+    html = `
+      <div class="alert alert-success" style="margin: 0;">
+        <strong>✓ सीमा के अंदर / Within Limits</strong><br>
+        <small>Generation ${ratio}% है। Safe limits में है। 👍</small>
+      </div>
+    `;
+  }
+  
+  warningBox.innerHTML = html;
+}
+
+// Helper: Get stored bills (adjust based on your storage method)
+function getStoredBills() {
+  // If using localStorage:
+  const stored = localStorage.getItem('solarBills');
+  if (stored) {
+    try {
+      return JSON.parse(stored);
+    } catch (e) {
+      return [];
+    }
+  }
+  
+  // If using Google Sheets, you'll need to fetch from there
+  // This is just a placeholder
+  return [];
+}
+
+// ==========================================
+// RENDER BILL CARDS IN DASHBOARD
+// ==========================================
+function renderBillCards(bills) {
+  const billsList = document.getElementById('billsList');
+  
+  if (!billsList) {
+    console.error('billsList element not found!');
+    return;
+  }
+  
+  // IMPORTANT: Store bills globally
+  window.userBills = bills;
+  
+  billsList.innerHTML = '';
+  
+  if (!bills || bills.length === 0) {
+    billsList.innerHTML = `
+      <div class="text-center text-muted py-5">
+        <p style="font-size: 1.2rem;">📋 No bills saved yet</p>
+      </div>
+    `;
+    return;
+  }
+  
+  bills.forEach((bill, index) => {
+    const cardHTML = createBillCard(bill, index);
+    billsList.innerHTML += cardHTML;
+  });
+  
+  console.log('Rendered', bills.length, 'bills'); // DEBUG
+}
+// ==========================================
+// SAVE BILLS TO STORAGE
+// ==========================================
+function saveBillsToStorage(bills) {
+  try {
+    // Save to localStorage
+    localStorage.setItem('solarBills', JSON.stringify(bills));
+    
+    // Also update global variable
+    window.userBills = bills;
+    
+    console.log('Bills saved successfully:', bills.length, 'bills');
+    
+    // TODO: If using Google Sheets, also save there
+    // saveToGoogleSheets(bills);
+    
+    return true;
+  } catch (error) {
+    console.error('Error saving bills:', error);
+    alert('Error saving bills. Please try again.');
+    return false;
+  }
+}
+
+// ==========================================
+// LOAD BILLS FROM STORAGE ON PAGE LOAD
+// ==========================================
+function loadBillsFromStorage() {
+  try {
+    const stored = localStorage.getItem('solarBills');
+    if (stored) {
+      const bills = JSON.parse(stored);
+      window.userBills = bills;
+      return bills;
+    }
+  } catch (error) {
+    console.error('Error loading bills:', error);
+  }
+  return [];
+}
+
+// ==========================================
+// INITIALIZE DASHBOARD
+// ==========================================
+function initializeDashboard() {
+  // Load bills
+  const bills = loadBillsFromStorage();
+  window.userBills = bills;
+  
+  // Render bills
+  renderBillCards(bills);
+  
+  // Update stats if function exists
+  if (typeof updateDashboardStats === 'function') {
+    updateDashboardStats(bills);
+  }
+  
+  console.log('Dashboard initialized with', bills.length, 'bills');
+}
+
+// Call initialize when page loads
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeDashboard);
+} else {
+  initializeDashboard();
+}
+
+// Call on dashboard load
+document.addEventListener('DOMContentLoaded', function() {
+  // Wait a bit for data to load
+  setTimeout(updateAnnualStats, 1000);
+});
+// ==========================================
+// 90% LIMIT HELP MODAL
+// ==========================================
+
+function show90LimitHelp() {
+  const helpHTML = `
+    <div style="text-align: left;">
+      <h5 style="color: #0b5ed7; margin-bottom: 1rem;">
+        📊 90% वार्षिक सीमा / 90% Annual Limit - Complete Guide
+      </h5>
+      
+      <div style="background: #fff3cd; padding: 1rem; border-radius: 8px; 
+           margin-bottom: 1rem; border-left: 4px solid #ffc107;">
+        <strong>⚠️ महत्वपूर्ण / Important:</strong><br>
+        यह limit हर state में अलग हो सकती है।<br>
+        This limit may vary by state.<br>
+        कृपया अपने state की policy check करें।<br>
+        Please check your state's policy.
+      </div>
+      
+      <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+        <strong>90% Limit क्या है? / What is 90% Limit?</strong><br><br>
+        कुछ states में नियम है कि आपके solar panels की वार्षिक generation
+        आपकी वार्षिक consumption के 90% से अधिक नहीं होनी चाहिए।<br><br>
+        Some states have a rule that your annual solar generation should not
+        exceed 90% of your annual consumption.
+      </div>
+      
+      <div style="background: #d1e7dd; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+        <strong>✓ उदाहरण / Example:</strong><br><br>
+        
+        <strong>Case 1: Safe</strong><br>
+        Annual Consumption: 10,000 units<br>
+        90% Reference: 9,000 units<br>
+        Your Generation: 8,500 units ✓<br>
+        Status: Full net metering benefits<br><br>
+        
+        <strong>Case 2: Exceeds</strong><br>
+        Annual Consumption: 10,000 units<br>
+        90% Reference: 9,000 units<br>
+        Your Generation: 12,000 units ⚠️<br>
+        Excess: 3,000 units<br><br>
+        
+        <strong>Excess units के लिए क्या होता है?</strong><br>
+        • कम दर पर भुगतान (₹2-3/unit) या<br>
+        • DISCOM को forfeit या<br>
+        • State policy पर depend
+      </div>
+      
+      <div style="background: #cfe2ff; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+        <strong>🔍 Haryana में क्या है?</strong><br><br>
+        कृपया UHBVN से confirm करें।<br>
+        Please confirm with UHBVN.<br><br>
+        
+        <strong>संपर्क / Contact:</strong><br>
+        • HERC Website: https://herc.gov.in<br>
+        • UHBVN: https://www.uhbvn.org.in<br>
+        • या अपने local UHBVN office
+      </div>
+      
+      <div style="background: #f8d7da; padding: 1rem; border-radius: 8px;">
+        <strong>💡 SolarSanchay में:</strong><br><br>
+        • हम आपको inform करते हैं ✓<br>
+        • Annual stats दिखाते हैं ✓<br>
+        • Warning देते हैं ✓<br>
+        • लेकिन automatic calculation नहीं<br>
+        • आप खुद decide करें!
+      </div>
+    </div>
+  `;
+  
+  showModal(
+    '📊',
+    '90% Annual Limit Guide',
+    helpHTML,
+    [{ text: 'समझ गया / Got it!', type: 'primary', action: closeModal }]
+  );
+}
+// ==========================================
+// MARCH RESET HELP MODAL
+// ==========================================
+
+function showMarchResetHelp() {
+  const helpHTML = `
+    <div style="text-align: left;">
+      <h5 style="color: #0b5ed7; margin-bottom: 1rem;">
+        📅 मार्च 31 Carry Forward Reset - Complete Guide
+      </h5>
+      
+      <div style="background: #fff3cd; padding: 1rem; border-radius: 8px; 
+           margin-bottom: 1rem; border-left: 4px solid #ffc107;">
+        <strong>⚠️ महत्वपूर्ण / Important:</strong><br>
+        यह policy हर state में अलग है।<br>
+        This policy varies by state.<br>
+        कृपया अपने DISCOM से confirm करें।<br>
+        Please confirm with your DISCOM.
+      </div>
+      
+      <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+        <strong>Carry Forward Reset क्या है? / What is CF Reset?</strong><br><br>
+        
+        <strong>दो अलग-अलग concepts हैं / Two different concepts:</strong><br><br>
+        
+        <strong>Concept 1: Monthly Carry Forward (लगातार चलती है)</strong><br>
+        • हर महीने: Previous Closing = Next Opening<br>
+        • March → April में भी चलती रहती है<br>
+        • यह monthly billing cycle है<br><br>
+        
+        <strong>Concept 2: Annual Settlement (FY के अंत में)</strong><br>
+        • कुछ states में March 31 को final adjustment<br>
+        • Remaining carry forward zero हो सकती है<br>
+        • या payment at avoided cost rate<br>
+        • या carry to next FY (rare)
+      </div>
+      
+      <div style="background: #d1e7dd; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+        <strong>✓ हमारी समझ / Our Understanding:</strong><br><br>
+        
+        <strong>अधिकतर states में (Most states):</strong><br>
+        • Monthly carry forward चलती रहती है ✓<br>
+        • March → April में भी चलती है ✓<br>
+        • कोई automatic reset नहीं<br><br>
+        
+        <strong>Example:</strong><br>
+        March 31: Closing CF = 130 units<br>
+        April 1: Opening CF = 130 units ✓<br>
+        (Same year billing, continuous)
+      </div>
+      
+      <div style="background: #f8d7da; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+        <strong>⚠️ लेकिन कुछ states में / But some states:</strong><br><br>
+        
+        • March 31 को annual settlement होता है<br>
+        • Carry forward reset to zero<br>
+        • या payment at lower rate<br>
+        • Policy document में clearly mentioned होता है<br><br>
+        
+        <strong>अगर ऐसा है तो / If this applies:</strong><br>
+        March 31: CF = 130 units<br>
+        April 1: CF = 0 ❌ (reset!)<br>
+        Loss: 130 units credit
+      </div>
+      
+      <div style="background: #cfe2ff; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+        <strong>🔍 Haryana UHBVN में क्या है?</strong><br><br>
+        
+        <strong>हमें exact information नहीं है।</strong><br>
+        We don't have exact information.<br><br>
+        
+        <strong>आपको क्या करना चाहिए? / What to do?</strong><br>
+        1. ✓ UHBVN office से पूछें<br>
+        2. ✓ Net Metering agreement पढ़ें<br>
+        3. ✓ HERC regulations check करें<br>
+        4. ✓ Solar installer से confirm करें<br>
+        5. ✓ Existing solar users से पूछें
+      </div>
+      
+      <div style="background: #e7f3ff; padding: 1rem; border-radius: 8px;">
+        <strong>💡 SolarSanchay में हमारा approach:</strong><br><br>
+        
+        • हम assume करते हैं: Monthly CF continuous है ✓<br>
+        • March → April में चलती रहती है<br>
+        • User को full information देते हैं<br>
+        • लेकिन automatic reset नहीं करते<br>
+        • User खुद decide करे!<br><br>
+        
+        <strong>Why?</strong><br>
+        • Policy हर state में अलग<br>
+        • Clear information नहीं मिली<br>
+        • User को empower करना बेहतर<br>
+        • Flexibility maintain रहे
+      </div>
+      
+      <hr style="margin: 1.5rem 0;">
+      
+      <div style="font-size: 0.9rem; color: #6c757d;">
+        <strong>महत्वपूर्ण संपर्क / Important Contacts:</strong><br>
+        • HERC: https://herc.gov.in<br>
+        • UHBVN: https://www.uhbvn.org.in<br>
+        • UHBVN Helpline: 1912<br>
+        • Net Metering Cell: Check local office
+      </div>
+    </div>
+  `;
+  
+  showModal(
+    '📅',
+    'March 31 Carry Forward Reset Guide',
+    helpHTML,
+    [{ text: 'समझ गया / Got it!', type: 'primary', action: closeModal }]
+  );
+}
+// Toggle policy info expand/collapse
+function togglePolicyInfo() {
+  const collapsed = document.getElementById('policyInfoCollapsed');
+  const expanded = document.getElementById('policyInfoExpanded');
+  
+  if (collapsed.style.display === 'none') {
+    collapsed.style.display = 'flex';
+    expanded.style.display = 'none';
+  } else {
+    collapsed.style.display = 'none';
+    expanded.style.display = 'block';
+  }
+}
+// ==========================================
+// MULTI-BILL SUMMARY FEATURE
+// ==========================================
+
+let currentSelectionMode = 'single'; // 'single' or 'summary'
+
+// Switch between Single and Summary modes
+function switchMode(mode) {
+  currentSelectionMode = mode;
+  
+  if (mode === 'single') {
+    // Single mode styling
+    document.getElementById('singleModeBtn').classList.add('btn-primary');
+    document.getElementById('singleModeBtn').classList.remove('btn-outline-primary');
+    document.getElementById('summaryModeBtn').classList.remove('btn-primary');
+    document.getElementById('summaryModeBtn').classList.add('btn-outline-primary');
+    
+    // SHOW single buttons, HIDE summary buttons
+    const singleActions = document.getElementById('singleModeActions');
+    const summaryActions = document.getElementById('summaryModeActions');
+    
+    if (singleActions) singleActions.style.display = 'flex';
+    if (summaryActions) summaryActions.style.display = 'none';
+    
+    // Show radios, hide checkboxes
+    document.querySelectorAll('.single-selector').forEach(el => el.style.display = 'block');
+    document.querySelectorAll('.summary-selector').forEach(el => {
+      el.style.display = 'none';
+      el.checked = false;
+    });
+    
+    // Update info
+    const modeInfo = document.getElementById('modeInfo');
+    if (modeInfo) {
+      modeInfo.innerHTML = '<strong>Single Selection Mode:</strong> Select one bill to View, Edit, or Delete.';
+    }
+    
+  } else if (mode === 'summary') {
+    // Summary mode styling
+    document.getElementById('summaryModeBtn').classList.add('btn-primary');
+    document.getElementById('summaryModeBtn').classList.remove('btn-outline-primary');
+    document.getElementById('singleModeBtn').classList.remove('btn-primary');
+    document.getElementById('singleModeBtn').classList.add('btn-outline-primary');
+    
+    // HIDE single buttons, SHOW summary buttons  ← THIS IS KEY!
+    const singleActions = document.getElementById('singleModeActions');
+    const summaryActions = document.getElementById('summaryModeActions');
+    
+    if (singleActions) singleActions.style.display = 'none';   // ← HIDE!
+    if (summaryActions) summaryActions.style.display = 'flex'; // ← SHOW!
+    
+    // Hide radios, show checkboxes
+    document.querySelectorAll('.single-selector').forEach(el => {
+      el.style.display = 'none';
+      el.checked = false;
+    });
+    document.querySelectorAll('.summary-selector').forEach(el => el.style.display = 'block');
+    
+    // Disable single mode buttons
+    const viewBtn = document.getElementById('viewBtn');
+    const editBtn = document.getElementById('editBtn');
+    const deleteBtn = document.getElementById('deleteBtn');
+    
+    if (viewBtn) viewBtn.disabled = true;
+    if (editBtn) editBtn.disabled = true;
+    if (deleteBtn) deleteBtn.disabled = true;
+    
+    selectedBillIndex = null;
+    
+    // Update info
+    const modeInfo = document.getElementById('modeInfo');
+    if (modeInfo) {
+      modeInfo.innerHTML = '<strong>Multi-Bill Summary Mode:</strong> Select multiple bills to see aggregate statistics.';
+    }
+    
+    updateSummarySelection();
+  }
+}
+
+// Update selected count and button state
+function updateSummarySelection() {
+  const checked = document.querySelectorAll('.summary-selector:checked');
+  const count = checked.length;
+  
+  document.getElementById('selectedCount').textContent = count;
+  document.getElementById('showSummaryBtn').disabled = count === 0;
+}
+
+// Select all bills
+function selectAllBills() {
+  document.querySelectorAll('.summary-selector').forEach(cb => cb.checked = true);
+  updateSummarySelection();
+}
+
+// Clear all selections
+function clearAllSelections() {
+  document.querySelectorAll('.summary-selector').forEach(cb => cb.checked = false);
+  updateSummarySelection();
+}
+
+// Show multi-bill summary modal
+function showMultiBillSummary() {
+  const checkedBoxes = document.querySelectorAll('.summary-selector:checked');
+  
+  if (checkedBoxes.length === 0) {
+    alert('कृपया कम से कम एक bill select करें।\nPlease select at least one bill.');
+    return;
+  }
+  
+  // Get all bills - try multiple sources
+  let allBills = window.userBills || [];
+  
+  // Fallback 1: Load from storage
+  if (allBills.length === 0) {
+    try {
+      const stored = localStorage.getItem('solarBills');
+      if (stored) {
+        allBills = JSON.parse(stored);
+        window.userBills = allBills; // Store for future use
+      }
+    } catch (e) {
+      console.error('Error loading bills:', e);
+    }
+  }
+  
+  // Fallback 2: Try getStoredBills function
+  if (allBills.length === 0 && typeof getStoredBills === 'function') {
+    allBills = getStoredBills() || [];
+    window.userBills = allBills;
+  }
+  
+  // Final check
+  if (allBills.length === 0) {
+    alert('कोई bills नहीं मिले। कृपया page refresh करें।\nNo bills found. Please refresh the page.');
+    return;
+  }
+  
+  console.log('Total bills available:', allBills.length);
+  console.log('Bills selected:', checkedBoxes.length);
+  
+  // Get selected bills data
+  const selectedBills = [];
+  checkedBoxes.forEach(cb => {
+    const index = parseInt(cb.value);
+    if (allBills[index]) {
+      selectedBills.push(allBills[index]);
+    }
+  });
+  
+  if (selectedBills.length === 0) {
+    alert('Selected bills data not found.');
+    return;
+  }
+  
+  console.log('Selected bills:', selectedBills.length);
+  
+  // Calculate aggregate statistics
+  const summary = calculateMultiBillSummary(selectedBills);
+  
+  // Show summary modal
+  displaySummaryModal(summary, selectedBills);
+}
+function calculateMultiBillSummary(bills) {
+  const summary = {
+    count: bills.length,
+    totalDays: 0,
+    totalGross: 0,
+    totalImport: 0,
+    totalExport: 0,
+    totalBillAmount: 0,
+    totalWithoutSolar: 0,
+    totalSavings: 0,
+    monthlyBreakdown: []
+  };
+  
+  bills.forEach(bill => {
+    // Days
+    const days = parseInt(bill['Days in Bill Period'] || bill.days || 30);
+    summary.totalDays += days;
+    
+    // Units
+    summary.totalGross += parseFloat(bill['Gross Units'] || bill.grossUnits || 0);
+    summary.totalImport += parseFloat(bill['Import Units'] || bill.importUnits || 0);
+    summary.totalExport += parseFloat(bill['Export Units'] || bill.exportUnits || 0);
+    
+    // Financial - TRY MULTIPLE FIELD NAMES
+    const billAmount = parseFloat(
+      bill['Total Bill Amount'] || 
+      bill['totalBillAmount'] || 
+      bill['Bill Amount'] || 
+      0
+    );
+    
+    const withoutSolar = parseFloat(
+      bill['Without Solar Amount'] || 
+      bill['withoutSolarAmount'] || 
+      bill['Without Solar Bill'] ||
+      bill['Estimated Bill Without Solar'] ||
+      0
+    );
+    
+    const savings = parseFloat(
+      bill['Solar Saving Amount'] || 
+      bill['totalSavings'] || 
+      bill['Saving Amount'] ||
+      bill['Solar Savings'] ||
+      0
+    );
+    
+    summary.totalBillAmount += billAmount;
+    summary.totalWithoutSolar += withoutSolar;
+    summary.totalSavings += savings;
+    
+    console.log('Bill:', bill['Bill Number'], 
+                'Without Solar:', withoutSolar, 
+                'Savings:', savings); // DEBUG
+    
+    // Monthly breakdown
+    summary.monthlyBreakdown.push({
+      billNumber: bill['Bill Number'] || bill.billNumber,
+      period: `${bill['Bill From Date'] || ''} - ${bill['Bill To Date'] || ''}`,
+      saving: savings,
+      savingPercent: parseFloat(bill['Saving Percentage'] || 0)
+    });
+  });
+  
+  // Calculate derived values
+  summary.netFromGrid = summary.totalImport - summary.totalExport;
+  summary.totalSolarGenerated = summary.totalGross - summary.totalImport + summary.totalExport;
+  summary.selfConsumption = summary.totalGross - summary.totalImport;
+  
+  // SAFE DIVISION - Avoid Infinity
+  if (summary.totalWithoutSolar > 0) {
+    summary.avgSavingPercent = (summary.totalSavings / summary.totalWithoutSolar * 100).toFixed(1);
+  } else {
+    // Calculate from bill percentage if available
+    const avgPercent = summary.monthlyBreakdown.reduce((sum, b) => sum + b.savingPercent, 0) / summary.count;
+    summary.avgSavingPercent = avgPercent.toFixed(1);
+  }
+  
+  summary.avgDaysPerBill = (summary.totalDays / bills.length).toFixed(1);
+  
+  // Per day calculations - SAFE DIVISION
+  summary.perDayWithSolar = summary.totalDays > 0 ? 
+    (summary.totalBillAmount / summary.totalDays).toFixed(0) : 0;
+  summary.perDayWithoutSolar = summary.totalDays > 0 ? 
+    (summary.totalWithoutSolar / summary.totalDays).toFixed(0) : 0;
+  summary.perDaySaving = summary.totalDays > 0 ? 
+    (summary.totalSavings / summary.totalDays).toFixed(0) : 0;
+  
+  console.log('Summary calculated:', summary); // DEBUG
+  
+  return summary;
+}
+
+// Display summary modal
+function displaySummaryModal(summary, bills) {
+  const modalHTML = `
+    <div style="text-align: left; max-height: 70vh; overflow-y: auto; font-family: system-ui; line-height: 1.6;">
+      
+      <!-- Header -->
+      <h4 style="color: #0b5ed7; margin-bottom: 1.5rem; border-bottom: 2px solid #0b5ed7; padding-bottom: 0.5rem;">
+        📊 Multi-Bill Summary
+      </h4>
+      
+      <!-- Selected Bills List -->
+      <div style="background: linear-gradient(135deg, #e0f2fe, #dbeafe); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; border-left: 4px solid #3b82f6;">
+        <div style="font-weight: 700; color: #1e3a8a; margin-bottom: 0.5rem;">
+          Selected Bills: ${summary.count}
+        </div>
+        ${bills.map((b, idx) => `
+          <div style="padding: 0.25rem 0; color: #1e40af;">
+            ${idx + 1}. Bill #${b['Bill Number'] || b.billNumber} 
+            <span style="color: #64748b; font-size: 0.9rem;">
+              (${formatBillPeriod(b)})
+            </span>
+          </div>
+        `).join('')}
+      </div>
+      
+      <!-- Period Summary -->
+      <div style="background: linear-gradient(135deg, #fef3c7, #fde68a); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid #f59e0b;">
+        <h6 style="color: #92400e; font-weight: 700; margin-bottom: 0.75rem;">📅 PERIOD SUMMARY</h6>
+        
+        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0;">
+          <span style="color: #78350f; font-weight: 600;">Total Days:</span>
+          <span style="font-weight: 700; color: #92400e;">${summary.totalDays} days</span>
+        </div>
+        ${bills.map((b, idx) => `
+          <div style="padding-left: 1rem; font-size: 0.85rem; color: #78350f; padding: 0.2rem 0;">
+            ↳ Bill ${idx + 1}: ${parseInt(b['Days in Bill Period'] || b.days || 30)} days
+          </div>
+        `).join('')}
+        
+        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; margin-top: 0.5rem;">
+          <span style="color: #78350f;">Avg Days/Bill:</span>
+          <span style="font-weight: 700; color: #92400e;">${summary.avgDaysPerBill} days</span>
+        </div>
+      </div>
+      
+      <!-- Units Summary -->
+      <div style="background: linear-gradient(135deg, #e0e7ff, #c7d2fe); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid #6366f1;">
+        <h6 style="color: #312e81; font-weight: 700; margin-bottom: 0.75rem;">⚡ UNITS SUMMARY</h6>
+        
+        <!-- Gross Units -->
+        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0;">
+          <span style="color: #4338ca; font-weight: 600;">Total Gross:</span>
+          <span style="font-weight: 700; color: #312e81;">${summary.totalGross.toLocaleString()} units</span>
+        </div>
+        ${bills.map((b, idx) => `
+          <div style="padding-left: 1rem; font-size: 0.85rem; color: #4338ca; padding: 0.2rem 0;">
+            ↳ Bill ${idx + 1}: ${parseFloat(b['Gross Units'] || 0).toLocaleString()} units
+          </div>
+        `).join('')}
+        
+        <!-- Import Units -->
+        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; margin-top: 0.5rem;">
+          <span style="color: #4338ca; font-weight: 600;">Total Import:</span>
+          <span style="font-weight: 700; color: #312e81;">${summary.totalImport.toLocaleString()} units</span>
+        </div>
+        ${bills.map((b, idx) => `
+          <div style="padding-left: 1rem; font-size: 0.85rem; color: #4338ca; padding: 0.2rem 0;">
+            ↳ Bill ${idx + 1}: ${parseFloat(b['Import Units'] || 0).toLocaleString()} units
+          </div>
+        `).join('')}
+        
+        <!-- Export Units -->
+        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; margin-top: 0.5rem;">
+          <span style="color: #4338ca; font-weight: 600;">Total Export:</span>
+          <span style="font-weight: 700; color: #312e81;">${summary.totalExport.toLocaleString()} units</span>
+        </div>
+        ${bills.map((b, idx) => `
+          <div style="padding-left: 1rem; font-size: 0.85rem; color: #4338ca; padding: 0.2rem 0;">
+            ↳ Bill ${idx + 1}: ${parseFloat(b['Export Units'] || 0).toLocaleString()} units
+          </div>
+        `).join('')}
+        
+        <div style="border-top: 1px solid #a5b4fc; margin: 0.75rem 0;"></div>
+        
+        <!-- Calculated Values -->
+        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0;">
+          <span style="color: #4338ca;">Net from Grid:</span>
+          <span style="font-weight: 700; color: #312e81;">${summary.netFromGrid.toLocaleString()} units</span>
+        </div>
+        <div style="padding-left: 1rem; font-size: 0.8rem; color: #6366f1; padding: 0.2rem 0;">
+          (Import ${summary.totalImport} - Export ${summary.totalExport})
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; margin-top: 0.3rem;">
+          <span style="color: #4338ca;">Solar Generated:</span>
+          <span style="font-weight: 700; color: #10b981;">${summary.totalSolarGenerated.toLocaleString()} units</span>
+        </div>
+        <div style="padding-left: 1rem; font-size: 0.8rem; color: #6366f1; padding: 0.2rem 0;">
+          (Gross ${summary.totalGross} - Import ${summary.totalImport} + Export ${summary.totalExport})
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; margin-top: 0.3rem;">
+          <span style="color: #4338ca;">Self Consumed:</span>
+          <span style="font-weight: 700; color: #312e81;">${summary.selfConsumption.toLocaleString()} units</span>
+        </div>
+        <div style="padding-left: 1rem; font-size: 0.8rem; color: #6366f1; padding: 0.2rem 0;">
+          (Gross ${summary.totalGross} - Import ${summary.totalImport})
+        </div>
+      </div>
+      
+      <!-- Financial Summary -->
+      <div style="background: linear-gradient(135deg, #dcfce7, #bbf7d0); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid #10b981;">
+        <h6 style="color: #14532d; font-weight: 700; margin-bottom: 0.75rem;">💰 FINANCIAL SUMMARY</h6>
+        
+        <!-- Total Bill Amount -->
+        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0;">
+          <span style="color: #166534; font-weight: 600;">Total Bill Amount:</span>
+          <span style="font-weight: 700; color: #14532d;">₹${summary.totalBillAmount.toLocaleString()}</span>
+        </div>
+        ${bills.map((b, idx) => `
+          <div style="padding-left: 1rem; font-size: 0.85rem; color: #166534; padding: 0.2rem 0;">
+            ↳ Bill ${idx + 1}: ₹${parseFloat(b['Total Bill Amount'] || 0).toLocaleString()}
+          </div>
+        `).join('')}
+        
+        <!-- Without Solar -->
+        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; margin-top: 0.5rem;">
+          <span style="color: #166534; font-weight: 600;">Without Solar:</span>
+          <span style="font-weight: 700; color: #14532d;">₹${summary.totalWithoutSolar.toLocaleString()}</span>
+        </div>
+        ${bills.map((b, idx) => {
+          const withoutSolar = parseFloat(
+            b['Without Solar Amount'] || 
+            b['withoutSolarAmount'] || 
+            b['Estimated Bill Without Solar'] || 
+            b['Without Solar Bill'] ||
+            0
+          );
+          return `
+          <div style="padding-left: 1rem; font-size: 0.85rem; color: #166534; padding: 0.2rem 0;">
+            ↳ Bill ${idx + 1}: ₹${withoutSolar.toLocaleString()}
+          </div>
+        `}).join('')}
+        
+        <div style="border-top: 2px solid #10b981; margin: 0.75rem 0;"></div>
+        
+        <!-- Total Savings -->
+        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0;">
+          <span style="color: #166534; font-weight: 700; font-size: 1rem;">Total Savings:</span>
+          <span style="font-weight: 700; color: #10b981; font-size: 1.2rem;">₹${summary.totalSavings.toLocaleString()}</span>
+        </div>
+        ${bills.map((b, idx) => `
+          <div style="padding-left: 1rem; font-size: 0.85rem; color: #166534; padding: 0.2rem 0;">
+            ↳ Bill ${idx + 1}: ₹${parseFloat(b['Solar Saving Amount'] || 0).toLocaleString()}
+          </div>
+        `).join('')}
+        
+        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; margin-top: 0.3rem;">
+          <span style="color: #166534;">Avg Saving %:</span>
+          <span style="font-weight: 700; color: #10b981; font-size: 1rem;">${summary.avgSavingPercent}%</span>
+        </div>
+        
+        <!-- Per Day Breakdown -->
+        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #86efac;">
+          <div style="font-weight: 700; color: #14532d; margin-bottom: 0.5rem; font-size: 0.95rem;">
+            Per Day Average:
+          </div>
+          <div style="display: flex; justify-content: space-between; padding: 0.3rem 0;">
+            <span style="color: #166534; font-size: 0.9rem;">• With Solar:</span>
+            <span style="font-weight: 600; color: #14532d;">₹${summary.perDayWithSolar}/day</span>
+          </div>
+          <div style="padding-left: 1.5rem; font-size: 0.75rem; color: #6b7280;">
+            (₹${summary.totalBillAmount.toLocaleString()} ÷ ${summary.totalDays} days)
+          </div>
+          
+          <div style="display: flex; justify-content: space-between; padding: 0.3rem 0; margin-top: 0.3rem;">
+            <span style="color: #166534; font-size: 0.9rem;">• Without Solar:</span>
+            <span style="font-weight: 600; color: #14532d;">₹${summary.perDayWithoutSolar}/day</span>
+          </div>
+          <div style="padding-left: 1.5rem; font-size: 0.75rem; color: #6b7280;">
+            (₹${summary.totalWithoutSolar.toLocaleString()} ÷ ${summary.totalDays} days)
+          </div>
+          
+          <div style="display: flex; justify-content: space-between; padding: 0.3rem 0; margin-top: 0.3rem;">
+            <span style="color: #166534; font-size: 0.9rem;">• Daily Saving:</span>
+            <span style="font-weight: 700; color: #10b981;">₹${summary.perDaySaving}/day</span>
+          </div>
+          <div style="padding-left: 1.5rem; font-size: 0.75rem; color: #6b7280;">
+            (₹${summary.totalSavings.toLocaleString()} ÷ ${summary.totalDays} days)
+          </div>
+        </div>
+      </div>
+      
+      <!-- Bill-wise Summary -->
+      <div style="background: linear-gradient(135deg, #f3f4f6, #e5e7eb); padding: 1rem; border-radius: 8px; border-left: 4px solid #6b7280;">
+        <h6 style="color: #1f2937; font-weight: 700; margin-bottom: 0.75rem;">📈 BILL-WISE SUMMARY</h6>
+        ${bills.map((b, idx) => {
+          const billNum = b['Bill Number'] || b.billNumber;
+          const days = parseInt(b['Days in Bill Period'] || b.days || 30);
+          const gross = parseFloat(b['Gross Units'] || 0);
+          const imp = parseFloat(b['Import Units'] || 0);
+          const exp = parseFloat(b['Export Units'] || 0);
+          const billAmt = parseFloat(b['Total Bill Amount'] || 0);
+          const saving = parseFloat(b['Solar Saving Amount'] || 0);
+          const savingPct = parseFloat(b['Saving Percentage'] || 0);
+          
+          return `
+          <div style="padding: 0.75rem; margin-bottom: 0.5rem; background: white; border-radius: 6px; border: 1px solid #d1d5db;">
+            <div style="font-weight: 700; color: #374151; margin-bottom: 0.5rem;">
+              ${idx + 1}. Bill #${billNum} (${formatBillPeriod(b)})
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.3rem; font-size: 0.85rem;">
+              <div style="color: #6b7280;">Days: <span style="font-weight: 600; color: #374151;">${days}</span></div>
+              <div style="color: #6b7280;">Gross: <span style="font-weight: 600; color: #374151;">${gross} units</span></div>
+              <div style="color: #6b7280;">Import: <span style="font-weight: 600; color: #374151;">${imp} units</span></div>
+              <div style="color: #6b7280;">Export: <span style="font-weight: 600; color: #374151;">${exp} units</span></div>
+              <div style="color: #6b7280;">Bill Amt: <span style="font-weight: 600; color: #374151;">₹${billAmt.toLocaleString()}</span></div>
+              <div style="color: #10b981; font-weight: 600;">Saving: ₹${saving.toLocaleString()} (${savingPct.toFixed(1)}%)</div>
+            </div>
+          </div>
+        `}).join('')}
+      </div>
+      
+    </div>
+  `;
+  
+  showModal(
+    '📊',
+    'Multi-Bill Summary',
+    modalHTML,
+    [
+      { text: '✕ Close', type: 'secondary', action: closeModal }
+    ]
+  );
+}
+
+// Helper function to format bill period
+function formatBillPeriod(bill) {
+  const fromDate = bill['Bill From Date'] || bill.billFromDate;
+  const toDate = bill['Bill To Date'] || bill.billToDate;
+  
+  if (!fromDate || !toDate) return 'N/A';
+  
+  try {
+    const from = new Date(fromDate);
+    const to = new Date(toDate);
+    
+    if (isNaN(from.getTime()) || isNaN(to.getTime())) return 'N/A';
+    
+    const fromDay = from.getDate();
+    const toDay = to.getDate();
+    const fromMonth = from.toLocaleDateString('en-IN', { month: 'short' });
+    const year = from.getFullYear();
+    
+    if (from.getMonth() === to.getMonth()) {
+      return `${fromDay}-${toDay} ${fromMonth} ${year}`;
+    } else {
+      const toMonth = to.toLocaleDateString('en-IN', { month: 'short' });
+      return `${fromDay} ${fromMonth} - ${toDay} ${toMonth} ${year}`;
+    }
+  } catch (e) {
+    return 'N/A';
+  }
+}
 </script>
 
 </body>
