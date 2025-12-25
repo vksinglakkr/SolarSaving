@@ -3960,18 +3960,30 @@ window.addEventListener('load', function() {
 function goToHome() {
   console.log('🏠 Going to home...');
   
-  // Hide all sections
-  document.getElementById('consumptionSection')?.classList.add('d-none');
-  document.getElementById('dashboardSection')?.classList.add('d-none');
-  document.getElementById('authSection')?.classList.add('d-none');
+  // Hide ALL sections
+  const sectionsToHide = [
+    'consumptionSection',
+    'dashboardSection',
+    'authSection',
+    'identitySection',      // ✅ ADD - Consumer Identification
+    'billPeriodSection',    // ✅ ADD - Bill Period
+    'carryForwardSection',  // ✅ ADD - Carry Forward
+    'intentSummary'         // ✅ ADD - Summary bar
+  ];
   
-  // Show intent section - FORCE IT!
+  sectionsToHide.forEach(id => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.classList.add('d-none');
+      element.style.display = 'none';
+    }
+  });
+  
+  // Show intent section
   const intentSection = document.getElementById('intentSection');
   if (intentSection) {
-    intentSection.classList.remove('d-none'); // Remove Bootstrap hide
-    intentSection.style.display = 'block';    // Force show
-  } else {
-    console.error('ERROR: intentSection not found!');
+    intentSection.classList.remove('d-none');
+    intentSection.style.display = 'block';
   }
   
   // Hide home button
