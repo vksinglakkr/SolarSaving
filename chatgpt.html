@@ -402,7 +402,7 @@ background: linear-gradient(135deg, #5568d3 0%, #6a3f91 100%);
 }
 /* Carry Forward Warning Styles */
 .carry-warning {
-  padding: 0.75rem;
+  padding: 0.5rem;
   border-radius: 8px;
   margin-top: 0.5rem;
   font-size: 0.9rem;
@@ -443,11 +443,37 @@ background: linear-gradient(135deg, #5568d3 0%, #6a3f91 100%);
 [title] {
   position: relative;
 }
+#simpleHomeBtn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+}
+
+#simpleHomeBtn:active {
+  transform: scale(0.95);
+}
 </style>
 </head>
 
 <body>
-
+<button id="simpleHomeBtn" 
+        onclick="goToHome()" 
+        style="position: fixed; 
+               bottom: 15px; 
+               right: 15px; 
+               width: 55px; 
+               height: 55px; 
+               border-radius: 50%; 
+               background: linear-gradient(135deg, #0d6efd, #0b5ed7); 
+               color: white; 
+               border: none; 
+               font-size: 1.3rem; 
+               box-shadow: 0 4px 12px rgba(0,0,0,0.3); 
+               cursor: pointer; 
+               z-index: 9999;
+               display: none;">
+  🏠
+</button>
+  <div class="container">  
 <!-- HEADER -->
 <div class="header">
   <div class="container d-flex align-items-center justify-content-between">
@@ -617,52 +643,16 @@ background: linear-gradient(135deg, #5568d3 0%, #6a3f91 100%);
     <div id="limitWarningBox" style="margin-top: 1rem;"></div>
   </div>
 </div>
-  <!-- HELPFUL LINKS -->
-<div id="helperCards"
-     class="mt-4 p-3 rounded helper-wrapper">
-
-  <div class="mb-2 text-muted small">
-    <h5>Helpful resources before you start</h5>
-  </div>
-
-  <div class="row g-3">
-  <!-- DOWNLOAD BILL -->
-  <div class="col-md-4">
-   <div class="card helper-card h-100 shadow-sm">
-      <div class="card-body">
-        <h6 class="card-title">📄 Download Electricity Bill</h6>
-        <a href="https://www.uhbvn.org.in/web/portal/auth?lastPage=/view-bill"
-           target="_blank"
-           class="btn btn-outline-primary btn-sm">
-          Open Bill Portal
-        </a>
-      </div>
-    </div>
-  </div>
-
-  <!-- HELP / TERMINOLOGY -->
-  <div class="col-md-4">
-    <div class="card helper-card h-100 shadow-sm">
-      <div class="card-body">
-        <h6 class="card-title">ℹ️ Understanding Bill Terms</h6>
-        <button class="btn btn-outline-secondary btn-sm"
-                onclick="openHelpModal()">
-          View Explanation
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- WHY THIS TOOL -->
-  <div class="col-md-4">
-    <div class="card helper-card h-100 shadow-sm">
-      <div class="card-body">
-        <h6 class="card-title">☀️ Why use SolarSaving?</h6>
-        <span class="badge bg-success">No login • Secure data</span>
-      </div>
-    </div>
-  </div>
-  </div>
+<!-- Simple Download Link -->
+<div style="text-align: center; padding: 1rem; background: #f0f9ff; border-radius: 8px; margin-bottom: 1rem;">
+  <p style="margin: 0; color: #0369a1;">
+    📄 Don't have your bill? 
+    <a href="https://uhbvn.org.in/web/portal/view-bill" 
+       target="_blank" 
+       style="color: #0284c7; font-weight: 600; text-decoration: underline;">
+      Download from UHBVN/DHBVN
+    </a>
+  </p>
 </div>
     
 
@@ -977,6 +967,12 @@ function selectIntent(type){
 
   // Button
   const actionBtn = document.getElementById("actionBtn");
+  if (consumption) consumption.style.display = '';
+  if (identity) identity.style.display = '';
+  if (billPeriod) billPeriod.style.display = '';
+  if (authSection) authSection.style.display = '';
+  if (dashboardSection) dashboardSection.style.display = '';
+  if (carrySec) carrySec.style.display = '';
 
   // Hide intent selector cards
   if (intentSection) intentSection.classList.add("d-none");
@@ -1020,6 +1016,28 @@ function selectIntent(type){
     }
 
     actionBtn.classList.remove("d-none");
+  }
+if (type === 'one' || type === 'save') {
+    // Show consumption section
+    consumptionSection.classList.remove('d-none');
+    intentSection.style.display = 'none';
+    
+    showHomeButton(); // ✅ ADD THIS
+    
+  } else if (type === 'dashboard') {
+    if (currentUser) {
+      dashboardSection.classList.remove('d-none');
+      intentSection.style.display = 'none';
+      
+      showHomeButton(); // ✅ ADD THIS
+      
+      displayBillsList();
+    } else {
+      authSection.classList.remove('d-none');
+      intentSection.style.display = 'none';
+      
+      showHomeButton(); // ✅ ADD THIS
+    }
   }
 }
 
@@ -1117,6 +1135,9 @@ function showDashboard() {
   document.getElementById('authSection').classList.add('d-none');
   document.getElementById('dashboardSection').classList.remove('d-none');
   document.getElementById('userInfo').textContent = `Meter: ${currentUser.meter} | Account: ${currentUser.account}`;
+  
+  showHomeButton(); // ✅ ADD THIS
+  
   displayBillsList();
 }
 
@@ -3113,81 +3134,64 @@ function calculateMultiBillSummary(bills) {
   };
   
   bills.forEach(bill => {
-    // Days
-    const days = parseInt(bill['Days in Bill Period'] || bill.days || 30);
+    // === DAYS ===
+    const days = parseInt(bill['Days in Bill Period'] || 30);
     summary.totalDays += days;
     
-    // Units
-    summary.totalGross += parseFloat(bill['Gross Units'] || bill.grossUnits || 0);
-    summary.totalImport += parseFloat(bill['Import Units'] || bill.importUnits || 0);
-    summary.totalExport += parseFloat(bill['Export Units'] || bill.exportUnits || 0);
+    // === UNITS ===
+    const gross = parseFloat(bill['Gross Units'] || 0);
+    const imp = parseFloat(bill['Import Units'] || 0);
+    const exp = parseFloat(bill['Export Units'] || 0);
     
-    // Financial - TRY MULTIPLE FIELD NAMES
-    const billAmount = parseFloat(
-      bill['Total Bill Amount'] || 
-      bill['totalBillAmount'] || 
-      bill['Bill Amount'] || 
-      0
-    );
+    summary.totalGross += gross;
+    summary.totalImport += imp;
+    summary.totalExport += exp;
     
-    const withoutSolar = parseFloat(
-      bill['Without Solar Amount'] || 
-      bill['withoutSolarAmount'] || 
-      bill['Without Solar Bill'] ||
-      bill['Estimated Bill Without Solar'] ||
-      0
-    );
+    // === MONEY ===
+    const billAmount = parseFloat(bill['Total Bill Amount'] || 0);
+    const savings = parseFloat(bill['Solar Saving Amount'] || 0);
     
-    const savings = parseFloat(
-      bill['Solar Saving Amount'] || 
-      bill['totalSavings'] || 
-      bill['Saving Amount'] ||
-      bill['Solar Savings'] ||
-      0
-    );
+    // TRY TO GET "Without Solar" - यह 0 दिखा रहा है
+    let withoutSolar = parseFloat(bill['Without Solar Amount'] || 0);
+    
+    // ✅ FIX: If Without Solar is 0, calculate it!
+    if (withoutSolar === 0 && savings > 0) {
+      // Without Solar = Bill Amount + Savings
+      // Example: ₹2,477 + ₹3,847 = ₹6,324
+      withoutSolar = billAmount + savings;
+    }
     
     summary.totalBillAmount += billAmount;
     summary.totalWithoutSolar += withoutSolar;
     summary.totalSavings += savings;
     
-    console.log('Bill:', bill['Bill Number'], 
-                'Without Solar:', withoutSolar, 
-                'Savings:', savings); // DEBUG
-    
-    // Monthly breakdown
+    // === BREAKDOWN ===
     summary.monthlyBreakdown.push({
-      billNumber: bill['Bill Number'] || bill.billNumber,
-      period: `${bill['Bill From Date'] || ''} - ${bill['Bill To Date'] || ''}`,
+      billNumber: bill['Bill Number'],
       saving: savings,
       savingPercent: parseFloat(bill['Saving Percentage'] || 0)
     });
   });
   
-  // Calculate derived values
+  // === CALCULATED VALUES ===
   summary.netFromGrid = summary.totalImport - summary.totalExport;
   summary.totalSolarGenerated = summary.totalGross - summary.totalImport + summary.totalExport;
   summary.selfConsumption = summary.totalGross - summary.totalImport;
   
-  // SAFE DIVISION - Avoid Infinity
+  // === AVERAGES ===
+  summary.avgDaysPerBill = (summary.totalDays / bills.length).toFixed(1);
+  
+  // Safe division to avoid Infinity
   if (summary.totalWithoutSolar > 0) {
     summary.avgSavingPercent = (summary.totalSavings / summary.totalWithoutSolar * 100).toFixed(1);
   } else {
-    // Calculate from bill percentage if available
-    const avgPercent = summary.monthlyBreakdown.reduce((sum, b) => sum + b.savingPercent, 0) / summary.count;
-    summary.avgSavingPercent = avgPercent.toFixed(1);
+    summary.avgSavingPercent = '0.0';
   }
   
-  summary.avgDaysPerBill = (summary.totalDays / bills.length).toFixed(1);
-  
-  // Per day calculations - SAFE DIVISION
-  summary.perDayWithSolar = summary.totalDays > 0 ? 
-    (summary.totalBillAmount / summary.totalDays).toFixed(0) : 0;
-  summary.perDayWithoutSolar = summary.totalDays > 0 ? 
-    (summary.totalWithoutSolar / summary.totalDays).toFixed(0) : 0;
-  summary.perDaySaving = summary.totalDays > 0 ? 
-    (summary.totalSavings / summary.totalDays).toFixed(0) : 0;
-  
-  console.log('Summary calculated:', summary); // DEBUG
+  // Per day
+  summary.perDayWithSolar = (summary.totalBillAmount / summary.totalDays).toFixed(0);
+  summary.perDayWithoutSolar = (summary.totalWithoutSolar / summary.totalDays).toFixed(0);
+  summary.perDaySaving = (summary.totalSavings / summary.totalDays).toFixed(0);
   
   return summary;
 }
@@ -3221,7 +3225,7 @@ function displaySummaryModal(summary, bills) {
       <div style="background: linear-gradient(135deg, #fef3c7, #fde68a); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid #f59e0b;">
         <h6 style="color: #92400e; font-weight: 700; margin-bottom: 0.75rem;">📅 PERIOD SUMMARY</h6>
         
-        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0;">
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
           <span style="color: #78350f; font-weight: 600;">Total Days:</span>
           <span style="font-weight: 700; color: #92400e;">${summary.totalDays} days</span>
         </div>
@@ -3231,7 +3235,7 @@ function displaySummaryModal(summary, bills) {
           </div>
         `).join('')}
         
-        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; margin-top: 0.5rem;">
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0; margin-top: 0.5rem;">
           <span style="color: #78350f;">Avg Days/Bill:</span>
           <span style="font-weight: 700; color: #92400e;">${summary.avgDaysPerBill} days</span>
         </div>
@@ -3242,7 +3246,7 @@ function displaySummaryModal(summary, bills) {
         <h6 style="color: #312e81; font-weight: 700; margin-bottom: 0.75rem;">⚡ UNITS SUMMARY</h6>
         
         <!-- Gross Units -->
-        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0;">
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
           <span style="color: #4338ca; font-weight: 600;">Total Gross:</span>
           <span style="font-weight: 700; color: #312e81;">${summary.totalGross.toLocaleString()} units</span>
         </div>
@@ -3253,7 +3257,7 @@ function displaySummaryModal(summary, bills) {
         `).join('')}
         
         <!-- Import Units -->
-        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; margin-top: 0.5rem;">
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0; margin-top: 0.5rem;">
           <span style="color: #4338ca; font-weight: 600;">Total Import:</span>
           <span style="font-weight: 700; color: #312e81;">${summary.totalImport.toLocaleString()} units</span>
         </div>
@@ -3264,7 +3268,7 @@ function displaySummaryModal(summary, bills) {
         `).join('')}
         
         <!-- Export Units -->
-        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; margin-top: 0.5rem;">
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0; margin-top: 0.5rem;">
           <span style="color: #4338ca; font-weight: 600;">Total Export:</span>
           <span style="font-weight: 700; color: #312e81;">${summary.totalExport.toLocaleString()} units</span>
         </div>
@@ -3277,7 +3281,7 @@ function displaySummaryModal(summary, bills) {
         <div style="border-top: 1px solid #a5b4fc; margin: 0.75rem 0;"></div>
         
         <!-- Calculated Values -->
-        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0;">
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
           <span style="color: #4338ca;">Net from Grid:</span>
           <span style="font-weight: 700; color: #312e81;">${summary.netFromGrid.toLocaleString()} units</span>
         </div>
@@ -3285,7 +3289,7 @@ function displaySummaryModal(summary, bills) {
           (Import ${summary.totalImport} - Export ${summary.totalExport})
         </div>
         
-        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; margin-top: 0.3rem;">
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0; margin-top: 0.3rem;">
           <span style="color: #4338ca;">Solar Generated:</span>
           <span style="font-weight: 700; color: #10b981;">${summary.totalSolarGenerated.toLocaleString()} units</span>
         </div>
@@ -3293,7 +3297,7 @@ function displaySummaryModal(summary, bills) {
           (Gross ${summary.totalGross} - Import ${summary.totalImport} + Export ${summary.totalExport})
         </div>
         
-        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; margin-top: 0.3rem;">
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0; margin-top: 0.3rem;">
           <span style="color: #4338ca;">Self Consumed:</span>
           <span style="font-weight: 700; color: #312e81;">${summary.selfConsumption.toLocaleString()} units</span>
         </div>
@@ -3307,7 +3311,7 @@ function displaySummaryModal(summary, bills) {
         <h6 style="color: #14532d; font-weight: 700; margin-bottom: 0.75rem;">💰 FINANCIAL SUMMARY</h6>
         
         <!-- Total Bill Amount -->
-        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0;">
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
           <span style="color: #166534; font-weight: 600;">Total Bill Amount:</span>
           <span style="font-weight: 700; color: #14532d;">₹${summary.totalBillAmount.toLocaleString()}</span>
         </div>
@@ -3318,7 +3322,7 @@ function displaySummaryModal(summary, bills) {
         `).join('')}
         
         <!-- Without Solar -->
-        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; margin-top: 0.5rem;">
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0; margin-top: 0.5rem;">
           <span style="color: #166534; font-weight: 600;">Without Solar:</span>
           <span style="font-weight: 700; color: #14532d;">₹${summary.totalWithoutSolar.toLocaleString()}</span>
         </div>
@@ -3339,7 +3343,7 @@ function displaySummaryModal(summary, bills) {
         <div style="border-top: 2px solid #10b981; margin: 0.75rem 0;"></div>
         
         <!-- Total Savings -->
-        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0;">
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
           <span style="color: #166534; font-weight: 700; font-size: 1rem;">Total Savings:</span>
           <span style="font-weight: 700; color: #10b981; font-size: 1.2rem;">₹${summary.totalSavings.toLocaleString()}</span>
         </div>
@@ -3349,7 +3353,7 @@ function displaySummaryModal(summary, bills) {
           </div>
         `).join('')}
         
-        <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; margin-top: 0.3rem;">
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0; margin-top: 0.3rem;">
           <span style="color: #166534;">Avg Saving %:</span>
           <span style="font-weight: 700; color: #10b981; font-size: 1rem;">${summary.avgSavingPercent}%</span>
         </div>
@@ -3399,7 +3403,7 @@ function displaySummaryModal(summary, bills) {
           const savingPct = parseFloat(b['Saving Percentage'] || 0);
           
           return `
-          <div style="padding: 0.75rem; margin-bottom: 0.5rem; background: white; border-radius: 6px; border: 1px solid #d1d5db;">
+          <div style="padding: 0.5rem; margin-bottom: 0.5rem; background: white; border-radius: 6px; border: 1px solid #d1d5db;">
             <div style="font-weight: 700; color: #374151; margin-bottom: 0.5rem;">
               ${idx + 1}. Bill #${billNum} (${formatBillPeriod(b)})
             </div>
@@ -3418,16 +3422,218 @@ function displaySummaryModal(summary, bills) {
     </div>
   `;
   
-  showModal(
-    '📊',
-    'Multi-Bill Summary',
-    modalHTML,
-    [
-      { text: '✕ Close', type: 'secondary', action: closeModal }
-    ]
-  );
+showModal(
+  '📊',
+  'Multi-Bill Summary',
+  modalHTML,
+  [
+    { 
+      text: '📱 Share WhatsApp', 
+      type: 'success', 
+      action: () => shareViaWhatsApp(summary, bills) 
+    },
+    { 
+      text: '📄 Download PDF', 
+      type: 'primary', 
+      action: () => downloadAsPDF(summary, bills) 
+    },
+    { text: '🔍 Analysis', type: 'info', action: () => { closeModal(); generateSolarAnalysis(); } },
+    { 
+      text: '✕ Close', 
+      type: 'secondary', 
+      action: closeModal 
+    }
+  ]
+);
 }
+function downloadAsPDF(summary, bills) {
+  // Create printable HTML
+  const printHTML = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Multi-Bill Summary</title>
+  <style>
+    @page { size: A4; margin: 2cm; }
+    body { 
+      font-family: Arial, sans-serif; 
+      line-height: 1.4;
+      color: #333;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #0b5ed7;
+      padding-bottom: 10px;
+    }
+    .section {
+      margin-bottom: 15px;
+      page-break-inside: avoid;
+    }
+    .section-title {
+      background: #f0f0f0;
+      padding: 8px;
+      font-weight: bold;
+      margin-bottom: 8px;
+      border-left: 4px solid #0b5ed7;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 10px;
+    }
+    td {
+      padding: 5px;
+      border-bottom: 1px solid #eee;
+    }
+    .breakdown {
+      padding-left: 20px;
+      font-size: 0.9em;
+      color: #666;
+    }
+    .total {
+      font-weight: bold;
+      font-size: 1.1em;
+    }
+    .footer {
+      margin-top: 30px;
+      text-align: center;
+      font-size: 0.8em;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>📊 SolarSanchay - Multi-Bill Summary</h1>
+    <p>Government of Haryana - Solar Savings Analysis</p>
+    <p>Generated: ${new Date().toLocaleDateString('en-IN', { 
+      day: '2-digit', 
+      month: 'short', 
+      year: 'numeric' 
+    })}</p>
+  </div>
 
+  <div class="section">
+    <div class="section-title">📋 Selected Bills</div>
+    ${bills.map((b, idx) => `
+      <div>${idx + 1}. Bill #${b['Bill Number']} (${formatBillPeriod(b)})</div>
+    `).join('')}
+  </div>
+
+  <div class="section">
+    <div class="section-title">📅 Period Summary</div>
+    <table>
+      <tr>
+        <td>Total Days:</td>
+        <td class="total">${summary.totalDays} days</td>
+      </tr>
+      ${bills.map((b, idx) => `
+        <tr class="breakdown">
+          <td>↳ Bill ${idx + 1}:</td>
+          <td>${parseInt(b['Days in Bill Period'] || 30)} days</td>
+        </tr>
+      `).join('')}
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">⚡ Units Summary</div>
+    <table>
+      <tr>
+        <td>Total Gross:</td>
+        <td class="total">${summary.totalGross.toLocaleString()} units</td>
+      </tr>
+      <tr>
+        <td>Total Import:</td>
+        <td class="total">${summary.totalImport.toLocaleString()} units</td>
+      </tr>
+      <tr>
+        <td>Total Export:</td>
+        <td class="total">${summary.totalExport.toLocaleString()} units</td>
+      </tr>
+      <tr>
+        <td>Solar Generated:</td>
+        <td class="total" style="color: #10b981;">${summary.totalSolarGenerated.toLocaleString()} units</td>
+      </tr>
+      <tr>
+        <td>Self Consumed:</td>
+        <td class="total">${summary.selfConsumption.toLocaleString()} units</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">💰 Financial Summary</div>
+    <table>
+      <tr>
+        <td>Total Bill Amount:</td>
+        <td class="total">₹${summary.totalBillAmount.toLocaleString()}</td>
+      </tr>
+      <tr>
+        <td>Without Solar:</td>
+        <td class="total">₹${summary.totalWithoutSolar.toLocaleString()}</td>
+      </tr>
+      <tr>
+        <td>Total Savings:</td>
+        <td class="total" style="color: #10b981;">₹${summary.totalSavings.toLocaleString()}</td>
+      </tr>
+      <tr>
+        <td>Avg Saving %:</td>
+        <td class="total" style="color: #10b981;">${summary.avgSavingPercent}%</td>
+      </tr>
+      <tr>
+        <td>Daily Saving:</td>
+        <td class="total" style="color: #10b981;">₹${summary.perDaySaving}/day</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">📈 Bill-wise Breakdown</div>
+    ${bills.map((b, idx) => {
+      const billNum = b['Bill Number'];
+      const days = parseInt(b['Days in Bill Period'] || 30);
+      const saving = parseFloat(b['Solar Saving Amount'] || 0);
+      const savingPct = parseFloat(b['Saving Percentage'] || 0);
+      
+      return `
+      <div style="margin-bottom: 10px; border: 1px solid #ddd; padding: 8px;">
+        <strong>${idx + 1}. Bill #${billNum}</strong> (${formatBillPeriod(b)})<br>
+        Days: ${days} | Saving: ₹${saving.toLocaleString()} (${savingPct.toFixed(1)}%)
+      </div>
+      `;
+    }).join('')}
+  </div>
+
+  <div class="footer">
+    <p><strong>SolarSanchay</strong> - Haryana Solar Savings Calculator</p>
+    <p>NIC, Kurukshetra | Government of Haryana</p>
+  </div>
+</body>
+</html>
+  `;
+  
+  // Create blob and download
+  const blob = new Blob([printHTML], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `Solar_Summary_${new Date().toISOString().split('T')[0]}.html`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  
+  // Also trigger print dialog
+  setTimeout(() => {
+    const printWindow = window.open(url);
+    printWindow.onload = function() {
+      printWindow.print();
+    };
+  }, 500);
+}
 // Helper function to format bill period
 function formatBillPeriod(bill) {
   const fromDate = bill['Bill From Date'] || bill.billFromDate;
@@ -3456,7 +3662,385 @@ function formatBillPeriod(bill) {
     return 'N/A';
   }
 }
-</script>
 
+function generateSolarAnalysis() {
+  const bills = window.userBills || [];
+  
+  if (bills.length === 0) {
+    alert('No bills to analyze!');
+    return;
+  }
+  
+  // Calculate metrics
+  const totalGross = bills.reduce((sum, b) => sum + parseFloat(b['Gross Units'] || 0), 0);
+  const totalImport = bills.reduce((sum, b) => sum + parseFloat(b['Import Units'] || 0), 0);
+  const totalExport = bills.reduce((sum, b) => sum + parseFloat(b['Export Units'] || 0), 0);
+  const totalDays = bills.reduce((sum, b) => sum + parseInt(b['Days in Bill Period'] || 30), 0);
+  
+  // Solar generation
+  const solarGenerated = totalGross - totalImport + totalExport;
+  const selfConsumption = totalGross - totalImport;
+  
+  // Calculate ratios
+  const selfConsumptionRatio = (selfConsumption / solarGenerated * 100).toFixed(1);
+  const exportRatio = (totalExport / solarGenerated * 100).toFixed(1);
+  const importRatio = (totalImport / totalGross * 100).toFixed(1);
+  
+  // Daily averages
+  const avgDailyGeneration = (solarGenerated / totalDays).toFixed(1);
+  const avgDailyConsumption = (totalGross / totalDays).toFixed(1);
+  const avgDailyImport = (totalImport / totalDays).toFixed(1);
+  const avgDailyExport = (totalExport / totalDays).toFixed(1);
+  
+  // Recommendations
+  let recommendation = '';
+  let reason = '';
+  let color = '';
+  
+  if (importRatio > 60) {
+    recommendation = '⬆️ INCREASE Solar Capacity';
+    reason = `You are importing ${importRatio}% of your consumption from grid. Increasing solar capacity will reduce your bills further.`;
+    color = '#ef4444';
+  } else if (exportRatio > 40) {
+    recommendation = '⬇️ DECREASE Solar Capacity';
+    reason = `You are exporting ${exportRatio}% of your solar generation. Your system is oversized for your consumption pattern.`;
+    color = '#f59e0b';
+  } else if (selfConsumptionRatio > 70) {
+    recommendation = '✅ OPTIMAL Solar Capacity';
+    reason = `Your system is well-sized. You're consuming ${selfConsumptionRatio}% of solar generation and importing only ${importRatio}% from grid.`;
+    color = '#10b981';
+  } else {
+    recommendation = '⚖️ BALANCED but Can Optimize';
+    reason = `Consider minor adjustments based on seasonal consumption patterns.`;
+    color = '#3b82f6';
+  }
+  
+  // Additional insights
+  const insights = [];
+  
+  if (avgDailyExport > avgDailyImport * 1.5) {
+    insights.push('💡 High export suggests daytime surplus. Consider adding battery storage or shifting usage to daytime.');
+  }
+  
+  if (avgDailyImport > avgDailyConsumption * 0.4) {
+    insights.push('🌙 High nighttime consumption detected. Battery storage could help use daytime solar at night.');
+  }
+  
+  if (selfConsumptionRatio < 60) {
+    insights.push('📊 Low self-consumption ratio. Consider energy-intensive activities during peak solar hours.');
+  }
+  
+  // Generate report HTML
+  const analysisHTML = `
+    <div style="text-align: left; max-height: 70vh; overflow-y: auto; font-family: system-ui; line-height: 1.6;">
+      
+      <!-- Header -->
+      <h4 style="color: #0b5ed7; margin-bottom: 1rem; border-bottom: 2px solid #0b5ed7; padding-bottom: 0.5rem;">
+        🔍 Solar Capacity Analysis Report
+      </h4>
+      
+      <!-- Analysis Period -->
+      <div style="background: #f0f9ff; padding: 0.75rem; border-radius: 6px; margin-bottom: 1rem;">
+        <strong>Analysis Period:</strong> ${totalDays} days (${bills.length} bills)<br>
+        <strong>Date Range:</strong> ${formatBillPeriod(bills[0])} to ${formatBillPeriod(bills[bills.length - 1])}
+      </div>
+      
+      <!-- Recommendation Box -->
+      <div style="background: ${color}22; border-left: 4px solid ${color}; padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
+        <h5 style="color: ${color}; margin: 0 0 0.5rem 0;">${recommendation}</h5>
+        <p style="margin: 0; color: #333;">${reason}</p>
+      </div>
+      
+      <!-- Key Metrics -->
+      <div style="background: linear-gradient(135deg, #e0e7ff, #c7d2fe); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+        <h6 style="color: #312e81; font-weight: 700; margin-bottom: 0.5rem;">📊 Key Performance Metrics</h6>
+        
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
+          <span>Solar Generation:</span>
+          <strong>${solarGenerated.toLocaleString()} units</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
+          <span>Self Consumption:</span>
+          <strong style="color: #10b981;">${selfConsumption.toLocaleString()} units (${selfConsumptionRatio}%)</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
+          <span>Export to Grid:</span>
+          <strong>${totalExport.toLocaleString()} units (${exportRatio}%)</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
+          <span>Import from Grid:</span>
+          <strong>${totalImport.toLocaleString()} units (${importRatio}%)</strong>
+        </div>
+      </div>
+      
+      <!-- Daily Averages -->
+      <div style="background: linear-gradient(135deg, #fef3c7, #fde68a); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+        <h6 style="color: #92400e; font-weight: 700; margin-bottom: 0.5rem;">📅 Daily Averages</h6>
+        
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
+          <span>Avg Daily Generation:</span>
+          <strong>${avgDailyGeneration} units/day</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
+          <span>Avg Daily Consumption:</span>
+          <strong>${avgDailyConsumption} units/day</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
+          <span>Avg Daily Import:</span>
+          <strong>${avgDailyImport} units/day</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
+          <span>Avg Daily Export:</span>
+          <strong>${avgDailyExport} units/day</strong>
+        </div>
+      </div>
+      
+      ${insights.length > 0 ? `
+      <!-- Insights -->
+      <div style="background: linear-gradient(135deg, #dcfce7, #bbf7d0); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+        <h6 style="color: #14532d; font-weight: 700; margin-bottom: 0.5rem;">💡 Additional Insights</h6>
+        ${insights.map(insight => `
+          <div style="padding: 0.3rem 0; color: #166534;">• ${insight}</div>
+        `).join('')}
+      </div>
+      ` : ''}
+      
+      <!-- Capacity Recommendations -->
+      <div style="background: #f3f4f6; padding: 1rem; border-radius: 8px;">
+        <h6 style="color: #1f2937; font-weight: 700; margin-bottom: 0.5rem;">🎯 Action Items</h6>
+        
+        ${importRatio > 60 ? `
+        <div style="padding: 0.3rem 0;">
+          ✓ Consider adding <strong>${(avgDailyImport * 0.8).toFixed(0)} units/day</strong> solar capacity
+        </div>
+        <div style="padding: 0.3rem 0;">
+          ✓ Estimated additional panels needed: <strong>${Math.ceil(avgDailyImport * 0.8 / 4)} panels</strong> (assuming 4 units/panel/day)
+        </div>
+        ` : ''}
+        
+        ${exportRatio > 40 ? `
+        <div style="padding: 0.3rem 0;">
+          ✓ Consider reducing capacity or adding battery storage
+        </div>
+        <div style="padding: 0.3rem 0;">
+          ✓ Potential battery capacity: <strong>${(avgDailyExport * 1.2).toFixed(0)} units</strong> for storing excess
+        </div>
+        ` : ''}
+        
+        ${selfConsumptionRatio > 70 ? `
+        <div style="padding: 0.3rem 0;">
+          ✓ Maintain current solar capacity
+        </div>
+        <div style="padding: 0.3rem 0;">
+          ✓ Monitor seasonal variations
+        </div>
+        ` : ''}
+      </div>
+      
+    </div>
+  `;
+  
+  showModal(
+    '🔍',
+    'Solar Capacity Analysis',
+    analysisHTML,
+    [
+      { 
+        text: '📱 Share Analysis', 
+        type: 'success', 
+        action: () => shareAnalysisViaWhatsApp(recommendation, reason, selfConsumptionRatio, importRatio, exportRatio) 
+      },
+      { 
+        text: '✕ Close', 
+        type: 'secondary', 
+        action: closeModal 
+      }
+    ]
+  );
+}
+
+function shareAnalysisViaWhatsApp(recommendation, reason, selfConsumption, importRatio, exportRatio) {
+  const text = `
+*🔍 SolarSanchay - Capacity Analysis*
+
+*Recommendation:*
+${recommendation}
+
+*Reason:*
+${reason}
+
+*Key Metrics:*
+• Self Consumption: ${selfConsumption}%
+• Import from Grid: ${importRatio}%
+• Export to Grid: ${exportRatio}%
+
+_Generated by SolarSanchay_
+  `.trim();
+  
+  const encodedText = encodeURIComponent(text);
+  const whatsappUrl = `https://wa.me/?text=${encodedText}`;
+  window.open(whatsappUrl, '_blank');
+}
+
+function shareViaWhatsApp(summary, bills) {
+  // Create text summary
+  const text = `
+*📊 SolarSanchay - Multi-Bill Summary*
+
+📅 *Period:* ${summary.totalDays} days (${summary.count} bills)
+
+⚡ *Units Summary:*
+• Total Gross: ${summary.totalGross} units
+• Solar Generated: ${summary.totalSolarGenerated} units
+• Self Consumed: ${summary.selfConsumption} units
+
+💰 *Financial Summary:*
+• Total Bill: ₹${summary.totalBillAmount.toLocaleString()}
+• Without Solar: ₹${summary.totalWithoutSolar.toLocaleString()}
+• Total Savings: ₹${summary.totalSavings.toLocaleString()}
+• Saving %: ${summary.avgSavingPercent}%
+• Daily Saving: ₹${summary.perDaySaving}/day
+
+📈 *Bill Details:*
+${bills.map((b, idx) => `
+${idx + 1}. Bill #${b['Bill Number']}
+   Saving: ₹${parseFloat(b['Solar Saving Amount'] || 0).toLocaleString()} (${parseFloat(b['Saving Percentage'] || 0).toFixed(1)}%)
+`).join('')}
+
+_Generated by SolarSanchay - Haryana Solar Savings Calculator_
+  `.trim();
+  
+  // Encode for WhatsApp
+  const encodedText = encodeURIComponent(text);
+  const whatsappUrl = `https://wa.me/?text=${encodedText}`;
+  
+  // Open WhatsApp
+  window.open(whatsappUrl, '_blank');
+}
+function goBack() {
+  window.history.back();
+}
+
+function goHome() {
+  // Go to dashboard or login
+  showView('dashboardView');
+}
+
+function setPageTitle(title) {
+  document.getElementById('pageTitle').textContent = title;
+}
+function showIntentSection() {
+  // Hide all sections
+  document.getElementById('intentSection').style.display = 'block';
+  document.getElementById('consumptionSection').classList.add('d-none');
+  document.getElementById('dashboardSection').classList.add('d-none');
+  document.getElementById('authSection').classList.add('d-none');
+  
+  // Update navigation
+  updateNavigation('intentSection');
+  
+  // Scroll to top
+  window.scrollTo(0, 0);
+}
+
+
+
+
+// Prevent browser back from leaving app
+window.addEventListener('load', function() {
+  // Add dummy entry
+  history.pushState(null, '', window.location.href);
+  
+  // When user presses browser back
+  window.addEventListener('popstate', function() {
+    // Stay in app
+    history.pushState(null, '', window.location.href);
+    // Use app's back logic
+    handleBack();
+  });
+});
+// ==========================================
+// SIMPLE HOME BUTTON
+// ==========================================
+
+function goToHome() {
+  console.log('🏠 Going to home...');
+  
+  // Hide ALL sections
+  const sectionsToHide = [
+    'consumptionSection',
+    'dashboardSection',
+    'authSection',
+    'identitySection',      // ✅ ADD - Consumer Identification
+    'billPeriodSection',    // ✅ ADD - Bill Period
+    'carryForwardSection',  // ✅ ADD - Carry Forward
+    'intentSummary'         // ✅ ADD - Summary bar
+  ];
+  
+  sectionsToHide.forEach(id => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.classList.add('d-none');
+      element.style.display = 'none';
+    }
+  });
+  
+  // Show intent section
+  const intentSection = document.getElementById('intentSection');
+  if (intentSection) {
+    intentSection.classList.remove('d-none');
+    intentSection.style.display = 'block';
+  }
+  
+  // Hide home button
+  document.getElementById('simpleHomeBtn').style.display = 'none';
+  
+  window.scrollTo(0, 0);
+}
+
+// Show home button when not on home page
+function showHomeButton() {
+  const homeBtn = document.getElementById('simpleHomeBtn');
+  if (homeBtn) {
+    homeBtn.style.display = 'block';
+  }
+}
+
+// Hide home button on home page
+function hideHomeButton() {
+  const homeBtn = document.getElementById('simpleHomeBtn');
+  if (homeBtn) {
+    homeBtn.style.display = 'none';
+  }
+}
+function handleHome() {
+  // Hide all sections
+  const consumptionSection = document.getElementById('consumptionSection');
+  const dashboardSection = document.getElementById('dashboardSection');
+  const authSection = document.getElementById('authSection');
+  const intentSection = document.getElementById('intentSection');
+  
+  if (consumptionSection) consumptionSection.classList.add('d-none');
+  if (dashboardSection) dashboardSection.classList.add('d-none');
+  if (authSection) authSection.classList.add('d-none');
+  
+  // Show intent selection (home)
+  if (intentSection) {
+    intentSection.style.display = 'block';
+  }
+  
+  // Hide the navbar
+  const navbar = document.getElementById('mainNavbar');
+  if (navbar) {
+    navbar.style.display = 'none';
+  }
+  
+  // Scroll to top
+  window.scrollTo(0, 0);
+  
+  console.log('Returned to home (Intent Selection)');
+}
+</script>
+ </div>
 </body>
 </html>
