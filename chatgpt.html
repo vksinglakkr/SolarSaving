@@ -451,6 +451,85 @@ background: linear-gradient(135deg, #5568d3 0%, #6a3f91 100%);
 #simpleHomeBtn:active {
   transform: scale(0.95);
 }
+/* Modern Floating Label Style */
+.modern-input-wrapper {
+  position: relative;
+}
+
+.modern-input {
+  width: 100%;
+  padding: 1rem 3rem 0.5rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #1f2937;
+  background: #ffffff;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.modern-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+  background: #f9fafb;
+}
+
+.modern-input:not(:placeholder-shown) ~ .modern-label,
+.modern-input:focus ~ .modern-label {
+  transform: translateY(-0.5rem) scale(0.85);
+  color: #3b82f6;
+  font-weight: 600;
+}
+
+.modern-label {
+  position: absolute;
+  left: 1rem;
+  top: 1rem;
+  color: #6b7280;
+  font-size: 1rem;
+  font-weight: 500;
+  pointer-events: none;
+  transform-origin: left top;
+  transition: all 0.2s ease;
+}
+
+.modern-hint {
+  position: absolute;
+  right: 3.5rem;
+  top: 1rem;
+  color: #9ca3af;
+  font-size: 0.875rem;
+  font-style: italic;
+}
+
+.modern-plus-btn {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2.5rem;
+  height: 2.5rem;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+}
+
+.modern-plus-btn:hover {
+  transform: translateY(-50%) scale(1.05);
+  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+}
+
+.modern-plus-btn:active {
+  transform: translateY(-50%) scale(0.95);
+}
 </style>
 </head>
 
@@ -751,19 +830,21 @@ background: linear-gradient(135deg, #5568d3 0%, #6a3f91 100%);
 <!-- CONSUMPTION -->
 <div class="card p-3 mb-3 d-none" id="consumptionSection">
   <h6>Consumption & Charges</h6>
-  <label>Gross Units (e.g. 1354)</label>
- <div class="input-group mb-2">
+<div class="modern-input-wrapper mb-3">
   <input id="gross"
-    type="text"
-    inputmode="numeric"
-    class="form-control"
-    placeholder="Enter value"
- oninput="handleNumericInput(this)">
-
-  <button class="btn btn-outline-secondary"
+         type="text"
+         inputmode="numeric"
+         class="modern-input"
+         placeholder=" "
+         oninput="handleNumericInput(this)">
+  <label class="modern-label">Gross Units</label>
+  <span class="modern-hint">e.g. 1354</span>
+  <button class="modern-plus-btn" 
           type="button"
           onclick="appendPlus('gross')">
-    +
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+      <path d="M8 0a1 1 0 0 1 1 1v6h6a1 1 0 1 1 0 2H9v6a1 1 0 1 1-2 0V9H1a1 1 0 0 1 0-2h6V1a1 1 0 0 1 1-1z"/>
+    </svg>
   </button>
 </div>
 
