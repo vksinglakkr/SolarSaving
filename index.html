@@ -967,6 +967,12 @@ function selectIntent(type){
 
   // Button
   const actionBtn = document.getElementById("actionBtn");
+  if (consumption) consumption.style.display = '';
+  if (identity) identity.style.display = '';
+  if (billPeriod) billPeriod.style.display = '';
+  if (authSection) authSection.style.display = '';
+  if (dashboardSection) dashboardSection.style.display = '';
+  if (carrySec) carrySec.style.display = '';
 
   // Hide intent selector cards
   if (intentSection) intentSection.classList.add("d-none");
