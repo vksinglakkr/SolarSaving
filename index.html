@@ -3998,6 +3998,33 @@ function hideHomeButton() {
     homeBtn.style.display = 'none';
   }
 }
+function handleHome() {
+  // Hide all sections
+  const consumptionSection = document.getElementById('consumptionSection');
+  const dashboardSection = document.getElementById('dashboardSection');
+  const authSection = document.getElementById('authSection');
+  const intentSection = document.getElementById('intentSection');
+  
+  if (consumptionSection) consumptionSection.classList.add('d-none');
+  if (dashboardSection) dashboardSection.classList.add('d-none');
+  if (authSection) authSection.classList.add('d-none');
+  
+  // Show intent selection (home)
+  if (intentSection) {
+    intentSection.style.display = 'block';
+  }
+  
+  // Hide the navbar
+  const navbar = document.getElementById('mainNavbar');
+  if (navbar) {
+    navbar.style.display = 'none';
+  }
+  
+  // Scroll to top
+  window.scrollTo(0, 0);
+  
+  console.log('Returned to home (Intent Selection)');
+}
 </script>
  </div>
 </body>
