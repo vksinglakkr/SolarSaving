@@ -723,6 +723,9 @@ background: linear-gradient(135deg, #5568d3 0%, #6a3f91 100%);
     <button id="showSummaryBtn" class="btn btn-success" onclick="showMultiBillSummary()">
       📊 Show Summary (<span id="selectedCount">0</span> bills)
     </button>
+   <button class="btn btn-info" onclick="generateSolarAnalysis()">
+  🔍 Solar Capacity Analysis
+    </button>
     <button class="btn btn-secondary" onclick="clearAllSelections()">
       ✕ Clear All
     </button>
@@ -3424,7 +3427,194 @@ showModal(
   ]
 );
 }
+function downloadAsPDF(summary, bills) {
+  // Create printable HTML
+  const printHTML = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Multi-Bill Summary</title>
+  <style>
+    @page { size: A4; margin: 2cm; }
+    body { 
+      font-family: Arial, sans-serif; 
+      line-height: 1.4;
+      color: #333;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #0b5ed7;
+      padding-bottom: 10px;
+    }
+    .section {
+      margin-bottom: 15px;
+      page-break-inside: avoid;
+    }
+    .section-title {
+      background: #f0f0f0;
+      padding: 8px;
+      font-weight: bold;
+      margin-bottom: 8px;
+      border-left: 4px solid #0b5ed7;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 10px;
+    }
+    td {
+      padding: 5px;
+      border-bottom: 1px solid #eee;
+    }
+    .breakdown {
+      padding-left: 20px;
+      font-size: 0.9em;
+      color: #666;
+    }
+    .total {
+      font-weight: bold;
+      font-size: 1.1em;
+    }
+    .footer {
+      margin-top: 30px;
+      text-align: center;
+      font-size: 0.8em;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>📊 SolarSanchay - Multi-Bill Summary</h1>
+    <p>Government of Haryana - Solar Savings Analysis</p>
+    <p>Generated: ${new Date().toLocaleDateString('en-IN', { 
+      day: '2-digit', 
+      month: 'short', 
+      year: 'numeric' 
+    })}</p>
+  </div>
 
+  <div class="section">
+    <div class="section-title">📋 Selected Bills</div>
+    ${bills.map((b, idx) => `
+      <div>${idx + 1}. Bill #${b['Bill Number']} (${formatBillPeriod(b)})</div>
+    `).join('')}
+  </div>
+
+  <div class="section">
+    <div class="section-title">📅 Period Summary</div>
+    <table>
+      <tr>
+        <td>Total Days:</td>
+        <td class="total">${summary.totalDays} days</td>
+      </tr>
+      ${bills.map((b, idx) => `
+        <tr class="breakdown">
+          <td>↳ Bill ${idx + 1}:</td>
+          <td>${parseInt(b['Days in Bill Period'] || 30)} days</td>
+        </tr>
+      `).join('')}
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">⚡ Units Summary</div>
+    <table>
+      <tr>
+        <td>Total Gross:</td>
+        <td class="total">${summary.totalGross.toLocaleString()} units</td>
+      </tr>
+      <tr>
+        <td>Total Import:</td>
+        <td class="total">${summary.totalImport.toLocaleString()} units</td>
+      </tr>
+      <tr>
+        <td>Total Export:</td>
+        <td class="total">${summary.totalExport.toLocaleString()} units</td>
+      </tr>
+      <tr>
+        <td>Solar Generated:</td>
+        <td class="total" style="color: #10b981;">${summary.totalSolarGenerated.toLocaleString()} units</td>
+      </tr>
+      <tr>
+        <td>Self Consumed:</td>
+        <td class="total">${summary.selfConsumption.toLocaleString()} units</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">💰 Financial Summary</div>
+    <table>
+      <tr>
+        <td>Total Bill Amount:</td>
+        <td class="total">₹${summary.totalBillAmount.toLocaleString()}</td>
+      </tr>
+      <tr>
+        <td>Without Solar:</td>
+        <td class="total">₹${summary.totalWithoutSolar.toLocaleString()}</td>
+      </tr>
+      <tr>
+        <td>Total Savings:</td>
+        <td class="total" style="color: #10b981;">₹${summary.totalSavings.toLocaleString()}</td>
+      </tr>
+      <tr>
+        <td>Avg Saving %:</td>
+        <td class="total" style="color: #10b981;">${summary.avgSavingPercent}%</td>
+      </tr>
+      <tr>
+        <td>Daily Saving:</td>
+        <td class="total" style="color: #10b981;">₹${summary.perDaySaving}/day</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">📈 Bill-wise Breakdown</div>
+    ${bills.map((b, idx) => {
+      const billNum = b['Bill Number'];
+      const days = parseInt(b['Days in Bill Period'] || 30);
+      const saving = parseFloat(b['Solar Saving Amount'] || 0);
+      const savingPct = parseFloat(b['Saving Percentage'] || 0);
+      
+      return `
+      <div style="margin-bottom: 10px; border: 1px solid #ddd; padding: 8px;">
+        <strong>${idx + 1}. Bill #${billNum}</strong> (${formatBillPeriod(b)})<br>
+        Days: ${days} | Saving: ₹${saving.toLocaleString()} (${savingPct.toFixed(1)}%)
+      </div>
+      `;
+    }).join('')}
+  </div>
+
+  <div class="footer">
+    <p><strong>SolarSanchay</strong> - Haryana Solar Savings Calculator</p>
+    <p>NIC, Kurukshetra | Government of Haryana</p>
+  </div>
+</body>
+</html>
+  `;
+  
+  // Create blob and download
+  const blob = new Blob([printHTML], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `Solar_Summary_${new Date().toISOString().split('T')[0]}.html`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  
+  // Also trigger print dialog
+  setTimeout(() => {
+    const printWindow = window.open(url);
+    printWindow.onload = function() {
+      printWindow.print();
+    };
+  }, 500);
+}
 // Helper function to format bill period
 function formatBillPeriod(bill) {
   const fromDate = bill['Bill From Date'] || bill.billFromDate;
@@ -3452,6 +3642,261 @@ function formatBillPeriod(bill) {
   } catch (e) {
     return 'N/A';
   }
+}
+
+function generateSolarAnalysis() {
+  const bills = window.userBills || [];
+  
+  if (bills.length === 0) {
+    alert('No bills to analyze!');
+    return;
+  }
+  
+  // Calculate metrics
+  const totalGross = bills.reduce((sum, b) => sum + parseFloat(b['Gross Units'] || 0), 0);
+  const totalImport = bills.reduce((sum, b) => sum + parseFloat(b['Import Units'] || 0), 0);
+  const totalExport = bills.reduce((sum, b) => sum + parseFloat(b['Export Units'] || 0), 0);
+  const totalDays = bills.reduce((sum, b) => sum + parseInt(b['Days in Bill Period'] || 30), 0);
+  
+  // Solar generation
+  const solarGenerated = totalGross - totalImport + totalExport;
+  const selfConsumption = totalGross - totalImport;
+  
+  // Calculate ratios
+  const selfConsumptionRatio = (selfConsumption / solarGenerated * 100).toFixed(1);
+  const exportRatio = (totalExport / solarGenerated * 100).toFixed(1);
+  const importRatio = (totalImport / totalGross * 100).toFixed(1);
+  
+  // Daily averages
+  const avgDailyGeneration = (solarGenerated / totalDays).toFixed(1);
+  const avgDailyConsumption = (totalGross / totalDays).toFixed(1);
+  const avgDailyImport = (totalImport / totalDays).toFixed(1);
+  const avgDailyExport = (totalExport / totalDays).toFixed(1);
+  
+  // Recommendations
+  let recommendation = '';
+  let reason = '';
+  let color = '';
+  
+  if (importRatio > 60) {
+    recommendation = '⬆️ INCREASE Solar Capacity';
+    reason = `You are importing ${importRatio}% of your consumption from grid. Increasing solar capacity will reduce your bills further.`;
+    color = '#ef4444';
+  } else if (exportRatio > 40) {
+    recommendation = '⬇️ DECREASE Solar Capacity';
+    reason = `You are exporting ${exportRatio}% of your solar generation. Your system is oversized for your consumption pattern.`;
+    color = '#f59e0b';
+  } else if (selfConsumptionRatio > 70) {
+    recommendation = '✅ OPTIMAL Solar Capacity';
+    reason = `Your system is well-sized. You're consuming ${selfConsumptionRatio}% of solar generation and importing only ${importRatio}% from grid.`;
+    color = '#10b981';
+  } else {
+    recommendation = '⚖️ BALANCED but Can Optimize';
+    reason = `Consider minor adjustments based on seasonal consumption patterns.`;
+    color = '#3b82f6';
+  }
+  
+  // Additional insights
+  const insights = [];
+  
+  if (avgDailyExport > avgDailyImport * 1.5) {
+    insights.push('💡 High export suggests daytime surplus. Consider adding battery storage or shifting usage to daytime.');
+  }
+  
+  if (avgDailyImport > avgDailyConsumption * 0.4) {
+    insights.push('🌙 High nighttime consumption detected. Battery storage could help use daytime solar at night.');
+  }
+  
+  if (selfConsumptionRatio < 60) {
+    insights.push('📊 Low self-consumption ratio. Consider energy-intensive activities during peak solar hours.');
+  }
+  
+  // Generate report HTML
+  const analysisHTML = `
+    <div style="text-align: left; max-height: 70vh; overflow-y: auto; font-family: system-ui; line-height: 1.6;">
+      
+      <!-- Header -->
+      <h4 style="color: #0b5ed7; margin-bottom: 1rem; border-bottom: 2px solid #0b5ed7; padding-bottom: 0.5rem;">
+        🔍 Solar Capacity Analysis Report
+      </h4>
+      
+      <!-- Analysis Period -->
+      <div style="background: #f0f9ff; padding: 0.75rem; border-radius: 6px; margin-bottom: 1rem;">
+        <strong>Analysis Period:</strong> ${totalDays} days (${bills.length} bills)<br>
+        <strong>Date Range:</strong> ${formatBillPeriod(bills[0])} to ${formatBillPeriod(bills[bills.length - 1])}
+      </div>
+      
+      <!-- Recommendation Box -->
+      <div style="background: ${color}22; border-left: 4px solid ${color}; padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
+        <h5 style="color: ${color}; margin: 0 0 0.5rem 0;">${recommendation}</h5>
+        <p style="margin: 0; color: #333;">${reason}</p>
+      </div>
+      
+      <!-- Key Metrics -->
+      <div style="background: linear-gradient(135deg, #e0e7ff, #c7d2fe); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+        <h6 style="color: #312e81; font-weight: 700; margin-bottom: 0.5rem;">📊 Key Performance Metrics</h6>
+        
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
+          <span>Solar Generation:</span>
+          <strong>${solarGenerated.toLocaleString()} units</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
+          <span>Self Consumption:</span>
+          <strong style="color: #10b981;">${selfConsumption.toLocaleString()} units (${selfConsumptionRatio}%)</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
+          <span>Export to Grid:</span>
+          <strong>${totalExport.toLocaleString()} units (${exportRatio}%)</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
+          <span>Import from Grid:</span>
+          <strong>${totalImport.toLocaleString()} units (${importRatio}%)</strong>
+        </div>
+      </div>
+      
+      <!-- Daily Averages -->
+      <div style="background: linear-gradient(135deg, #fef3c7, #fde68a); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+        <h6 style="color: #92400e; font-weight: 700; margin-bottom: 0.5rem;">📅 Daily Averages</h6>
+        
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
+          <span>Avg Daily Generation:</span>
+          <strong>${avgDailyGeneration} units/day</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
+          <span>Avg Daily Consumption:</span>
+          <strong>${avgDailyConsumption} units/day</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
+          <span>Avg Daily Import:</span>
+          <strong>${avgDailyImport} units/day</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
+          <span>Avg Daily Export:</span>
+          <strong>${avgDailyExport} units/day</strong>
+        </div>
+      </div>
+      
+      ${insights.length > 0 ? `
+      <!-- Insights -->
+      <div style="background: linear-gradient(135deg, #dcfce7, #bbf7d0); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+        <h6 style="color: #14532d; font-weight: 700; margin-bottom: 0.5rem;">💡 Additional Insights</h6>
+        ${insights.map(insight => `
+          <div style="padding: 0.3rem 0; color: #166534;">• ${insight}</div>
+        `).join('')}
+      </div>
+      ` : ''}
+      
+      <!-- Capacity Recommendations -->
+      <div style="background: #f3f4f6; padding: 1rem; border-radius: 8px;">
+        <h6 style="color: #1f2937; font-weight: 700; margin-bottom: 0.5rem;">🎯 Action Items</h6>
+        
+        ${importRatio > 60 ? `
+        <div style="padding: 0.3rem 0;">
+          ✓ Consider adding <strong>${(avgDailyImport * 0.8).toFixed(0)} units/day</strong> solar capacity
+        </div>
+        <div style="padding: 0.3rem 0;">
+          ✓ Estimated additional panels needed: <strong>${Math.ceil(avgDailyImport * 0.8 / 4)} panels</strong> (assuming 4 units/panel/day)
+        </div>
+        ` : ''}
+        
+        ${exportRatio > 40 ? `
+        <div style="padding: 0.3rem 0;">
+          ✓ Consider reducing capacity or adding battery storage
+        </div>
+        <div style="padding: 0.3rem 0;">
+          ✓ Potential battery capacity: <strong>${(avgDailyExport * 1.2).toFixed(0)} units</strong> for storing excess
+        </div>
+        ` : ''}
+        
+        ${selfConsumptionRatio > 70 ? `
+        <div style="padding: 0.3rem 0;">
+          ✓ Maintain current solar capacity
+        </div>
+        <div style="padding: 0.3rem 0;">
+          ✓ Monitor seasonal variations
+        </div>
+        ` : ''}
+      </div>
+      
+    </div>
+  `;
+  
+  showModal(
+    '🔍',
+    'Solar Capacity Analysis',
+    analysisHTML,
+    [
+      { 
+        text: '📱 Share Analysis', 
+        type: 'success', 
+        action: () => shareAnalysisViaWhatsApp(recommendation, reason, selfConsumptionRatio, importRatio, exportRatio) 
+      },
+      { 
+        text: '✕ Close', 
+        type: 'secondary', 
+        action: closeModal 
+      }
+    ]
+  );
+}
+
+function shareAnalysisViaWhatsApp(recommendation, reason, selfConsumption, importRatio, exportRatio) {
+  const text = `
+*🔍 SolarSanchay - Capacity Analysis*
+
+*Recommendation:*
+${recommendation}
+
+*Reason:*
+${reason}
+
+*Key Metrics:*
+• Self Consumption: ${selfConsumption}%
+• Import from Grid: ${importRatio}%
+• Export to Grid: ${exportRatio}%
+
+_Generated by SolarSanchay_
+  `.trim();
+  
+  const encodedText = encodeURIComponent(text);
+  const whatsappUrl = `https://wa.me/?text=${encodedText}`;
+  window.open(whatsappUrl, '_blank');
+}
+
+function shareViaWhatsApp(summary, bills) {
+  // Create text summary
+  const text = `
+*📊 SolarSanchay - Multi-Bill Summary*
+
+📅 *Period:* ${summary.totalDays} days (${summary.count} bills)
+
+⚡ *Units Summary:*
+• Total Gross: ${summary.totalGross} units
+• Solar Generated: ${summary.totalSolarGenerated} units
+• Self Consumed: ${summary.selfConsumption} units
+
+💰 *Financial Summary:*
+• Total Bill: ₹${summary.totalBillAmount.toLocaleString()}
+• Without Solar: ₹${summary.totalWithoutSolar.toLocaleString()}
+• Total Savings: ₹${summary.totalSavings.toLocaleString()}
+• Saving %: ${summary.avgSavingPercent}%
+• Daily Saving: ₹${summary.perDaySaving}/day
+
+📈 *Bill Details:*
+${bills.map((b, idx) => `
+${idx + 1}. Bill #${b['Bill Number']}
+   Saving: ₹${parseFloat(b['Solar Saving Amount'] || 0).toLocaleString()} (${parseFloat(b['Saving Percentage'] || 0).toFixed(1)}%)
+`).join('')}
+
+_Generated by SolarSanchay - Haryana Solar Savings Calculator_
+  `.trim();
+  
+  // Encode for WhatsApp
+  const encodedText = encodeURIComponent(text);
+  const whatsappUrl = `https://wa.me/?text=${encodedText}`;
+  
+  // Open WhatsApp
+  window.open(whatsappUrl, '_blank');
 }
 </script>
 
