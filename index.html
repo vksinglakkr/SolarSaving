@@ -957,6 +957,7 @@ oninput="handleNumericInput(this)">
 // ==========================================
 let entryMode = "one";
 let currentUser = null;
+let currentView = 'intentSection';
 // Initialize and synchronize userBills
 let userBills = [];
 
@@ -1044,6 +1045,30 @@ function selectIntent(type){
     }
 
     actionBtn.classList.remove("d-none");
+  }
+   if (type === 'one' || type === 'save') {
+    // Show consumption section
+    consumptionSection.classList.remove('d-none');
+    intentSection.style.display = 'none';
+    
+    // ✅ ADD THIS
+    updateNavigation('consumptionSection');
+    
+  } else if (type === 'dashboard') {
+    // Show auth or dashboard
+    if (currentUser) {
+      dashboardSection.classList.remove('d-none');
+      intentSection.style.display = 'none';
+      
+      // ✅ ADD THIS
+      updateNavigation('dashboardSection');
+    } else {
+      authSection.classList.remove('d-none');
+      intentSection.style.display = 'none';
+      
+      // ✅ ADD THIS
+      updateNavigation('authSection');
+    }
   }
 }
 
@@ -1141,6 +1166,7 @@ function showDashboard() {
   document.getElementById('authSection').classList.add('d-none');
   document.getElementById('dashboardSection').classList.remove('d-none');
   document.getElementById('userInfo').textContent = `Meter: ${currentUser.meter} | Account: ${currentUser.account}`;
+  updateNavigation('dashboardSection'); // ✅ ADD THIS LINE
   displayBillsList();
 }
 
@@ -3932,24 +3958,39 @@ function goHome() {
 function setPageTitle(title) {
   document.getElementById('pageTitle').textContent = title;
 }
-function handleBack() {
-  // Prevent going to external sites
-  // Navigate within app only
+function showIntentSection() {
+  // Hide all sections
+  document.getElementById('intentSection').style.display = 'block';
+  document.getElementById('consumptionSection').classList.add('d-none');
+  document.getElementById('dashboardSection').classList.add('d-none');
+  document.getElementById('authSection').classList.add('d-none');
   
-  if (currentView === 'dashboardView') {
-    // From Dashboard → Go to Form
-    showView('formView');
-  } else if (currentView === 'formView') {
-    // From Form → Go to Dashboard (not login)
-    showView('dashboardView');
+  // Update navigation
+  updateNavigation('intentSection');
+  
+  // Scroll to top
+  window.scrollTo(0, 0);
+}
+function handleBack() {
+  // Navigate within app based on actual sections
+  
+  if (currentView === 'dashboardSection') {
+    // From Dashboard → Go to Intent Selection
+    showIntentSection();
+  } else if (currentView === 'consumptionSection') {
+    // From Form → Go back to Intent Selection
+    showIntentSection();
+  } else if (currentView === 'authSection') {
+    // From Auth → Go to Intent Selection
+    showIntentSection();
   } else {
-    // Default: go to dashboard
-    showView('dashboardView');
+    // Default: go to Intent Selection (home)
+    showIntentSection();
   }
 }
 function handleHome() {
-  // Always go to Dashboard (not login)
-  showView('dashboardView');
+  // Go to Intent Selection (home page)
+  showIntentSection();
 }
 function updateNavigation(viewName) {
   const navbar = document.getElementById('mainNavbar');
@@ -3960,30 +4001,34 @@ function updateNavigation(viewName) {
   // Update current view tracker
   currentView = viewName;
   
-  if (viewName === 'loginView') {
-    // Hide entire navbar on login page
+  if (viewName === 'intentSection') {
+    // Hide navbar on intent selection (home page)
     navbar.style.display = 'none';
     
-  } else if (viewName === 'formView') {
+  } else if (viewName === 'consumptionSection') {
     // Show navbar on form
     navbar.style.display = 'block';
     backBtn.style.display = 'inline-block';
     homeBtn.style.display = 'inline-block';
     pageTitle.textContent = 'Add New Bill';
     
-  } else if (viewName === 'dashboardView') {
+  } else if (viewName === 'dashboardSection') {
     // Show navbar on dashboard
     navbar.style.display = 'block';
     backBtn.style.display = 'inline-block';
-    homeBtn.style.display = 'none'; // Hide home when already on dashboard
+    homeBtn.style.display = 'inline-block';
     pageTitle.textContent = 'My Dashboard';
     
-  } else {
-    // Default
+  } else if (viewName === 'authSection') {
+    // Show navbar on auth
     navbar.style.display = 'block';
     backBtn.style.display = 'inline-block';
     homeBtn.style.display = 'inline-block';
-    pageTitle.textContent = 'SolarSanchay';
+    pageTitle.textContent = 'Login';
+    
+  } else {
+    // Default - hide navbar
+    navbar.style.display = 'none';
   }
 }
 function showView(viewName) {
