@@ -629,6 +629,118 @@ input[type="date"].card-input::-webkit-calendar-picker-indicator {
 input[type="date"].card-input::-webkit-calendar-picker-indicator:hover {
   background: #e2e8f0;
 }
+/* ==========================================
+   SECTION CONTAINER STYLES
+   ========================================== */
+
+.section-container {
+  background: white;
+  border: 3px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+}
+
+.section-container:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Different border colors for different sections */
+.section-identity {
+  border-left: 6px solid #8b5cf6;
+  background: linear-gradient(to right, #faf5ff, #ffffff);
+}
+
+.section-period {
+  border-left: 6px solid #f59e0b;
+  background: linear-gradient(to right, #fffbeb, #ffffff);
+}
+
+.section-consumption {
+  border-left: 6px solid #3b82f6;
+  background: linear-gradient(to right, #eff6ff, #ffffff);
+}
+
+/* Section header styles */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.section-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-size: 1.3rem;
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+  border: 2px solid #bfdbfe;
+}
+
+.section-icon-identity {
+  background: linear-gradient(135deg, #f3e8ff, #fae8ff);
+  border-color: #d8b4fe;
+}
+
+.section-icon-period {
+  background: linear-gradient(135deg, #fef3c7, #fef9c3);
+  border-color: #fcd34d;
+}
+
+.section-icon-consumption {
+  background: linear-gradient(135deg, #dbeafe, #eff6ff);
+  border-color: #93c5fd;
+}
+
+.section-title-text {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.section-subtitle {
+  font-size: 0.8rem;
+  color: #64748b;
+  font-weight: 400;
+  display: block;
+  margin-top: 0.2rem;
+}
+
+.section-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.3rem 0.6rem;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-required {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.badge-optional {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
 </style>
 </head>
 
@@ -1317,117 +1429,6 @@ input[type="date"].card-input::-webkit-calendar-picker-indicator:hover {
   </small>
   Last Updated: <span id="lastModified"></span>
 </footer>
-/* ==========================================
-   SECTION CONTAINER STYLES
-   ========================================== */
-
-.section-container {
-  background: white;
-  border: 3px solid #e2e8f0;
-  border-radius: 16px;
-  padding: 1.25rem;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  transition: all 0.3s ease;
-}
-
-.section-container:hover {
-  border-color: #cbd5e1;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-}
-
-/* Different border colors for different sections */
-.section-identity {
-  border-left: 6px solid #8b5cf6;
-  background: linear-gradient(to right, #faf5ff, #ffffff);
-}
-
-.section-period {
-  border-left: 6px solid #f59e0b;
-  background: linear-gradient(to right, #fffbeb, #ffffff);
-}
-
-.section-consumption {
-  border-left: 6px solid #3b82f6;
-  background: linear-gradient(to right, #eff6ff, #ffffff);
-}
-
-/* Section header styles */
-.section-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1.25rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 2px solid #e5e7eb;
-}
-
-.section-title {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin: 0;
-}
-
-.section-icon {
-  width: 2.5rem;
-  height: 2.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 10px;
-  font-size: 1.3rem;
-  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
-  border: 2px solid #bfdbfe;
-}
-
-.section-icon-identity {
-  background: linear-gradient(135deg, #f3e8ff, #fae8ff);
-  border-color: #d8b4fe;
-}
-
-.section-icon-period {
-  background: linear-gradient(135deg, #fef3c7, #fef9c3);
-  border-color: #fcd34d;
-}
-
-.section-icon-consumption {
-  background: linear-gradient(135deg, #dbeafe, #eff6ff);
-  border-color: #93c5fd;
-}
-
-.section-title-text {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #1e293b;
-}
-
-.section-subtitle {
-  font-size: 0.8rem;
-  color: #64748b;
-  font-weight: 400;
-  display: block;
-  margin-top: 0.2rem;
-}
-
-.section-badge {
-  font-size: 0.7rem;
-  font-weight: 600;
-  padding: 0.3rem 0.6rem;
-  border-radius: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.badge-required {
-  background: #fee2e2;
-  color: #991b1b;
-}
-
-.badge-optional {
-  background: #dbeafe;
-  color: #1e40af;
-}
 <script>
 // ==========================================
 // GLOBAL VARIABLES
