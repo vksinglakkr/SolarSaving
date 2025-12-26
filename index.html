@@ -1461,23 +1461,27 @@ const result = document.getElementById("result");
 // INTENT SELECTION
 // ==========================================
 function selectIntent(type){
+  console.log('selectIntent called with type:', type);
+  
   entryMode = type;
 
+  // Get all elements
   const intentSection = document.getElementById("intentSection");
   const helper = document.getElementById("helperCards");
   const intentSummary = document.getElementById("intentSummary");
   const intentText = document.getElementById("intentText");
-
-  // Sections
   const consumption = document.getElementById("consumptionSection");
   const identity = document.getElementById("identitySection");
   const billPeriod = document.getElementById("billPeriodSection");
   const authSection = document.getElementById("authSection");
   const dashboardSection = document.getElementById("dashboardSection");
   const carrySec = document.getElementById("carryForwardSection");
-
-  // Button
   const actionBtn = document.getElementById("actionBtn");
+
+  // ==========================================
+  // STEP 1: CLEAR ALL INLINE STYLES
+  // ==========================================
+  console.log('Clearing inline styles...');
   if (consumption) consumption.style.display = '';
   if (identity) identity.style.display = '';
   if (billPeriod) billPeriod.style.display = '';
@@ -1485,20 +1489,49 @@ function selectIntent(type){
   if (dashboardSection) dashboardSection.style.display = '';
   if (carrySec) carrySec.style.display = '';
 
-  // Hide intent selector cards
-  if (intentSection) intentSection.classList.add("d-none");
+  // ==========================================
+  // STEP 2: HIDE INTENT SECTION
+  // ==========================================
+  console.log('Hiding intent section...');
+  if (intentSection) {
+    intentSection.classList.add("d-none");
+    intentSection.style.display = 'none';
+  }
   if (helper) helper.classList.add("d-none");
 
+  // ==========================================
+  // STEP 3: SHOW APPROPRIATE SECTIONS
+  // ==========================================
+  
   if (type === "dashboard") {
-    // Show authentication for dashboard
-    authSection.classList.remove("d-none");
-    consumption.classList.add("d-none");
-    identity.classList.add("d-none");
-    billPeriod.classList.add("d-none");
-    actionBtn.classList.add("d-none");
-    dashboardSection.classList.add("d-none");
+    console.log('Dashboard mode selected');
+    
+    // Hide form sections
+    if (consumption) consumption.classList.add("d-none");
+    if (identity) identity.classList.add("d-none");
+    if (billPeriod) billPeriod.classList.add("d-none");
+    if (carrySec) carrySec.classList.add("d-none");
+    if (actionBtn) actionBtn.classList.add("d-none");
     if (intentSummary) intentSummary.classList.add("d-none");
+    if (dashboardSection) dashboardSection.classList.add("d-none");
+    
+    // Show auth section
+    if (authSection) authSection.classList.remove("d-none");
+    
+    // Show home button
+    showHomeButton();
+    
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
   } else {
+    // Form mode (one or save)
+    console.log('Form mode selected:', type);
+    
+    // Hide dashboard/auth
+    if (authSection) authSection.classList.add("d-none");
+    if (dashboardSection) dashboardSection.classList.add("d-none");
+    
     // Show intent summary
     if (intentSummary && intentText) {
       intentSummary.classList.remove("d-none");
@@ -1508,48 +1541,50 @@ function selectIntent(type){
           : "✔ <b>Save for Future:</b> Bill details will be stored";
     }
 
-    // Show main sections
-    consumption.classList.remove("d-none");
-    billPeriod.classList.remove("d-none");
-    authSection.classList.add("d-none");
-    dashboardSection.classList.add("d-none");
+    // Show consumption and bill period (always needed)
+    if (consumption) {
+      consumption.classList.remove("d-none");
+      console.log('Consumption section shown');
+    }
+    if (billPeriod) {
+      billPeriod.classList.remove("d-none");
+      console.log('Bill period section shown');
+    }
 
-    // Mode-specific sections
+    // Mode-specific: Identity and Carry Forward
     if (type === "save") {
-      identity.classList.remove("d-none");
-      actionBtn.innerText = "💾 Save & Submit";
-      carrySec.classList.remove("d-none");
+      if (identity) {
+        identity.classList.remove("d-none");
+        console.log('Identity section shown (save mode)');
+      }
+      if (carrySec) {
+        carrySec.classList.remove("d-none");
+        console.log('Carry forward section shown');
+      }
+      if (actionBtn) actionBtn.innerText = "💾 Save & Submit";
     } else {
-      identity.classList.add("d-none");
-      actionBtn.innerText = "🔍 Calculate Saving";
-      carrySec.classList.add("d-none");
-      document.getElementById("openingCarry").value = "";
+      // type === "one"
+      if (identity) identity.classList.add("d-none");
+      if (carrySec) carrySec.classList.add("d-none");
+      const openingCarry = document.getElementById("openingCarry");
+      if (openingCarry) openingCarry.value = "";
+      if (actionBtn) actionBtn.innerText = "🔍 Calculate Saving";
     }
 
-    actionBtn.classList.remove("d-none");
-  }
-if (type === 'one' || type === 'save') {
-    // Show consumption section
-    consumption.classList.remove('d-none');
-    intentSection.style.display = 'none';
-    
-    showHomeButton(); // ✅ ADD THIS
-    
-  } else if (type === 'dashboard') {
-    if (currentUser) {
-      dashboardSection.classList.remove('d-none');
-      intentSection.style.display = 'none';
-      
-      showHomeButton(); // ✅ ADD THIS
-      
-      displayBillsList();
-    } else {
-      authSection.classList.remove('d-none');
-      intentSection.style.display = 'none';
-      
-      showHomeButton(); // ✅ ADD THIS
+    // Show action button
+    if (actionBtn) {
+      actionBtn.classList.remove("d-none");
+      console.log('Action button shown');
     }
+    
+    // Show home button
+    showHomeButton();
+    
+    // Scroll to top smoothly
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
+  
+  console.log('selectIntent completed');
 }
 
 // ==========================================
