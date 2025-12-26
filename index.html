@@ -614,6 +614,21 @@ background: linear-gradient(135deg, #5568d3 0%, #6a3f91 100%);
     font-size: 1.1rem;
   }
 }  
+/* Date input specific styles */
+input[type="date"].card-input {
+  cursor: pointer;
+}
+
+input[type="date"].card-input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 0.25rem;
+  border-radius: 4px;
+}
+
+input[type="date"].card-input::-webkit-calendar-picker-indicator:hover {
+  background: #e2e8f0;
+}
 </style>
 </head>
 
@@ -892,23 +907,145 @@ background: linear-gradient(135deg, #5568d3 0%, #6a3f91 100%);
 </div>
 
 <!-- IDENTITY -->
-<div class="card p-3 mb-3 d-none" id="identitySection">
-  <h6>Consumer Identification</h6>
-  <label>Bill Number (e.g. 123456)</label>
-  <input id="billNumber" class="form-control mb-2" placeholder="Enter bill number">
-  <label>Meter Number (e.g. 24600455)</label>
-  <input id="meter" class="form-control mb-2" placeholder="Enter meter number">
-  <label>Account Number (e.g. ACC12345)</label>
-  <input id="accountNum" class="form-control" placeholder="Enter account number">
+<!-- IDENTITY SECTION - Colorful Cards -->
+<div class="d-none" id="identitySection">
+  
+  <!-- Section Header -->
+  <div style="margin-bottom: 1rem; padding: 0.75rem; background: linear-gradient(135deg, #f0f9ff, #e0f2fe); border-left: 4px solid #0ea5e9; border-radius: 8px;">
+    <h6 style="margin: 0; color: #0c4a6e; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
+      <span style="font-size: 1.2rem;">👤</span>
+      Consumer Identification
+    </h6>
+    <small style="color: #475569; display: block; margin-top: 0.25rem;">Enter your bill details for secure storage</small>
+  </div>
+
+  <!-- Bill Number - Indigo Card -->
+  <div class="card-input-wrapper">
+    <div class="card-input-container" style="background: linear-gradient(135deg, #e0e7ff, #eef2ff); border: 2px solid #818cf8;">
+      <div class="card-top-bar"></div>
+      <div class="card-content">
+        <div class="card-title-row">
+          <h6 class="card-input-title">
+            <span class="card-icon">📄</span>
+            Bill Number
+          </h6>
+          <span class="card-hint">e.g. 123456</span>
+        </div>
+        <div class="card-input-field">
+          <input id="billNumber"
+                 type="text"
+                 inputmode="numeric"
+                 class="card-input"
+                 placeholder="Enter bill number">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Meter Number - Teal Card -->
+  <div class="card-input-wrapper">
+    <div class="card-input-container" style="background: linear-gradient(135deg, #ccfbf1, #f0fdfa); border: 2px solid #2dd4bf;">
+      <div class="card-top-bar"></div>
+      <div class="card-content">
+        <div class="card-title-row">
+          <h6 class="card-input-title">
+            <span class="card-icon">📟</span>
+            Meter Number
+          </h6>
+          <span class="card-hint">e.g. 24600455</span>
+        </div>
+        <div class="card-input-field">
+          <input id="meter"
+                 type="text"
+                 inputmode="numeric"
+                 class="card-input"
+                 placeholder="Enter meter number">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Account Number - Pink Card -->
+  <div class="card-input-wrapper">
+    <div class="card-input-container" style="background: linear-gradient(135deg, #fce7f3, #fdf2f8); border: 2px solid #f472b6;">
+      <div class="card-top-bar"></div>
+      <div class="card-content">
+        <div class="card-title-row">
+          <h6 class="card-input-title">
+            <span class="card-icon">🔑</span>
+            Account Number
+          </h6>
+          <span class="card-hint">e.g. ACC12345</span>
+        </div>
+        <div class="card-input-field">
+          <input id="accountNum"
+                 type="text"
+                 class="card-input"
+                 placeholder="Enter account number">
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <!-- BILL PERIOD -->
-<div class="card p-3 mb-3 d-none" id="billPeriodSection">
-  <h6>Bill Period</h6>
-  <label>From</label>
-  <input type="date" id="billFrom" class="form-control mb-2">
-  <label>To</label>
-  <input type="date" id="billTo" class="form-control">
+<!-- BILL PERIOD SECTION - Colorful Cards -->
+<div class="d-none" id="billPeriodSection">
+  
+  <!-- Section Header -->
+  <div style="margin-bottom: 1rem; padding: 0.75rem; background: linear-gradient(135deg, #fef3c7, #fef9c3); border-left: 4px solid #f59e0b; border-radius: 8px;">
+    <h6 style="margin: 0; color: #78350f; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
+      <span style="font-size: 1.2rem;">📅</span>
+      Bill Period
+    </h6>
+    <small style="color: #92400e; display: block; margin-top: 0.25rem;">Select billing start and end dates</small>
+  </div>
+
+  <!-- From Date - Amber Card -->
+  <div class="card-input-wrapper">
+    <div class="card-input-container" style="background: linear-gradient(135deg, #fef3c7, #fffbeb); border: 2px solid #fbbf24;">
+      <div class="card-top-bar"></div>
+      <div class="card-content">
+        <div class="card-title-row">
+          <h6 class="card-input-title">
+            <span class="card-icon">📆</span>
+            From Date
+          </h6>
+          <span class="card-hint">Start date</span>
+        </div>
+        <div class="card-input-field">
+          <input id="billFrom"
+                 type="date"
+                 class="card-input"
+                 style="cursor: pointer;">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- To Date - Lime Card -->
+  <div class="card-input-wrapper">
+    <div class="card-input-container" style="background: linear-gradient(135deg, #d9f99d, #ecfccb); border: 2px solid #a3e635;">
+      <div class="card-top-bar"></div>
+      <div class="card-content">
+        <div class="card-title-row">
+          <h6 class="card-input-title">
+            <span class="card-icon">📆</span>
+            To Date
+          </h6>
+          <span class="card-hint">End date</span>
+        </div>
+        <div class="card-input-field">
+          <input id="billTo"
+                 type="date"
+                 class="card-input"
+                 style="cursor: pointer;">
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <!-- CONSUMPTION -->
