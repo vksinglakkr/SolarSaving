@@ -4656,7 +4656,7 @@ window.addEventListener('message', function(event) {
     console.log('=== RECEIVED SCAN DATA ===');
     console.log(data);
     
-    // Date converter (DD/MM/YYYY → YYYY-MM-DD)
+    // Date converter
     function convertDate(dateStr) {
       if (!dateStr) return '';
       const parts = dateStr.split('/');
@@ -4666,77 +4666,59 @@ window.addEventListener('message', function(event) {
       return dateStr;
     }
     
-    // Smart field setter
+    // Simple field setter
     function setField(id, value) {
-      const element = document.getElementById(id);
-      if (element && value !== null && value !== undefined) {
-        element.value = value;
+      const el = document.getElementById(id);
+      if (el && value != null) {
+        el.value = value;
         console.log(`✓ Set ${id}: ${value}`);
         return true;
       }
       return false;
     }
     
-    // ==============================================
-    // DETECT FORM TYPE
-    // ==============================================
-    const isSaveEntry = document.getElementById('billNumber') !== null;
-    const formType = isSaveEntry ? 'Save Entry' : 'Quick Entry';
+    // Detect form type
+    const isSave = document.getElementById('billNumber') !== null;
+    console.log(`=== FORM TYPE: ${isSave ? 'Save Entry' : 'Quick Entry'} ===`);
     
-    console.log(`=== FORM TYPE: ${formType} ===`);
-    
-    // ==============================================
-    // SET FIELDS BASED ON FORM TYPE
-    // ==============================================
-    
-    if (isSaveEntry) {
-      // SAVE ENTRY: Set ALL 12 fields
-      console.log('Setting all 12 fields...');
-      
+    if (isSave) {
+      // Save Entry: Set identification fields
       setField('billNumber', data.billNumber);
-      setField('accountNumber', data.accountNumber);
-      setField('meterNumber', data.meterNumber);
-      setField('billFrom', convertDate(data.billFrom));
-      setField('billTo', convertDate(data.billTo));
-      setField('solarGenerated', data.solarGenerated);
-      setField('importUnits', data.importUnits);
-      setField('exportUnits', data.exportUnits);
-      setField('grossUnits', data.grossUnits);
-      setField('totalBill', data.totalBill);
-      setField('fixedCharges', data.fixedCharges);
-      setField('arrears', data.arrears);
-      
-    } else {
-      // QUICK ENTRY: Set 9 fields (exclude Bill/Account/Meter)
-      console.log('Setting 9 fields (excluding Bill/Account/Meter)...');
-      
-      // SKIP: billNumber, accountNumber, meterNumber
-      
-      setField('billFrom', convertDate(data.billFrom));
-      setField('billTo', convertDate(data.billTo));
-      setField('solarGenerated', data.solarGenerated);
-      setField('importUnits', data.importUnits);
-      setField('exportUnits', data.exportUnits);
-      setField('grossUnits', data.grossUnits);
-      setField('totalBill', data.totalBill);
-      setField('fixedCharges', data.fixedCharges);
-      setField('arrears', data.arrears);
+      setField('accountNum', data.accountNumber);      // ← accountNum (not accountNumber!)
+      setField('meter', data.meterNumber);             // ← meter (not meterNumber!)
     }
     
-    console.log('✅ Data transfer complete!');
+    // Both forms: Set data fields
+    setField('billFrom', convertDate(data.billFrom));
+    setField('billTo', convertDate(data.billTo));
+    setField('gross', data.grossUnits);                // ← gross (not grossUnits!)
+    setField('importU', data.importUnits);             // ← importU (not importUnits!)
+    setField('exportU', data.exportUnits);             // ← exportU (not exportUnits!)
+    setField('fixed', data.fixedCharges);              // ← fixed (not fixedCharges!)
+    setField('totalBill', data.totalBill);
+    setField('arrears', data.arrears);
     
-    // Close scanner modal
+    // Calculate openingCarry if needed
+    // openingCarry = solarGenerated + importUnits - exportUnits - grossUnits
+    if (data.solarGenerated) {
+      const opening = parseInt(data.solarGenerated || 0) + 
+                      parseInt(data.importUnits || 0) - 
+                      parseInt(data.exportUnits || 0) - 
+                      parseInt(data.grossUnits || 0);
+      setField('openingCarry', opening);
+      console.log(`✓ Calculated openingCarry: ${opening}`);
+    }
+    
+    console.log('✅ All fields transferred!');
+    
+    // Close modal
     const modal = document.getElementById('scannerModal');
-    if (modal) {
-      modal.style.display = 'none';
-    }
+    if (modal) modal.style.display = 'none';
   }
   
   if (event.data.type === 'SCAN_CANCELLED') {
     const modal = document.getElementById('scannerModal');
-    if (modal) {
-      modal.style.display = 'none';
-    }
+    if (modal) modal.style.display = 'none';
   }
 });
 // Show scanner button when form mode selected
