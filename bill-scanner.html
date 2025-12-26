@@ -686,37 +686,56 @@ function displayResults() {
   const container = document.getElementById('extractedFieldsContainer');
   
   if (Object.keys(extractedData).length === 0) {
-    container.innerHTML = '<p style="color: #dc2626; text-align: center;">No data could be extracted. Please try again with a clearer image.</p>';
+    container.innerHTML = `
+      <div style="color: #dc2626; text-align: center; padding: 1rem;">
+        ❌ No data extracted.
+      </div>
+    `;
   } else {
-    let html = '';
-    const labels = {
+    let html = '<div style="display: grid; grid-template-columns: 1fr; gap: 0.5rem;">';
+    
+    const fieldLabels = {
       billNumber: '📄 Bill Number',
       meterNumber: '📟 Meter Number',
       accountNumber: '🔑 Account Number',
-      grossUnits: '⚡ Units',
+      solarGenerated: '☀️ Solar Generated',
+      exportUnits: '📤 Export Units',
+      importUnits: '📥 Import Units',
+      grossUnits: '⚡ Gross Units (Total Consumed)',
       totalBill: '💰 Total Amount',
       billFrom: '📅 From Date',
       billTo: '📅 To Date',
-      fixedCharges: '₹ Fixed Charges'
+      fixedCharges: '₹ Fixed Charges',
+      arrears: '📋 Arrears'
     };
     
-    for (let [key, value] of Object.entries(extractedData)) {
+    // Show in specific order
+    const fieldOrder = [
+      'billNumber', 'accountNumber', 'meterNumber',
+      'billFrom', 'billTo',
+      'grossUnits', 'importUnits', 'exportUnits', 'solarGenerated',
+      'totalBill', 'fixedCharges', 'arrears'
+    ];
+    
+    for (let key of fieldOrder) {
+      const value = extractedData[key];
       if (value) {
         html += `
           <div class="extracted-field">
-            <span class="field-label">${labels[key]}</span>
+            <span class="field-label">${fieldLabels[key]}</span>
             <span class="field-value">${value}</span>
           </div>
         `;
       }
     }
+    
+    html += '</div>';
     container.innerHTML = html;
   }
   
   document.getElementById('progressSection').style.display = 'none';
   document.getElementById('resultsSection').style.display = 'block';
 }
-
 function confirmData() {
   // Send data to parent window
   window.parent.postMessage({
