@@ -451,6 +451,169 @@ background: linear-gradient(135deg, #5568d3 0%, #6a3f91 100%);
 #simpleHomeBtn:active {
   transform: scale(0.95);
 }
+/* ==========================================
+   COLORFUL CARD INPUT STYLES
+   ========================================== */
+
+.card-input-wrapper {
+  margin-bottom: 0.75rem;
+}
+
+.card-input-container {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.card-input-container:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-1px);
+}
+
+/* Color schemes for different fields */
+.card-color-blue {
+  background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
+  border: 2px solid #60a5fa;
+}
+
+.card-color-green {
+  background: linear-gradient(135deg, #d1fae5 0%, #ecfdf5 100%);
+  border: 2px solid #34d399;
+}
+
+.card-color-purple {
+  background: linear-gradient(135deg, #e9d5ff 0%, #f5f3ff 100%);
+  border: 2px solid #a78bfa;
+}
+
+.card-color-orange {
+  background: linear-gradient(135deg, #fed7aa 0%, #fef3c7 100%);
+  border: 2px solid #fb923c;
+}
+
+.card-color-red {
+  background: linear-gradient(135deg, #fecaca 0%, #fee2e2 100%);
+  border: 2px solid #f87171;
+}
+
+.card-color-cyan {
+  background: linear-gradient(135deg, #cffafe 0%, #ecfeff 100%);
+  border: 2px solid #22d3ee;
+}
+
+.card-top-bar {
+  height: 4px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+}
+
+.card-content {
+  padding: 0.875rem;
+}
+
+.card-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.card-input-title {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.card-icon {
+  font-size: 1rem;
+}
+
+.card-hint {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.card-input-field {
+  display: flex;
+  align-items: stretch;
+  gap: 0.5rem;
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0;
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+
+.card-input-field:focus-within {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.card-input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: none;
+  background: transparent;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #0f172a;
+  outline: none;
+}
+
+.card-input::placeholder {
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.card-action-btn {
+  width: 3rem;
+  border: none;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  font-size: 1.25rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-action-btn:hover {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  transform: scale(1.02);
+}
+
+.card-action-btn:active {
+  transform: scale(0.98);
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .card-content {
+    padding: 0.75rem;
+  }
+  
+  .card-input-title {
+    font-size: 0.8rem;
+  }
+  
+  .card-hint {
+    font-size: 0.7rem;
+  }
+  
+  .card-action-btn {
+    width: 2.5rem;
+    font-size: 1.1rem;
+  }
+}  
 </style>
 </head>
 
@@ -751,55 +914,94 @@ background: linear-gradient(135deg, #5568d3 0%, #6a3f91 100%);
 <!-- CONSUMPTION -->
 <div class="card p-3 mb-3 d-none" id="consumptionSection">
   <h6>Consumption & Charges</h6>
-  <label>Gross Units (e.g. 1354)</label>
- <div class="input-group mb-2">
-  <input id="gross"
-    type="text"
-    inputmode="numeric"
-    class="form-control"
-    placeholder="Enter value"
- oninput="handleNumericInput(this)">
-
-  <button class="btn btn-outline-secondary"
-          type="button"
-          onclick="appendPlus('gross')">
-    +
-  </button>
+<!-- Gross Units - Blue Card -->
+<div class="card-input-wrapper">
+  <div class="card-input-container card-color-blue">
+    <div class="card-top-bar"></div>
+    <div class="card-content">
+      <div class="card-title-row">
+        <h6 class="card-input-title">
+          <span class="card-icon">⚡</span>
+          Gross Units
+        </h6>
+        <span class="card-hint">e.g. 1354</span>
+      </div>
+      <div class="card-input-field">
+        <input id="gross"
+               type="text"
+               inputmode="numeric"
+               class="card-input"
+               placeholder="Enter value"
+               oninput="handleNumericInput(this)">
+        <button class="card-action-btn" 
+                type="button"
+                onclick="appendPlus('gross')">
+          +
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 
-
-  <label>Import Units (e.g. 1114)</label>
- <div class="input-group mb-2">
-  <input id="importU"
-    type="text"
-    inputmode="numeric"
-    class="form-control"
-    placeholder="Enter value"
-oninput="handleNumericInput(this)"
-onblur="validateUnits()">
-
-  <button class="btn btn-outline-secondary"
-          type="button"
-          onclick="appendPlus('importU')">
-    +
-  </button>
+<!-- Import Units - Green Card -->
+<div class="card-input-wrapper">
+  <div class="card-input-container card-color-green">
+    <div class="card-top-bar"></div>
+    <div class="card-content">
+      <div class="card-title-row">
+        <h6 class="card-input-title">
+          <span class="card-icon">📥</span>
+          Import Units
+        </h6>
+        <span class="card-hint">e.g. 1114</span>
+      </div>
+      <div class="card-input-field">
+        <input id="importU"
+               type="text"
+               inputmode="numeric"
+               class="card-input"
+               placeholder="Enter value"
+               oninput="handleNumericInput(this)"
+               onblur="validateUnits()">
+        <button class="card-action-btn" 
+                type="button"
+                onclick="appendPlus('importU')"
+                style="background: linear-gradient(135deg, #10b981, #059669);">
+          +
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
-
-  <label>Export Units (e.g. 944)</label>
- <div class="input-group mb-2">
-  <input id="exportU"
-    type="text"
-    inputmode="numeric"
-    class="form-control"
-    placeholder="Enter value"
-oninput="handleNumericInput(this)"
-onblur="validateUnits()">
-
-  <button class="btn btn-outline-secondary"
-          type="button"
-          onclick="appendPlus('exportU')">
-    +
-  </button>
+<!-- Export Units - Purple Card -->
+<div class="card-input-wrapper">
+  <div class="card-input-container card-color-purple">
+    <div class="card-top-bar"></div>
+    <div class="card-content">
+      <div class="card-title-row">
+        <h6 class="card-input-title">
+          <span class="card-icon">📤</span>
+          Export Units
+        </h6>
+        <span class="card-hint">e.g. 944</span>
+      </div>
+      <div class="card-input-field">
+        <input id="exportU"
+               type="text"
+               inputmode="numeric"
+               class="card-input"
+               placeholder="Enter value"
+               oninput="handleNumericInput(this)"
+               onblur="validateUnits()">
+        <button class="card-action-btn" 
+                type="button"
+                onclick="appendPlus('exportU')"
+                style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+          +
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 <!-- ==========================================
      ENHANCED OPENING CARRY FORWARD FIELD
@@ -836,55 +1038,94 @@ onblur="validateUnits()">
 </div>
 
   
-  <label>Fixed Charges ₹ (e.g. 1605)</label>
- <div class="input-group mb-2">
-  <input id="fixed"
-    type="text"
-    inputmode="numeric"
-    class="form-control"
-    placeholder="Enter amount"
-oninput="handleNumericInput(this)">
-
-  <button class="btn btn-outline-secondary"
-          type="button"
-          onclick="appendPlus('fixed')">
-    +
-  </button>
+ <!-- Fixed Charges - Orange Card -->
+<div class="card-input-wrapper">
+  <div class="card-input-container card-color-orange">
+    <div class="card-top-bar"></div>
+    <div class="card-content">
+      <div class="card-title-row">
+        <h6 class="card-input-title">
+          <span class="card-icon">₹</span>
+          Fixed Charges
+        </h6>
+        <span class="card-hint">e.g. 1605</span>
+      </div>
+      <div class="card-input-field">
+        <input id="fixed"
+               type="text"
+               inputmode="numeric"
+               class="card-input"
+               placeholder="Enter amount"
+               oninput="handleNumericInput(this)">
+        <button class="card-action-btn" 
+                type="button"
+                onclick="appendPlus('fixed')"
+                style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+          +
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 
-
-  <label>Total Bill Amount ₹ (e.g. 2700)</label>
- <div class="input-group mb-2">
-  <input id="totalBill"
-    type="text"
-    inputmode="numeric"
-    class="form-control"
-    placeholder="Enter amount"
-oninput="handleNumericInput(this)">
-
-  <button class="btn btn-outline-secondary"
-          type="button"
-          onclick="appendPlus('totalBill')">
-    +
-  </button>
+<!-- Total Bill Amount - Red Card -->
+<div class="card-input-wrapper">
+  <div class="card-input-container card-color-red">
+    <div class="card-top-bar"></div>
+    <div class="card-content">
+      <div class="card-title-row">
+        <h6 class="card-input-title">
+          <span class="card-icon">💰</span>
+          Total Bill Amount
+        </h6>
+        <span class="card-hint">e.g. 2700</span>
+      </div>
+      <div class="card-input-field">
+        <input id="totalBill"
+               type="text"
+               inputmode="numeric"
+               class="card-input"
+               placeholder="Enter amount"
+               oninput="handleNumericInput(this)">
+        <button class="card-action-btn" 
+                type="button"
+                onclick="appendPlus('totalBill')"
+                style="background: linear-gradient(135deg, #ef4444, #dc2626);">
+          +
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 
-
- 
-    <label>Arrears ₹ (if any)</label>
- <div class="input-group mb-2">
-  <input id="arrears"
-    type="text"
-    inputmode="numeric"
-    class="form-control"
-    placeholder="Enter amount"
-oninput="handleNumericInput(this)">
-
-  <button class="btn btn-outline-secondary"
-          type="button"
-          onclick="appendPlus('arrears')">
-    +
-  </button>
+ <!-- Arrears - Cyan Card -->
+<div class="card-input-wrapper">
+  <div class="card-input-container card-color-cyan">
+    <div class="card-top-bar"></div>
+    <div class="card-content">
+      <div class="card-title-row">
+        <h6 class="card-input-title">
+          <span class="card-icon">📊</span>
+          Arrears
+        </h6>
+        <span class="card-hint">if any</span>
+      </div>
+      <div class="card-input-field">
+        <input id="arrears"
+               type="text"
+               inputmode="numeric"
+               class="card-input"
+               placeholder="Enter amount"
+               oninput="handleNumericInput(this)">
+        <button class="card-action-btn" 
+                type="button"
+                onclick="appendPlus('arrears')"
+                style="background: linear-gradient(135deg, #06b6d4, #0891b2);">
+          +
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 
 </div>
