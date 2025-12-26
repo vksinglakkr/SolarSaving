@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bill Scanner</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   
   <style>
     body {
@@ -19,6 +18,8 @@
       border-radius: 16px;
       padding: 2rem;
       box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      max-width: 800px;
+      margin: 0 auto;
     }
     
     .upload-zone {
@@ -87,10 +88,10 @@
   <div style="text-align: center; margin-bottom: 2rem;">
     <span style="font-size: 3rem;">📸</span>
     <h4 style="color: #166534; font-weight: 700; margin: 0.5rem 0;">
-      Smart Bill Scanner
+      Smart Bill Scanner (AI Powered)
     </h4>
     <p style="color: #64748b;">
-      Upload your electricity bill image for automatic data extraction
+      Upload your electricity bill for automatic AI extraction
     </p>
   </div>
   
@@ -158,7 +159,7 @@
     <div id="extractedFieldsContainer"></div>
     
     <!-- Action Buttons -->
-    <div style="display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: center;">
+    <div style="display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: center; flex-wrap: wrap;">
       <button onclick="confirmData()" class="btn-primary-custom">
         ✓ Use This Data
       </button>
@@ -176,14 +177,16 @@
 </div>
 
 <script>
+// ==========================================
+// CONFIGURATION
+// ==========================================
 const N8N_WEBHOOK_URL = 'https://n8n-workflow-test.duckdns.org/webhook/scan-bill';
-// ==========================================
-// BILL SCANNER LOGIC
-// ==========================================
 
 let extractedData = {};
 
-// Drag and drop support
+// ==========================================
+// DRAG AND DROP SUPPORT
+// ==========================================
 const uploadZone = document.getElementById('uploadZone');
 
 uploadZone.addEventListener('dragover', (e) => {
@@ -205,113 +208,25 @@ uploadZone.addEventListener('drop', (e) => {
   }
 });
 
-// File selection
+// ==========================================
+// FILE HANDLING
+// ==========================================
 function handleFileSelect(event) {
   const file = event.target.files[0];
   if (file) {
     handleFile(file);
   }
 }
-// Add before runOCR() function
 
-async function preprocessImage(imageSrc) {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.onload = function() {
-      // Create canvas
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      
-      canvas.width = img.width;
-      canvas.height = img.height;
-      
-      // Draw image
-      ctx.drawImage(img, 0, 0);
-      
-      // Get image data
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const data = imageData.data;
-      
-      // Increase contrast and convert to grayscale
-      for (let i = 0; i < data.length; i += 4) {
-        // Grayscale
-        const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
-        
-        // Increase contrast (threshold)
-        const threshold = 128;
-        const value = gray > threshold ? 255 : 0;
-        
-        data[i] = value;     // R
-        data[i + 1] = value; // G
-        data[i + 2] = value; // B
-      }
-      
-      ctx.putImageData(imageData, 0, 0);
-      resolve(canvas.toDataURL());
-    };
-    img.src = imageSrc;
-  });
-}
-
-async function runOCR(imageFile) {
-  document.getElementById('progressSection').style.display = 'block';
-  document.getElementById('resultsSection').style.display = 'none';
-  
-  try {
-    updateScanStatus('Uploading image...', 20);
-    
-    // Create FormData
-    const formData = new FormData();
-    formData.append('data', imageFile);
-    
-    updateScanStatus('AI is analyzing...', 40);
-    
-    // Send to n8n webhook
-    const response = await fetch(N8N_WEBHOOK_URL, {
-      method: 'POST',
-      body: formData
-    });
-    
-    if (!response.ok) {
-      throw new Error(`Server error: ${response.status}`);
-    }
-    
-    updateScanStatus('Extracting fields...', 70);
-    
-    const result = await response.json();
-    
-    console.log('✓ n8n Response:', result);
-    
-    if (result.success && result.data) {
-      // Store extracted data
-      window.extractedData = result.data;
-      
-      updateScanStatus('Complete!', 100);
-      
-      // Display results
-      displayExtractedData();
-    } else {
-      throw new Error('No data extracted');
-    }
-    
-  } catch (error) {
-    console.error('Scan Error:', error);
-    alert('Failed to scan bill: ' + error.message);
-    resetScanner();
-  }
-}
-
-// Process file
 function handleFile(file) {
-  // Validate
-  const maxSize = 5 * 1024 * 1024;
-  if (file.size > maxSize) {
-    alert('File too large! Please upload a file smaller than 5MB.');
+  // Validate file
+  if (!file.type.match('image.*')) {
+    alert('Please upload an image file (JPG, PNG)');
     return;
   }
   
-  if (!file.type.match('image.*')) {
-    alert('Please upload an image file (JPG or PNG).');
+  if (file.size > 5 * 1024 * 1024) {
+    alert('File size must be less than 5MB');
     return;
   }
   
@@ -321,393 +236,105 @@ function handleFile(file) {
     document.getElementById('previewImg').src = e.target.result;
     document.getElementById('uploadPrompt').style.display = 'none';
     document.getElementById('uploadPreview').style.display = 'block';
-    
-    // Start OCR
-    runOCR(e.target.result);
   };
   reader.readAsDataURL(file);
+  
+  // Start AI scanning
+  runAIScan(file);
 }
 
-// Run OCR
-async function runOCR(imageSrc) {
+// ==========================================
+// AI SCANNING WITH N8N
+// ==========================================
+async function runAIScan(imageFile) {
+  console.log('=== STARTING AI SCAN ===');
+  console.log('File:', imageFile.name, imageFile.size, 'bytes');
+  
   document.getElementById('progressSection').style.display = 'block';
   document.getElementById('resultsSection').style.display = 'none';
   
   try {
-    const { data: { text } } = await Tesseract.recognize(
-      imageSrc,
-      'eng',
-      {
-        logger: m => {
-          if (m.status === 'recognizing text') {
-            const progress = Math.round(m.progress * 100);
-            document.getElementById('progressText').textContent = `Scanning... ${progress}%`;
-            document.getElementById('progressBar').style.width = progress + '%';
-          }
-        }
-      }
-    );
+    updateScanStatus('Preparing image...', 10);
     
-    console.log('OCR Text:', text);
-    extractFields(text);
+    // Create FormData
+    const formData = new FormData();
+    formData.append('data', imageFile);
+    
+    console.log('FormData created');
+    console.log('Sending to:', N8N_WEBHOOK_URL);
+    
+    updateScanStatus('Sending to AI...', 30);
+    
+    // Send to n8n webhook
+    const response = await fetch(N8N_WEBHOOK_URL, {
+      method: 'POST',
+      body: formData
+    });
+    
+    console.log('Response status:', response.status);
+    console.log('Response headers:', [...response.headers.entries()]);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Server error:', response.status, errorText);
+      throw new Error(`Server error: ${response.status} - ${errorText}`);
+    }
+    
+    updateScanStatus('Processing response...', 70);
+    
+    const result = await response.json();
+    
+    console.log('=== AI RESPONSE ===');
+    console.log(JSON.stringify(result, null, 2));
+    
+    if (result.success && result.data) {
+      extractedData = result.data;
+      
+      console.log('=== EXTRACTED DATA ===');
+      console.log(extractedData);
+      
+      updateScanStatus('Complete!', 100);
+      
+      // Display results
+      setTimeout(() => {
+        displayResults();
+      }, 500);
+    } else {
+      console.error('Invalid response format:', result);
+      throw new Error('No data extracted from AI');
+    }
     
   } catch (error) {
-    console.error('OCR Error:', error);
-    alert('Failed to scan bill. Please try with a clearer image.');
+    console.error('=== SCAN ERROR ===');
+    console.error('Error:', error);
+    console.error('Stack:', error.stack);
+    
+    alert('Failed to scan bill:\n' + error.message + '\n\nPlease check:\n1. n8n workflow is active\n2. Webhook URL is correct\n3. Network connection\n4. Browser console for details');
+    
     resetScanner();
   }
 }
+
 function updateScanStatus(message, progress) {
-  const statusEl = document.getElementById('scanStatus');
-  const progressEl = document.getElementById('scanProgressBar');
+  const statusEl = document.getElementById('progressText');
+  const progressEl = document.getElementById('progressBar');
   
   if (statusEl) statusEl.textContent = message;
   if (progressEl) progressEl.style.width = progress + '%';
-}
-function extractFields(text) {
-  extractedData = {};
   
-  console.log('=== RAW OCR TEXT ===');
-  console.log(text);
-  console.log('===================');
-  
-  // Store for debugging
-  window.lastOCRText = text;
-  
-  // ==========================================
-  // 1. BILL NUMBER (12 digits)
-  // ==========================================
-  const billPatterns = [
-    /BILL\s*(?:NO|NUMBER|#)?\s*:?\s*(\d{12})/i,
-    /\b(\d{12})\b/
-  ];
-  
-  for (let pattern of billPatterns) {
-    const match = text.match(pattern);
-    if (match && match[1]) {
-      extractedData.billNumber = match[1].trim();
-      console.log('✓ Bill Number:', extractedData.billNumber);
-      break;
-    }
-  }
-  
-  // ==========================================
-  // 2. ACCOUNT NUMBER (10 digits)
-  // ==========================================
-  const accountPatterns = [
-    /ACCOUNT\s*(?:NO|NUMBER)?\s*:?\s*(\d{10})/i,
-    /\b(\d{10})\b/
-  ];
-  
-  for (let pattern of accountPatterns) {
-    const match = text.match(pattern);
-    if (match && match[1] && match[1] !== extractedData.billNumber) {
-      extractedData.accountNumber = match[1].trim();
-      console.log('✓ Account Number:', extractedData.accountNumber);
-      break;
-    }
-  }
-  
-  // ==========================================
-  // 3. METER NUMBER (8-10 digits)
-  // ==========================================
-  const meterPatterns = [
-    /(?:IMPORT|IMP)[\s\S]{0,40}?METER[\s\S]{0,20}?(\d{8,11})/i,
-    /METER\s*(?:NO|NUMBER)?\s*:?\s*(\d{8,11})/i,
-    /SERVICE\s*NO\s*:?\s*(\d{8,11})/i,
-    /\b(\d{8,11})\b/
-  ];
-  
-  for (let pattern of meterPatterns) {
-    const match = text.match(pattern);
-    if (match && match[1]) {
-      const meter = match[1];
-      if (meter !== extractedData.billNumber && 
-          meter !== extractedData.accountNumber &&
-          meter.length >= 8 && meter.length <= 11) {
-        extractedData.meterNumber = meter.trim();
-        console.log('✓ Meter Number:', extractedData.meterNumber);
-        break;
-      }
-    }
-  }
-  
-  // ==========================================
-  // 4. DATES - CRITICAL FIX!
-  // ==========================================
-  
-  // Pattern: DD/MM/YYYY
-  const datePattern = /(\d{2})[\/\-](\d{2})[\/\-](\d{4})/g;
-  const foundDates = [];
-  let match;
-  
-  while ((match = datePattern.exec(text)) !== null) {
-    const day = match[1];
-    const month = match[2];
-    const year = match[3];
-    
-    // Validate
-    const monthNum = parseInt(month);
-    const dayNum = parseInt(day);
-    
-    if (monthNum >= 1 && monthNum <= 12 && dayNum >= 1 && dayNum <= 31) {
-      foundDates.push({
-        original: match[0],
-        day: day,
-        month: month,
-        year: year,
-        iso: `${year}-${month}-${day}`,
-        timestamp: new Date(year, monthNum - 1, dayNum).getTime()
-      });
-    }
-  }
-  
-  console.log('All dates found:', foundDates.map(d => d.original));
-  
-  if (foundDates.length >= 2) {
-    // Sort by timestamp
-    foundDates.sort((a, b) => a.timestamp - b.timestamp);
-    
-    const fromDate = foundDates[0];
-    const toDate = foundDates[foundDates.length - 1];
-    
-    extractedData.billFrom = fromDate.iso;
-    extractedData.billTo = toDate.iso;
-    
-    console.log('✓ From Date:', extractedData.billFrom, '(', fromDate.original, ')');
-    console.log('✓ To Date:', extractedData.billTo, '(', toDate.original, ')');
-  }
-  
-  // ==========================================
-  // 5. FIXED CHARGES
-  // ==========================================
-  const fixedPatterns = [
-    /FIXED\s*CHARGES?\s*:?\s*(?:RS\.?|₹)?\s*(\d{1,6}(?:\.\d{2})?)/i,
-    /FIX\s*CHG\s*:?\s*(?:RS\.?|₹)?\s*(\d{1,6}(?:\.\d{2})?)/i,
-    /MINIMUM\s*CHARGE\s*:?\s*(?:RS\.?|₹)?\s*(\d{1,6}(?:\.\d{2})?)/i
-  ];
-  
-  for (let pattern of fixedPatterns) {
-    const match = text.match(pattern);
-    if (match && match[1]) {
-      extractedData.fixedCharges = match[1].trim();
-      console.log('✓ Fixed Charges:', extractedData.fixedCharges);
-      break;
-    }
-  }
-  
-  // ==========================================
-  // 6. TOTAL BILL AMOUNT
-  // ==========================================
-  const amountPatterns = [
-    /TOTAL\s*(?:AMOUNT|BILL)?\s*(?:PAYABLE|DUE)?\s*:?\s*(?:RS\.?|₹)?\s*(\d{3,6})\b/i,
-    /NET\s*AMOUNT\s*:?\s*(?:RS\.?|₹)?\s*(\d{3,6})\b/i,
-    /AMOUNT\s*PAYABLE\s*:?\s*(?:RS\.?|₹)?\s*(\d{3,6})\b/i,
-    /PAYABLE\s*:?\s*(?:RS\.?|₹)?\s*(\d{3,6})\b/i
-  ];
-  
-  let maxAmount = 0;
-  for (let pattern of amountPatterns) {
-    const match = text.match(pattern);
-    if (match && match[1]) {
-      const amount = parseInt(match[1]);
-      if (amount > maxAmount && amount >= 500 && amount <= 50000) {
-        maxAmount = amount;
-        extractedData.totalBill = match[1].trim();
-      }
-    }
-  }
-  
-  if (extractedData.totalBill) {
-    console.log('✓ Total Bill:', extractedData.totalBill);
-  }
-  
-  // ==========================================
-  // 7. SOLAR GENERATED (NEW!)
-  // ==========================================
-  const solarGenPatterns = [
-    /SOLAR\s*GENERATED\s*:?\s*(\d{1,5})\b/i,
-    /GENERATION\s*:?\s*(\d{1,5})\b/i,
-    /SOLAR\s*PRODUCTION\s*:?\s*(\d{1,5})\b/i,
-    /SOLAR\s*:?\s*(\d{1,5})\s*(?:UNITS?|KWH)/i,
-    /GENERATED\s*:?\s*(\d{1,5})\s*(?:UNITS?|KWH)/i
-  ];
-  
-  for (let pattern of solarGenPatterns) {
-    const match = text.match(pattern);
-    if (match && match[1]) {
-      const val = match[1];
-      if (val !== extractedData.totalBill) {
-        extractedData.solarGenerated = val.trim();
-        console.log('✓ Solar Generated:', extractedData.solarGenerated);
-        break;
-      }
-    }
-  }
-  
-  // ==========================================
-  // 8. IMPORT UNITS (Grid → Home)
-  // ==========================================
-  const importPatterns = [
-    /IMPORT(?:ED)?\s*(?:UNITS?|ENERGY)?\s*:?\s*(\d{1,5})\b/i,
-    /IMP\s*:?\s*(\d{1,5})\b/i,
-    /GRID\s*SUPPLY\s*:?\s*(\d{1,5})\b/i,
-    /PURCHASED\s*:?\s*(\d{1,5})\b/i,
-    /FROM\s*GRID\s*:?\s*(\d{1,5})\b/i
-  ];
-  
-  for (let pattern of importPatterns) {
-    const match = text.match(pattern);
-    if (match && match[1]) {
-      const val = match[1];
-      if (val !== extractedData.totalBill && 
-          val !== extractedData.solarGenerated) {
-        extractedData.importUnits = val.trim();
-        console.log('✓ Import Units:', extractedData.importUnits);
-        break;
-      }
-    }
-  }
-  
-  // ==========================================
-  // 9. EXPORT UNITS (Solar → Grid)
-  // ==========================================
-  const exportPatterns = [
-    /EXPORT(?:ED)?\s*(?:UNITS?|ENERGY)?\s*:?\s*(\d{1,5})\b/i,
-    /EXP\s*:?\s*(\d{1,5})\b/i,
-    /SOLD\s*(?:TO\s*GRID)?\s*:?\s*(\d{1,5})\b/i,
-    /TO\s*GRID\s*:?\s*(\d{1,5})\b/i,
-    /SURPLUS\s*:?\s*(\d{1,5})\b/i
-  ];
-  
-  for (let pattern of exportPatterns) {
-    const match = text.match(pattern);
-    if (match && match[1]) {
-      const val = match[1];
-      if (val !== extractedData.totalBill && 
-          val !== extractedData.solarGenerated &&
-          val !== extractedData.importUnits) {
-        extractedData.exportUnits = val.trim();
-        console.log('✓ Export Units:', extractedData.exportUnits);
-        break;
-      }
-    }
-  }
-  
-  // ==========================================
-  // 10. GROSS/TOTAL CONSUMED (Most Important!)
-  // ==========================================
-  const grossPatterns = [
-    /TOTAL\s*(?:UNITS?)?\s*CONSUMED\s*:?\s*(\d{1,5})\b/i,
-    /GROSS\s*(?:UNITS?|CONSUMPTION)?\s*:?\s*(\d{1,5})\b/i,
-    /NET\s*CONSUMPTION\s*:?\s*(\d{1,5})\b/i,
-    /CONSUMPTION\s*:?\s*(\d{1,5})\b/i,
-    /TOTAL\s*CONSUMPTION\s*:?\s*(\d{1,5})\b/i,
-    /UNITS?\s*CONSUMED\s*:?\s*(\d{1,5})\b/i
-  ];
-  
-  for (let pattern of grossPatterns) {
-    const match = text.match(pattern);
-    if (match && match[1]) {
-      const val = match[1];
-      
-      // Should NOT be total bill
-      if (val === extractedData.totalBill) {
-        console.log('⚠️ Skipping - matches total bill:', val);
-        continue;
-      }
-      
-      // Should be reasonable consumption
-      const num = parseInt(val);
-      if (num >= 100 && num <= 9999) {
-        extractedData.grossUnits = val.trim();
-        console.log('✓ Gross Units (Total Consumed):', extractedData.grossUnits);
-        break;
-      }
-    }
-  }
-  
-  // ==========================================
-  // 11. SMART CALCULATIONS
-  // ==========================================
-  
-  // If we have solar generated and import, but no gross
-  if (!extractedData.grossUnits && 
-      extractedData.solarGenerated && 
-      extractedData.importUnits) {
-    
-    const solar = parseInt(extractedData.solarGenerated);
-    const imported = parseInt(extractedData.importUnits);
-    const exported = extractedData.exportUnits ? parseInt(extractedData.exportUnits) : 0;
-    
-    // Formula: Gross = Solar Generated - Export + Import
-    const calculated = solar - exported + imported;
-    
-    extractedData.grossUnits = calculated.toString();
-    console.log('✓ Gross calculated:', extractedData.grossUnits, 
-                `(${solar} solar - ${exported} export + ${imported} import)`);
-  }
-  
-  // ==========================================
-  // 12. ARREARS (if present)
-  // ==========================================
-  const arrearsPatterns = [
-    /ARREARS?\s*:?\s*(?:RS\.?|₹)?\s*(\d{1,6}(?:\.\d{2})?)/i,
-    /OUTSTANDING\s*:?\s*(?:RS\.?|₹)?\s*(\d{1,6}(?:\.\d{2})?)/i,
-    /PREVIOUS\s*DUE\s*:?\s*(?:RS\.?|₹)?\s*(\d{1,6}(?:\.\d{2})?)/i
-  ];
-  
-  for (let pattern of arrearsPatterns) {
-    const match = text.match(pattern);
-    if (match && match[1]) {
-      const val = parseFloat(match[1]);
-      if (val > 0 && val < 100000) {
-        extractedData.arrears = match[1].trim();
-        console.log('✓ Arrears:', extractedData.arrears);
-        break;
-      }
-    }
-  }
-  
-  // ==========================================
-  // 13. CLEAN UP
-  // ==========================================
-  
-  for (let key in extractedData) {
-    if (extractedData[key] === undefined || 
-        extractedData[key] === null || 
-        extractedData[key] === '') {
-      delete extractedData[key];
-    }
-  }
-  
-  console.log('=== FINAL EXTRACTED DATA ===');
-  console.log(extractedData);
-  console.log('============================');
-  
-  displayResults();
-}
-function convertDate(dateStr) {
-  const parts = dateStr.split(/[\/\-]/);
-  if (parts.length === 3) {
-    const day = parts[0].padStart(2, '0');
-    const month = parts[1].padStart(2, '0');
-    let year = parts[2];
-    if (year.length === 2) {
-      year = (parseInt(year) > 50 ? '19' : '20') + year;
-    }
-    return `${year}-${month}-${day}`;
-  }
-  return '';
+  console.log(`Progress: ${progress}% - ${message}`);
 }
 
+// ==========================================
+// DISPLAY RESULTS
+// ==========================================
 function displayResults() {
   const container = document.getElementById('extractedFieldsContainer');
   
   if (Object.keys(extractedData).length === 0) {
     container.innerHTML = `
       <div style="color: #dc2626; text-align: center; padding: 1rem;">
-        ❌ No data extracted.
+        ❌ No data extracted. Please try with a clearer image.
       </div>
     `;
   } else {
@@ -755,7 +382,13 @@ function displayResults() {
   document.getElementById('progressSection').style.display = 'none';
   document.getElementById('resultsSection').style.display = 'block';
 }
+
+// ==========================================
+// ACTIONS
+// ==========================================
 function confirmData() {
+  console.log('Sending data to parent:', extractedData);
+  
   // Send data to parent window
   window.parent.postMessage({
     type: 'SCAN_COMPLETE',
@@ -764,12 +397,16 @@ function confirmData() {
 }
 
 function cancelScan() {
+  console.log('Scan cancelled by user');
+  
   window.parent.postMessage({
     type: 'SCAN_CANCELLED'
   }, '*');
 }
 
 function resetScanner() {
+  console.log('Resetting scanner');
+  
   extractedData = {};
   document.getElementById('fileInput').value = '';
   document.getElementById('uploadPrompt').style.display = 'block';
@@ -777,6 +414,13 @@ function resetScanner() {
   document.getElementById('progressSection').style.display = 'none';
   document.getElementById('resultsSection').style.display = 'none';
 }
+
+// ==========================================
+// DEBUG INFO
+// ==========================================
+console.log('=== BILL SCANNER INITIALIZED ===');
+console.log('n8n Webhook URL:', N8N_WEBHOOK_URL);
+console.log('Ready to scan!');
 </script>
 
 </body>
