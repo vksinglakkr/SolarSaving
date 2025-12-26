@@ -821,6 +821,51 @@ input[type="date"].card-input::-webkit-calendar-picker-indicator:hover {
     </div>
   </div>
 </div>
+<div style="text-align: center; margin: 1rem 0;">
+  <button id="openScannerBtn" 
+          onclick="openBillScanner()"
+          class="d-none"
+          style="padding: 0.75rem 2rem; 
+                 background: linear-gradient(135deg, #10b981, #059669); 
+                 color: white; 
+                 border: none; 
+                 border-radius: 25px; 
+                 font-weight: 700; 
+                 font-size: 1rem; 
+                 cursor: pointer; 
+                 box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+                 transition: all 0.3s;">
+    📸 Scan Bill to Auto-Fill
+  </button>
+</div>
+
+<!-- SCANNER MODAL CONTAINER -->
+<div id="scannerModal" style="display: none; 
+                              position: fixed; 
+                              top: 0; 
+                              left: 0; 
+                              width: 100%; 
+                              height: 100%; 
+                              background: rgba(0,0,0,0.5); 
+                              z-index: 10000;
+                              overflow: auto;">
+  <div style="min-height: 100vh; 
+              display: flex; 
+              align-items: center; 
+              justify-content: center; 
+              padding: 1rem;">
+    <iframe id="scannerFrame" 
+            src="bill-scanner.html" 
+            style="width: 100%; 
+                   max-width: 800px; 
+                   height: 90vh; 
+                   border: none; 
+                   border-radius: 16px; 
+                   background: white;
+                   box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+    </iframe>
+  </div>
+</div>
 <!-- COLLAPSIBLE POLICY INFORMATION -->
 <div style="margin: 1rem 0;">
   <!-- Collapsed View (Default) -->
@@ -4596,6 +4641,37 @@ function handleHome() {
   
   console.log('Returned to home (Intent Selection)');
 }
+
+// ==========================================
+// BILL SCANNER INTEGRATION
+// ==========================================
+
+// Show scanner button when form mode selected
+function showScannerButton() {
+  const btn = document.getElementById('openScannerBtn');
+  if (btn && (entryMode === 'one' || entryMode === 'save')) {
+    btn.classList.remove('d-none');
+  }
+}
+
+// Open scanner modal
+function openBillScanner() {
+  const modal = document.getElementById('scannerModal');
+  if (modal) {
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden'; // Prevent background scroll
+  }
+}
+
+// Close scanner modal
+function closeBillScanner() {
+  const modal = document.getElementById('scannerModal');
+  if (modal) {
+    modal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+  }
+}
+
 </script>
  </div>
 </body>
