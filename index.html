@@ -906,151 +906,176 @@ input[type="date"].card-input::-webkit-calendar-picker-indicator:hover {
   <button class="btn btn-secondary w-100 mt-3" onclick="logout()">Logout</button>
 </div>
 
-<!-- IDENTITY -->
-<!-- IDENTITY SECTION - Colorful Cards -->
+<!-- IDENTITY SECTION WITH CONTAINER -->
 <div class="d-none" id="identitySection">
-  
-  <!-- Section Header -->
-  <div style="margin-bottom: 1rem; padding: 0.75rem; background: linear-gradient(135deg, #f0f9ff, #e0f2fe); border-left: 4px solid #0ea5e9; border-radius: 8px;">
-    <h6 style="margin: 0; color: #0c4a6e; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
-      <span style="font-size: 1.2rem;">👤</span>
-      Consumer Identification
-    </h6>
-    <small style="color: #475569; display: block; margin-top: 0.25rem;">Enter your bill details for secure storage</small>
-  </div>
-
-  <!-- Bill Number - Indigo Card -->
-  <div class="card-input-wrapper">
-    <div class="card-input-container" style="background: linear-gradient(135deg, #e0e7ff, #eef2ff); border: 2px solid #818cf8;">
-      <div class="card-top-bar"></div>
-      <div class="card-content">
-        <div class="card-title-row">
-          <h6 class="card-input-title">
-            <span class="card-icon">📄</span>
-            Bill Number
-          </h6>
-          <span class="card-hint">e.g. 123456</span>
+  <div class="section-container section-identity">
+    
+    <!-- Section Header -->
+    <div class="section-header">
+      <div class="section-title">
+        <div class="section-icon section-icon-identity">
+          👤
         </div>
-        <div class="card-input-field">
-          <input id="billNumber"
-                 type="text"
-                 inputmode="numeric"
-                 class="card-input"
-                 placeholder="Enter bill number">
+        <div>
+          <h6 class="section-title-text">Consumer Identification</h6>
+          <small class="section-subtitle">Enter your bill details for secure storage</small>
+        </div>
+      </div>
+      <span class="section-badge badge-required">Required</span>
+    </div>
+
+    <!-- Bill Number - Indigo Card -->
+    <div class="card-input-wrapper">
+      <div class="card-input-container" style="background: linear-gradient(135deg, #e0e7ff, #eef2ff); border: 2px solid #818cf8;">
+        <div class="card-top-bar"></div>
+        <div class="card-content">
+          <div class="card-title-row">
+            <h6 class="card-input-title">
+              <span class="card-icon">📄</span>
+              Bill Number
+            </h6>
+            <span class="card-hint">e.g. 123456</span>
+          </div>
+          <div class="card-input-field">
+            <input id="billNumber"
+                   type="text"
+                   inputmode="numeric"
+                   class="card-input"
+                   placeholder="Enter bill number">
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Meter Number - Teal Card -->
-  <div class="card-input-wrapper">
-    <div class="card-input-container" style="background: linear-gradient(135deg, #ccfbf1, #f0fdfa); border: 2px solid #2dd4bf;">
-      <div class="card-top-bar"></div>
-      <div class="card-content">
-        <div class="card-title-row">
-          <h6 class="card-input-title">
-            <span class="card-icon">📟</span>
-            Meter Number
-          </h6>
-          <span class="card-hint">e.g. 24600455</span>
-        </div>
-        <div class="card-input-field">
-          <input id="meter"
-                 type="text"
-                 inputmode="numeric"
-                 class="card-input"
-                 placeholder="Enter meter number">
+    <!-- Meter Number - Teal Card -->
+    <div class="card-input-wrapper">
+      <div class="card-input-container" style="background: linear-gradient(135deg, #ccfbf1, #f0fdfa); border: 2px solid #2dd4bf;">
+        <div class="card-top-bar"></div>
+        <div class="card-content">
+          <div class="card-title-row">
+            <h6 class="card-input-title">
+              <span class="card-icon">📟</span>
+              Meter Number
+            </h6>
+            <span class="card-hint">e.g. 24600455</span>
+          </div>
+          <div class="card-input-field">
+            <input id="meter"
+                   type="text"
+                   inputmode="numeric"
+                   class="card-input"
+                   placeholder="Enter meter number">
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Account Number - Pink Card -->
-  <div class="card-input-wrapper">
-    <div class="card-input-container" style="background: linear-gradient(135deg, #fce7f3, #fdf2f8); border: 2px solid #f472b6;">
-      <div class="card-top-bar"></div>
-      <div class="card-content">
-        <div class="card-title-row">
-          <h6 class="card-input-title">
-            <span class="card-icon">🔑</span>
-            Account Number
-          </h6>
-          <span class="card-hint">e.g. ACC12345</span>
-        </div>
-        <div class="card-input-field">
-          <input id="accountNum"
-                 type="text"
-                 class="card-input"
-                 placeholder="Enter account number">
+    <!-- Account Number - Pink Card -->
+    <div class="card-input-wrapper">
+      <div class="card-input-container" style="background: linear-gradient(135deg, #fce7f3, #fdf2f8); border: 2px solid #f472b6;">
+        <div class="card-top-bar"></div>
+        <div class="card-content">
+          <div class="card-title-row">
+            <h6 class="card-input-title">
+              <span class="card-icon">🔑</span>
+              Account Number
+            </h6>
+            <span class="card-hint">e.g. ACC12345</span>
+          </div>
+          <div class="card-input-field">
+            <input id="accountNum"
+                   type="text"
+                   class="card-input"
+                   placeholder="Enter account number">
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
+  </div>
 </div>
-
-<!-- BILL PERIOD -->
-<!-- BILL PERIOD SECTION - Colorful Cards -->
+<!-- BILL PERIOD SECTION WITH CONTAINER -->
 <div class="d-none" id="billPeriodSection">
-  
-  <!-- Section Header -->
-  <div style="margin-bottom: 1rem; padding: 0.75rem; background: linear-gradient(135deg, #fef3c7, #fef9c3); border-left: 4px solid #f59e0b; border-radius: 8px;">
-    <h6 style="margin: 0; color: #78350f; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
-      <span style="font-size: 1.2rem;">📅</span>
-      Bill Period
-    </h6>
-    <small style="color: #92400e; display: block; margin-top: 0.25rem;">Select billing start and end dates</small>
-  </div>
-
-  <!-- From Date - Amber Card -->
-  <div class="card-input-wrapper">
-    <div class="card-input-container" style="background: linear-gradient(135deg, #fef3c7, #fffbeb); border: 2px solid #fbbf24;">
-      <div class="card-top-bar"></div>
-      <div class="card-content">
-        <div class="card-title-row">
-          <h6 class="card-input-title">
-            <span class="card-icon">📆</span>
-            From Date
-          </h6>
-          <span class="card-hint">Start date</span>
+  <div class="section-container section-period">
+    
+    <!-- Section Header -->
+    <div class="section-header">
+      <div class="section-title">
+        <div class="section-icon section-icon-period">
+          📅
         </div>
-        <div class="card-input-field">
-          <input id="billFrom"
-                 type="date"
-                 class="card-input"
-                 style="cursor: pointer;">
+        <div>
+          <h6 class="section-title-text">Bill Period</h6>
+          <small class="section-subtitle">Select billing start and end dates</small>
+        </div>
+      </div>
+      <span class="section-badge badge-required">Required</span>
+    </div>
+
+    <!-- From Date - Amber Card -->
+    <div class="card-input-wrapper">
+      <div class="card-input-container" style="background: linear-gradient(135deg, #fef3c7, #fffbeb); border: 2px solid #fbbf24;">
+        <div class="card-top-bar"></div>
+        <div class="card-content">
+          <div class="card-title-row">
+            <h6 class="card-input-title">
+              <span class="card-icon">📆</span>
+              From Date
+            </h6>
+            <span class="card-hint">Start date</span>
+          </div>
+          <div class="card-input-field">
+            <input id="billFrom"
+                   type="date"
+                   class="card-input"
+                   style="cursor: pointer;">
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- To Date - Lime Card -->
-  <div class="card-input-wrapper">
-    <div class="card-input-container" style="background: linear-gradient(135deg, #d9f99d, #ecfccb); border: 2px solid #a3e635;">
-      <div class="card-top-bar"></div>
-      <div class="card-content">
-        <div class="card-title-row">
-          <h6 class="card-input-title">
-            <span class="card-icon">📆</span>
-            To Date
-          </h6>
-          <span class="card-hint">End date</span>
-        </div>
-        <div class="card-input-field">
-          <input id="billTo"
-                 type="date"
-                 class="card-input"
-                 style="cursor: pointer;">
+    <!-- To Date - Lime Card -->
+    <div class="card-input-wrapper">
+      <div class="card-input-container" style="background: linear-gradient(135deg, #d9f99d, #ecfccb); border: 2px solid #a3e635;">
+        <div class="card-top-bar"></div>
+        <div class="card-content">
+          <div class="card-title-row">
+            <h6 class="card-input-title">
+              <span class="card-icon">📆</span>
+              To Date
+            </h6>
+            <span class="card-hint">End date</span>
+          </div>
+          <div class="card-input-field">
+            <input id="billTo"
+                   type="date"
+                   class="card-input"
+                   style="cursor: pointer;">
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
+  </div>
 </div>
 
-<!-- CONSUMPTION -->
-<div class="card p-3 mb-3 d-none" id="consumptionSection">
-  <h6>Consumption & Charges</h6>
+<!-- CONSUMPTION SECTION WITH CONTAINER -->
+<div class="d-none" id="consumptionSection">
+  <div class="section-container section-consumption">
+    
+    <!-- Section Header -->
+    <div class="section-header">
+      <div class="section-title">
+        <div class="section-icon section-icon-consumption">
+          ⚡
+        </div>
+        <div>
+          <h6 class="section-title-text">Consumption & Charges</h6>
+          <small class="section-subtitle">Enter units and billing amounts</small>
+        </div>
+      </div>
+      <span class="section-badge badge-required">Required</span>
+    </div>
 <!-- Gross Units - Blue Card -->
 <div class="card-input-wrapper">
   <div class="card-input-container card-color-blue">
@@ -1264,8 +1289,8 @@ input[type="date"].card-input::-webkit-calendar-picker-indicator:hover {
     </div>
   </div>
 </div>
-
-</div>
+  </div> <!-- Close section-container -->
+</div> <!-- Close consumptionSection -->
 <button id="actionBtn"
         class="btn btn-primary w-100 d-none"
         onclick="calculate()">
