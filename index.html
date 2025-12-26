@@ -1637,7 +1637,7 @@ function selectIntent(type){
     // Scroll to top smoothly
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
-  
+  showScannerButton();
   console.log('selectIntent completed');
 }
 
@@ -4645,7 +4645,66 @@ function handleHome() {
 // ==========================================
 // BILL SCANNER INTEGRATION
 // ==========================================
+// ==========================================
+// BILL SCANNER COMMUNICATION
+// ==========================================
 
+// Listen for messages from scanner iframe
+window.addEventListener('message', function(event) {
+  // Security: verify origin if needed
+  // if (event.origin !== "your-domain.com") return;
+  
+  if (event.data.type === 'SCAN_COMPLETE') {
+    const data = event.data.payload;
+    
+    // Auto-fill form fields
+    if (data.billNumber) {
+      const field = document.getElementById('billNumber');
+      if (field) field.value = data.billNumber;
+    }
+    if (data.meterNumber) {
+      const field = document.getElementById('meter');
+      if (field) field.value = data.meterNumber;
+    }
+    if (data.accountNumber) {
+      const field = document.getElementById('accountNum');
+      if (field) field.value = data.accountNumber;
+    }
+    if (data.grossUnits) {
+      const field = document.getElementById('gross');
+      if (field) field.value = data.grossUnits;
+    }
+    if (data.totalBill) {
+      const field = document.getElementById('totalBill');
+      if (field) field.value = data.totalBill;
+    }
+    if (data.billFrom) {
+      const field = document.getElementById('billFrom');
+      if (field) field.value = data.billFrom;
+    }
+    if (data.billTo) {
+      const field = document.getElementById('billTo');
+      if (field) field.value = data.billTo;
+    }
+    if (data.fixedCharges) {
+      const field = document.getElementById('fixed');
+      if (field) field.value = data.fixedCharges;
+    }
+    
+    // Close modal
+    closeBillScanner();
+    
+    // Show success
+    showCustomModal('✅', 'Auto-Filled!', 'Please verify the values and fill any missing fields.', 'success');
+    
+    // Scroll to form
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  
+  if (event.data.type === 'SCAN_CANCELLED') {
+    closeBillScanner();
+  }
+});
 // Show scanner button when form mode selected
 function showScannerButton() {
   const btn = document.getElementById('openScannerBtn');
