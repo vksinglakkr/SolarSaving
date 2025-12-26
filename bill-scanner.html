@@ -349,168 +349,217 @@ async function runOCR(imageSrc) {
 function extractFields(text) {
   extractedData = {};
   
-  console.log('OCR Text:', text); // DEBUG
+  console.log('=== OCR TEXT START ===');
+  console.log(text);
+  console.log('=== OCR TEXT END ===');
   
-  // Normalize text - make uppercase and clean spaces
+  // Normalize text
   const cleanText = text.toUpperCase()
                        .replace(/\s+/g, ' ')
-                       .replace(/[|]/g, 'I'); // Pipe to I
-  
-  console.log('Cleaned Text:', cleanText); // DEBUG
+                       .replace(/[|]/g, 'I')
+                       .replace(/[Oo]/g, '0'); // O to 0 for numbers
   
   // ==========================================
-  // 1. BILL NUMBER (Multiple patterns)
+  // 1. BILL NUMBER
   // ==========================================
   const billPatterns = [
     /BILL\s*(?:NO|NUMBER|#|NUM)?\s*:?\s*(\d{10,15})/i,
-    /INVOICE\s*(?:NO|NUMBER|#)?\s*:?\s*(\d{10,15})/i,
     /CONSUMER\s*(?:NO|NUMBER)?\s*:?\s*(\d{10,15})/i,
-    /BILL\s*ID\s*:?\s*(\d{10,15})/i,
-    /B\/NO\s*:?\s*(\d{10,15})/i,
-    /REF\s*NO\s*:?\s*(\d{10,15})/i,
-    // Just standalone 12 digit numbers
-    /\b(\d{12})\b/
+    /INVOICE\s*:?\s*(\d{10,15})/i,
+    /\b(\d{12})\b/ // Standalone 12 digits
   ];
   
   for (let pattern of billPatterns) {
     const match = text.match(pattern);
     if (match && match[1]) {
       extractedData.billNumber = match[1].trim();
-      console.log('Bill Number found:', extractedData.billNumber);
+      console.log('✓ Bill Number:', extractedData.billNumber);
       break;
     }
   }
   
   // ==========================================
-  // 2. METER NUMBER (8-12 digits)
+  // 2. METER NUMBER
   // ==========================================
   const meterPatterns = [
-    /METER\s*(?:NO|NUMBER|#|NUM)?\s*:?\s*(\d{8,12})/i,
-    /METER\s*:?\s*(\d{8,12})/i,
-    /M[\/.]?NO?\s*:?\s*(\d{8,12})/i,
+    /METER\s*(?:NO|NUMBER)?\s*:?\s*(\d{8,12})/i,
     /SERVICE\s*NO\s*:?\s*(\d{8,12})/i,
-    /METER\s*ID\s*:?\s*(\d{8,12})/i,
-    /MTR\s*NO\s*:?\s*(\d{8,12})/i,
-    // Look for "METER" followed by number in next 20 chars
-    /METER[\s\S]{0,20}?(\d{8,12})/i
+    /MTR\s*:?\s*(\d{8,12})/i,
+    /M[\/.]NO\s*:?\s*(\d{8,12})/i
   ];
   
   for (let pattern of meterPatterns) {
     const match = text.match(pattern);
-    if (match && match[1]) {
-      const num = match[1].trim();
-      // Make sure it's different from bill number
-      if (num !== extractedData.billNumber) {
-        extractedData.meterNumber = num;
-        console.log('Meter Number found:', extractedData.meterNumber);
-        break;
-      }
+    if (match && match[1] && match[1] !== extractedData.billNumber) {
+      extractedData.meterNumber = match[1].trim();
+      console.log('✓ Meter Number:', extractedData.meterNumber);
+      break;
     }
   }
   
   // ==========================================
-  // 3. ACCOUNT NUMBER (Alphanumeric)
+  // 3. ACCOUNT NUMBER
   // ==========================================
   const accountPatterns = [
-    /ACCOUNT\s*(?:NO|NUMBER|#|NUM)?\s*:?\s*([A-Z0-9]{8,15})/i,
-    /A[\/.]?C+\s*(?:NO|NUM)?\s*:?\s*([A-Z0-9]{8,15})/i,
-    /ACC\s*NO\s*:?\s*([A-Z0-9]{8,15})/i,
+    /ACCOUNT\s*(?:NO|NUMBER)?\s*:?\s*([A-Z0-9]{8,15})/i,
+    /A[\/.]?C+\s*NO\s*:?\s*([A-Z0-9]{8,15})/i,
     /K\s*NO\s*:?\s*([A-Z0-9]{8,15})/i,
-    /CONSUMER\s*ACC\s*:?\s*([A-Z0-9]{8,15})/i,
-    /CA\s*NO\s*:?\s*([A-Z0-9]{8,15})/i
+    /CA\s*:?\s*([A-Z0-9]{8,15})/i
   ];
   
   for (let pattern of accountPatterns) {
     const match = text.match(pattern);
     if (match && match[1]) {
       extractedData.accountNumber = match[1].trim();
-      console.log('Account Number found:', extractedData.accountNumber);
+      console.log('✓ Account Number:', extractedData.accountNumber);
       break;
     }
   }
   
   // ==========================================
-  // 4. UNITS / CONSUMPTION (Very important!)
+  // 4. SOLAR BILL SPECIFIC - EXPORT UNITS
   // ==========================================
-  const unitsPatterns = [
-    // "Consumption" with number
-    /CONSUMPTION\s*:?\s*(\d{1,6})\s*(?:UNITS|KWH|KWHR)?/i,
-    /UNITS\s*CONSUMED\s*:?\s*(\d{1,6})/i,
-    /TOTAL\s*UNITS\s*:?\s*(\d{1,6})/i,
-    /ENERGY\s*CONSUMED\s*:?\s*(\d{1,6})/i,
+  const exportPatterns = [
+    // Common patterns in Haryana bills
+    /EXPORT(?:ED)?\s*(?:UNITS?|ENERGY|KWH)?\s*:?\s*(\d{1,6})/i,
+    /EXP(?:ORT)?\s*:?\s*(\d{1,6})/i,
+    /UNITS?\s*EXPORT(?:ED)?\s*:?\s*(\d{1,6})/i,
+    /ENERGY\s*EXPORT(?:ED)?\s*:?\s*(\d{1,6})/i,
+    /SOLD\s*(?:TO\s*GRID)?\s*:?\s*(\d{1,6})/i,
+    /GENERATION\s*:?\s*(\d{1,6})/i,
+    /EXPORT\s*READING\s*:?\s*(\d{1,6})/i,
     
-    // KWH variations
-    /KWH\s*:?\s*(\d{1,6})/i,
-    /KWHR\s*:?\s*(\d{1,6})/i,
-    /KW\s*HR\s*:?\s*(\d{1,6})/i,
+    // Pattern: "Export" followed by number within 30 chars
+    /EXPORT[\s\S]{0,30}?(\d{1,6})/i,
     
-    // Current - Previous pattern (common in bills)
-    /CURRENT\s*:?\s*(\d{1,6})[\s\S]{0,30}PREVIOUS/i,
-    /PRESENT\s*(?:READING)?\s*:?\s*(\d{4,7})[\s\S]{0,30}PREVIOUS\s*:?\s*(\d{4,7})/i,
-    
-    // Look for "UNITS" word followed by number
-    /UNITS[\s:]*(\d{1,6})/i,
-    /UNIT\s*CONSUMED[\s:]*(\d{1,6})/i,
-    
-    // Sometimes just labeled as "CONSUMED"
-    /CONSUMED\s*:?\s*(\d{1,6})/i,
-    
-    // Look for pattern like "350 KWH" or "350 UNITS"
-    /(\d{1,6})\s*(?:KWH|KWHR|UNITS|UNIT)/i
+    // Look for E01/E02 meter reading labels
+    /E\s*0?[12]\s*:?\s*(\d{1,6})/i
   ];
   
-  for (let pattern of unitsPatterns) {
+  for (let pattern of exportPatterns) {
     const match = text.match(pattern);
-    if (match) {
-      let units = match[1];
-      
-      // If pattern has 2 groups (current - previous), calculate difference
-      if (match[2]) {
-        const current = parseInt(match[1]);
-        const previous = parseInt(match[2]);
-        units = (current - previous).toString();
-      }
-      
-      // Sanity check: units should be reasonable (not too big or small)
-      const unitsNum = parseInt(units);
-      if (unitsNum >= 1 && unitsNum <= 99999) {
-        extractedData.grossUnits = units.trim();
-        console.log('Units found:', extractedData.grossUnits);
+    if (match && match[1]) {
+      const val = parseInt(match[1]);
+      if (val >= 0 && val <= 9999) { // Reasonable export range
+        extractedData.exportUnits = match[1].trim();
+        console.log('✓ Export Units:', extractedData.exportUnits);
         break;
       }
     }
   }
   
   // ==========================================
-  // 5. TOTAL BILL AMOUNT (Critical!)
+  // 5. SOLAR BILL SPECIFIC - IMPORT UNITS
+  // ==========================================
+  const importPatterns = [
+    /IMPORT(?:ED)?\s*(?:UNITS?|ENERGY|KWH)?\s*:?\s*(\d{1,6})/i,
+    /IMP(?:ORT)?\s*:?\s*(\d{1,6})/i,
+    /UNITS?\s*IMPORT(?:ED)?\s*:?\s*(\d{1,6})/i,
+    /ENERGY\s*IMPORT(?:ED)?\s*:?\s*(\d{1,6})/i,
+    /PURCHASED\s*(?:FROM\s*GRID)?\s*:?\s*(\d{1,6})/i,
+    /GRID\s*SUPPLY\s*:?\s*(\d{1,6})/i,
+    /IMPORT\s*READING\s*:?\s*(\d{1,6})/i,
+    
+    // Pattern: "Import" followed by number
+    /IMPORT[\s\S]{0,30}?(\d{1,6})/i,
+    
+    // Look for I01/I02 meter reading labels
+    /I\s*0?[12]\s*:?\s*(\d{1,6})/i
+  ];
+  
+  for (let pattern of importPatterns) {
+    const match = text.match(pattern);
+    if (match && match[1]) {
+      const val = parseInt(match[1]);
+      if (val >= 0 && val <= 9999) {
+        extractedData.importUnits = match[1].trim();
+        console.log('✓ Import Units:', extractedData.importUnits);
+        break;
+      }
+    }
+  }
+  
+  // ==========================================
+  // 6. GROSS UNITS (Total Consumption)
+  // ==========================================
+  const grossPatterns = [
+    // Explicit "Gross" labels
+    /GROSS\s*(?:UNITS?|CONSUMPTION|ENERGY)?\s*:?\s*(\d{1,6})/i,
+    /GROSS\s*:?\s*(\d{1,6})/i,
+    
+    // Total consumption patterns
+    /TOTAL\s*CONSUMPTION\s*:?\s*(\d{1,6})/i,
+    /NET\s*CONSUMPTION\s*:?\s*(\d{1,6})/i,
+    /CONSUMPTION\s*:?\s*(\d{1,6})/i,
+    /UNITS?\s*CONSUMED\s*:?\s*(\d{1,6})/i,
+    
+    // Current - Previous = Consumption
+    /CURRENT\s*(?:READING)?\s*:?\s*(\d{4,7})[\s\S]{0,50}PREVIOUS\s*(?:READING)?\s*:?\s*(\d{4,7})/i,
+    /PRESENT\s*:?\s*(\d{4,7})[\s\S]{0,50}LAST\s*:?\s*(\d{4,7})/i,
+    
+    // KWH patterns (but not too high numbers)
+    /KWH\s*:?\s*(\d{1,6})\b/i,
+    /KWHR\s*:?\s*(\d{1,6})\b/i,
+    
+    // Sometimes just "UNITS" with number
+    /\bUNITS\s*:?\s*(\d{1,6})\b/i,
+    /\bUNIT\s*:?\s*(\d{1,6})\b/i
+  ];
+  
+  for (let pattern of grossPatterns) {
+    const match = text.match(pattern);
+    if (match && match[1]) {
+      let units = match[1];
+      
+      // If pattern has 2 groups (current - previous), calculate difference
+      if (match[2]) {
+        const current = parseInt(match[1]);
+        const previous = parseInt(match[2]);
+        units = Math.abs(current - previous).toString();
+      }
+      
+      const unitsNum = parseInt(units);
+      
+      // Sanity checks
+      if (unitsNum >= 1 && unitsNum <= 9999) {
+        // Make sure it's NOT the same as total bill amount
+        if (extractedData.totalBill && units === extractedData.totalBill) {
+          console.log('⚠️ Skipping units - same as total bill:', units);
+          continue;
+        }
+        
+        // Make sure it's NOT the same as fixed charges
+        if (extractedData.fixedCharges && units === extractedData.fixedCharges) {
+          console.log('⚠️ Skipping units - same as fixed charges:', units);
+          continue;
+        }
+        
+        extractedData.grossUnits = units.trim();
+        console.log('✓ Gross Units:', extractedData.grossUnits);
+        break;
+      }
+    }
+  }
+  
+  // ==========================================
+  // 7. TOTAL BILL AMOUNT (Do this BEFORE units!)
   // ==========================================
   const amountPatterns = [
-    // Total amount variations
     /TOTAL\s*(?:AMOUNT|BILL|CHARGES?)?\s*(?:DUE|PAYABLE)?\s*:?\s*(?:RS\.?|₹)?\s*(\d{1,6}(?:\.\d{2})?)/i,
-    /NET\s*AMOUNT\s*(?:PAYABLE)?\s*:?\s*(?:RS\.?|₹)?\s*(\d{1,6}(?:\.\d{2})?)/i,
+    /NET\s*AMOUNT\s*:?\s*(?:RS\.?|₹)?\s*(\d{1,6}(?:\.\d{2})?)/i,
     /AMOUNT\s*PAYABLE\s*:?\s*(?:RS\.?|₹)?\s*(\d{1,6}(?:\.\d{2})?)/i,
     /BILL\s*AMOUNT\s*:?\s*(?:RS\.?|₹)?\s*(\d{1,6}(?:\.\d{2})?)/i,
     /CURRENT\s*BILL\s*:?\s*(?:RS\.?|₹)?\s*(\d{1,6}(?:\.\d{2})?)/i,
-    /TOTAL\s*:?\s*(?:RS\.?|₹)?\s*(\d{1,6}(?:\.\d{2})?)/i,
-    
-    // "TO BE PAID" or "PAY"
-    /(?:TO\s*BE\s*)?PAID?\s*:?\s*(?:RS\.?|₹)?\s*(\d{1,6}(?:\.\d{2})?)/i,
     /PAYABLE\s*:?\s*(?:RS\.?|₹)?\s*(\d{1,6}(?:\.\d{2})?)/i,
-    
-    // Just "₹ 1850" or "Rs 1850"
-    /(?:RS\.?|₹)\s*(\d{1,6}(?:\.\d{2})?)/i,
-    
-    // "AMOUNT" followed by number in next 10 chars
-    /AMOUNT[\s:]{0,10}(\d{1,6})/i
+    /(?:RS\.?|₹)\s*(\d{1,6}(?:\.\d{2})?)\s*(?:ONLY)?$/im // Amount at end of line
   ];
   
-  // Try to find highest amount (usually total bill)
   let maxAmount = 0;
   for (let pattern of amountPatterns) {
     const match = text.match(pattern);
     if (match && match[1]) {
       const amount = parseFloat(match[1]);
-      if (amount > maxAmount && amount < 100000) { // Sanity check
+      if (amount > maxAmount && amount >= 100 && amount < 100000) {
         maxAmount = amount;
         extractedData.totalBill = match[1].trim();
       }
@@ -518,32 +567,32 @@ function extractFields(text) {
   }
   
   if (extractedData.totalBill) {
-    console.log('Total Bill found:', extractedData.totalBill);
+    console.log('✓ Total Bill:', extractedData.totalBill);
   }
   
   // ==========================================
-  // 6. FIXED CHARGES
+  // 8. FIXED CHARGES
   // ==========================================
   const fixedPatterns = [
     /FIXED\s*CHARGES?\s*:?\s*(?:RS\.?|₹)?\s*(\d{1,6}(?:\.\d{2})?)/i,
-    /FIX\s*CHG\s*:?\s*(?:RS\.?|₹)?\s*(\d{1,6}(?:\.\d{2})?)/i,
+    /FIX(?:ED)?\s*CHG\s*:?\s*(?:RS\.?|₹)?\s*(\d{1,6}(?:\.\d{2})?)/i,
     /FIXED\s*:?\s*(?:RS\.?|₹)?\s*(\d{1,6}(?:\.\d{2})?)/i,
-    /F\.CHARGES?\s*:?\s*(?:RS\.?|₹)?\s*(\d{1,6}(?:\.\d{2})?)/i
+    /F\.?\s*CHARGE\s*:?\s*(?:RS\.?|₹)?\s*(\d{1,6}(?:\.\d{2})?)/i,
+    /MINIMUM\s*CHARGE\s*:?\s*(?:RS\.?|₹)?\s*(\d{1,6}(?:\.\d{2})?)/i
   ];
   
   for (let pattern of fixedPatterns) {
     const match = text.match(pattern);
     if (match && match[1]) {
       extractedData.fixedCharges = match[1].trim();
-      console.log('Fixed Charges found:', extractedData.fixedCharges);
+      console.log('✓ Fixed Charges:', extractedData.fixedCharges);
       break;
     }
   }
   
   // ==========================================
-  // 7. BILL PERIOD DATES
+  // 9. BILL PERIOD DATES
   // ==========================================
-  // Look for dates in format DD/MM/YYYY or DD-MM-YYYY
   const datePattern = /(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/g;
   const dates = [];
   let match;
@@ -555,58 +604,78 @@ function extractFields(text) {
   console.log('Dates found:', dates);
   
   if (dates.length >= 2) {
-    // Usually first date is "From" and last date is "To"
-    extractedData.billFrom = convertDate(dates[0]);
-    extractedData.billTo = convertDate(dates[dates.length - 1]);
-    console.log('Bill Period:', extractedData.billFrom, 'to', extractedData.billTo);
+    // Look for "FROM" and "TO" keywords
+    const fromMatch = text.match(/FROM\s*(?:DATE)?\s*:?\s*(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/i);
+    const toMatch = text.match(/TO\s*(?:DATE)?\s*:?\s*(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/i);
+    
+    if (fromMatch && toMatch) {
+      extractedData.billFrom = convertDate(fromMatch[1]);
+      extractedData.billTo = convertDate(toMatch[1]);
+    } else {
+      // Assume first date is FROM, last is TO
+      extractedData.billFrom = convertDate(dates[0]);
+      extractedData.billTo = convertDate(dates[dates.length - 1]);
+    }
+    
+    console.log('✓ Bill Period:', extractedData.billFrom, 'to', extractedData.billTo);
   }
   
   // ==========================================
-  // 8. FALLBACK: LOOK FOR ANY REASONABLE NUMBERS
+  // 10. SMART FALLBACKS
   // ==========================================
   
-  // If units not found, look for reasonable consumption value
+  // If gross units still not found, try to find it from context
   if (!extractedData.grossUnits) {
-    // Look for standalone numbers between 1-9999 (likely units)
-    const possibleUnits = text.match(/\b([1-9]\d{0,3})\b/g);
-    if (possibleUnits && possibleUnits.length > 0) {
-      // Take first reasonable number as units (educated guess)
-      for (let num of possibleUnits) {
-        const val = parseInt(num);
-        if (val >= 50 && val <= 9999) { // Typical consumption range
-          extractedData.grossUnits = num;
-          console.log('Units (fallback):', num);
-          break;
+    // Look for standalone numbers that could be units (not amounts)
+    const lines = text.split('\n');
+    for (let line of lines) {
+      // Skip lines with Rs/₹ (those are amounts)
+      if (line.match(/RS\.?|₹/i)) continue;
+      
+      // Look for reasonable unit numbers
+      const nums = line.match(/\b([1-9]\d{1,3})\b/g);
+      if (nums) {
+        for (let num of nums) {
+          const val = parseInt(num);
+          // Typical consumption: 50-9999
+          if (val >= 50 && val <= 9999) {
+            // Make sure not same as total bill
+            if (extractedData.totalBill && num === extractedData.totalBill) continue;
+            if (extractedData.fixedCharges && num === extractedData.fixedCharges.split('.')[0]) continue;
+            
+            extractedData.grossUnits = num;
+            console.log('✓ Gross Units (fallback):', num);
+            break;
+          }
         }
+        if (extractedData.grossUnits) break;
       }
     }
   }
   
-  // If amount not found, look for numbers with Rs/₹
-  if (!extractedData.totalBill) {
-    const rupeeAmounts = text.match(/(?:RS\.?|₹)\s*(\d{2,6})/gi);
-    if (rupeeAmounts && rupeeAmounts.length > 0) {
-      // Take highest amount
-      let maxAmt = 0;
-      for (let amt of rupeeAmounts) {
-        const num = parseInt(amt.match(/\d+/)[0]);
-        if (num > maxAmt && num < 100000) {
-          maxAmt = num;
-          extractedData.totalBill = num.toString();
-        }
-      }
-      if (extractedData.totalBill) {
-        console.log('Total Bill (fallback):', extractedData.totalBill);
-      }
-    }
+  // If export/import found but not gross, calculate it
+  if (!extractedData.grossUnits && extractedData.importUnits && extractedData.exportUnits) {
+    const importVal = parseInt(extractedData.importUnits);
+    const exportVal = parseInt(extractedData.exportUnits);
+    extractedData.grossUnits = (importVal + exportVal).toString();
+    console.log('✓ Gross calculated from Import+Export:', extractedData.grossUnits);
   }
   
   // ==========================================
-  // 9. FINAL LOG
+  // 11. FINAL VALIDATION
   // ==========================================
-  console.log('Final Extracted Data:', extractedData);
   
-  // Show results
+  // Remove duplicates (if units = total bill, clear units)
+  if (extractedData.grossUnits && extractedData.totalBill) {
+    if (extractedData.grossUnits === extractedData.totalBill) {
+      console.log('⚠️ Clearing duplicate units (matched total bill)');
+      delete extractedData.grossUnits;
+    }
+  }
+  
+  console.log('=== FINAL EXTRACTED DATA ===');
+  console.log(extractedData);
+  
   displayResults();
 }
 
