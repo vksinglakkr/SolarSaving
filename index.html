@@ -4666,49 +4666,63 @@ window.addEventListener('message', function(event) {
       return dateStr;
     }
     
-    // Smart field setter - only sets if field exists
-    function setFieldIfExists(id, value) {
+    // Smart field setter
+    function setField(id, value) {
       const element = document.getElementById(id);
-      if (element) {
-        element.value = value || '';
-        console.log(`✓ Set ${id}:`, value);
+      if (element && value !== null && value !== undefined) {
+        element.value = value;
+        console.log(`✓ Set ${id}: ${value}`);
         return true;
       }
       return false;
     }
     
     // ==============================================
-    // SET ALL 12 FIELDS (works for both forms)
+    // DETECT FORM TYPE
     // ==============================================
+    const isSaveEntry = document.getElementById('billNumber') !== null;
+    const formType = isSaveEntry ? 'Save Entry' : 'Quick Entry';
     
-    // Basic Info (3 fields)
-    setFieldIfExists('billNumber', data.billNumber);
-    setFieldIfExists('accountNumber', data.accountNumber);
-    setFieldIfExists('meterNumber', data.meterNumber);
-    
-    // Dates (2 fields) - with conversion
-    setFieldIfExists('billFrom', convertDate(data.billFrom));
-    setFieldIfExists('billTo', convertDate(data.billTo));
-    
-    // Solar & Units (4 fields)
-    setFieldIfExists('solarGenerated', data.solarGenerated);
-    setFieldIfExists('importUnits', data.importUnits);
-    setFieldIfExists('exportUnits', data.exportUnits);
-    setFieldIfExists('grossUnits', data.grossUnits);
-    
-    // Amounts (3 fields)
-    setFieldIfExists('totalBill', data.totalBill);
-    setFieldIfExists('fixedCharges', data.fixedCharges);
-    setFieldIfExists('arrears', data.arrears);
+    console.log(`=== FORM TYPE: ${formType} ===`);
     
     // ==============================================
-    // DETERMINE WHICH FORM IS ACTIVE
+    // SET FIELDS BASED ON FORM TYPE
     // ==============================================
     
-    const hasAccountNumber = document.getElementById('accountNumber');
-    const formType = hasAccountNumber ? 'Save Entry' : 'Quick Entry';
+    if (isSaveEntry) {
+      // SAVE ENTRY: Set ALL 12 fields
+      console.log('Setting all 12 fields...');
+      
+      setField('billNumber', data.billNumber);
+      setField('accountNumber', data.accountNumber);
+      setField('meterNumber', data.meterNumber);
+      setField('billFrom', convertDate(data.billFrom));
+      setField('billTo', convertDate(data.billTo));
+      setField('solarGenerated', data.solarGenerated);
+      setField('importUnits', data.importUnits);
+      setField('exportUnits', data.exportUnits);
+      setField('grossUnits', data.grossUnits);
+      setField('totalBill', data.totalBill);
+      setField('fixedCharges', data.fixedCharges);
+      setField('arrears', data.arrears);
+      
+    } else {
+      // QUICK ENTRY: Set 9 fields (exclude Bill/Account/Meter)
+      console.log('Setting 9 fields (excluding Bill/Account/Meter)...');
+      
+      // SKIP: billNumber, accountNumber, meterNumber
+      
+      setField('billFrom', convertDate(data.billFrom));
+      setField('billTo', convertDate(data.billTo));
+      setField('solarGenerated', data.solarGenerated);
+      setField('importUnits', data.importUnits);
+      setField('exportUnits', data.exportUnits);
+      setField('grossUnits', data.grossUnits);
+      setField('totalBill', data.totalBill);
+      setField('fixedCharges', data.fixedCharges);
+      setField('arrears', data.arrears);
+    }
     
-    console.log('=== FORM TYPE: ' + formType + ' ===');
     console.log('✅ Data transfer complete!');
     
     // Close scanner modal
