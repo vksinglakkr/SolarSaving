@@ -4649,60 +4649,76 @@ function handleHome() {
 // BILL SCANNER COMMUNICATION
 // ==========================================
 
-// Listen for messages from scanner iframe
 window.addEventListener('message', function(event) {
-  // Security: verify origin if needed
-  // if (event.origin !== "your-domain.com") return;
-  
   if (event.data.type === 'SCAN_COMPLETE') {
     const data = event.data.payload;
     
-    // Auto-fill form fields
-    if (data.billNumber) {
-      const field = document.getElementById('billNumber');
-      if (field) field.value = data.billNumber;
-    }
-    if (data.meterNumber) {
-      const field = document.getElementById('meter');
-      if (field) field.value = data.meterNumber;
-    }
-    if (data.accountNumber) {
-      const field = document.getElementById('accountNum');
-      if (field) field.value = data.accountNumber;
-    }
-    if (data.grossUnits) {
-      const field = document.getElementById('gross');
-      if (field) field.value = data.grossUnits;
-    }
-    if (data.totalBill) {
-      const field = document.getElementById('totalBill');
-      if (field) field.value = data.totalBill;
-    }
-    if (data.billFrom) {
-      const field = document.getElementById('billFrom');
-      if (field) field.value = data.billFrom;
-    }
-    if (data.billTo) {
-      const field = document.getElementById('billTo');
-      if (field) field.value = data.billTo;
-    }
-    if (data.fixedCharges) {
-      const field = document.getElementById('fixed');
-      if (field) field.value = data.fixedCharges;
+    console.log('=== RECEIVED DATA ===');
+    console.log(data);
+    
+    // Helper function to set field value
+    function setField(id, value) {
+      const element = document.getElementById(id);
+      if (element) {
+        element.value = value || '';
+        console.log(`✓ Set ${id}:`, value);
+      } else {
+        console.warn(`⚠️ Field not found: ${id}`);
+      }
     }
     
-    // Close modal
-    closeBillScanner();
+    // Date converter (DD/MM/YYYY → YYYY-MM-DD)
+    function convertDate(dateStr) {
+      if (!dateStr) return '';
+      const parts = dateStr.split('/');
+      if (parts.length === 3) {
+        return `${parts[2]}-${parts[1]}-${parts[0]}`;
+      }
+      return dateStr;
+    }
     
-    // Show success
-    showCustomModal('✅', 'Auto-Filled!', 'Please verify the values and fill any missing fields.', 'success');
+    // Map all fields (try multiple possible field names)
+    setField('billNumber', data.billNumber);
+    setField('accountNumber', data.accountNumber);
+    setField('meterNumber', data.meterNumber);
     
-    // Scroll to form
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-  
-  if (event.data.type === 'SCAN_CANCELLED') {
-    closeBillScanner();
+    // Dates - try different formats
+    const fromDate = convertDate(data.billFrom);
+    const toDate = convertDate(data.billTo);
+    
+    setField('billFrom', fromDate);
+    setField('dateFrom', fromDate);
+    setField('fromDate', fromDate);
+    
+    setField('billTo', toDate);
+    setField('dateTo', toDate);
+    setField('toDate', toDate);
+    
+    // Import/Export - try different field names
+    setField('importUnits', data.importUnits);
+    setField('import', data.importUnits);
+    setField('unitsImport', data.importUnits);
+    
+    setField('exportUnits', data.exportUnits);
+    setField('export', data.exportUnits);
+    setField('unitsExport', data.exportUnits);
+    
+    // Other fields
+    setField('solarGenerated', data.solarGenerated);
+    setField('solar', data.solarGenerated);
+    
+    setField('grossUnits', data.grossUnits);
+    setField('totalBill', data.totalBill);
+    setField('fixedCharges', data.fixedCharges);
+    setField('arrears', data.arrears);
+    
+    // Close scanner modal/iframe
+    const scannerModal = document.getElementById('scannerModal');
+    if (scannerModal) {
+      scannerModal.style.display = 'none';
+    }
+    
+    console.log('=== DATA TRANSFER COMPLETE ===');
   }
 });
 // Show scanner button when form mode selected
