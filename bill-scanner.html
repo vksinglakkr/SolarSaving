@@ -176,6 +176,7 @@
 </div>
 
 <script>
+const N8N_WEBHOOK_URL = 'https://n8n-workflow-test.duckdns.org/webhook/scan-bill';
 // ==========================================
 // BILL SCANNER LOGIC
 // ==========================================
@@ -252,42 +253,54 @@ async function preprocessImage(imageSrc) {
   });
 }
 
-// Modify runOCR to use preprocessing:
-async function runOCR(imageSrc) {
+async function runOCR(imageFile) {
   document.getElementById('progressSection').style.display = 'block';
   document.getElementById('resultsSection').style.display = 'none';
   
   try {
-    // Preprocess image for better OCR
-    document.getElementById('progressText').textContent = 'Enhancing image...';
-    const processedImage = await preprocessImage(imageSrc);
+    updateScanStatus('Uploading image...', 20);
     
-    document.getElementById('progressText').textContent = 'Reading text...';
+    // Create FormData
+    const formData = new FormData();
+    formData.append('data', imageFile);
     
-    const { data: { text } } = await Tesseract.recognize(
-      processedImage, // Use processed image
-      'eng',
-      {
-        logger: m => {
-          if (m.status === 'recognizing text') {
-            const progress = Math.round(m.progress * 100);
-            document.getElementById('progressText').textContent = `Scanning... ${progress}%`;
-            document.getElementById('progressBar').style.width = progress + '%';
-          }
-        }
-      }
-    );
+    updateScanStatus('AI is analyzing...', 40);
     
-    console.log('OCR Text:', text);
-    extractFields(text);
+    // Send to n8n webhook
+    const response = await fetch(N8N_WEBHOOK_URL, {
+      method: 'POST',
+      body: formData
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Server error: ${response.status}`);
+    }
+    
+    updateScanStatus('Extracting fields...', 70);
+    
+    const result = await response.json();
+    
+    console.log('✓ n8n Response:', result);
+    
+    if (result.success && result.data) {
+      // Store extracted data
+      window.extractedData = result.data;
+      
+      updateScanStatus('Complete!', 100);
+      
+      // Display results
+      displayExtractedData();
+    } else {
+      throw new Error('No data extracted');
+    }
     
   } catch (error) {
-    console.error('OCR Error:', error);
-    alert('Failed to scan bill. Please try with a clearer image.');
+    console.error('Scan Error:', error);
+    alert('Failed to scan bill: ' + error.message);
     resetScanner();
   }
 }
-  
+
 // Process file
 function handleFile(file) {
   // Validate
@@ -344,7 +357,13 @@ async function runOCR(imageSrc) {
     resetScanner();
   }
 }
-
+function updateScanStatus(message, progress) {
+  const statusEl = document.getElementById('scanStatus');
+  const progressEl = document.getElementById('scanProgressBar');
+  
+  if (statusEl) statusEl.textContent = message;
+  if (progressEl) progressEl.style.width = progress + '%';
+}
 function extractFields(text) {
   extractedData = {};
   
