@@ -4653,72 +4653,83 @@ window.addEventListener('message', function(event) {
   if (event.data.type === 'SCAN_COMPLETE') {
     const data = event.data.payload;
     
-    console.log('=== RECEIVED SCAN DATA ===');
-    console.log(data);
+    console.log('=== SCAN DATA ===');
     
-    // Date converter
-    function convertDate(dateStr) {
-      if (!dateStr) return '';
-      const parts = dateStr.split('/');
-      if (parts.length === 3) {
-        return `${parts[2]}-${parts[1]}-${parts[0]}`;
-      }
-      return dateStr;
+    function convertDate(d) {
+      if (!d) return '';
+      const p = d.split('/');
+      return `${p[2]}-${p[1]}-${p[0]}`;
     }
     
-    // Simple field setter
-    function setField(id, value) {
+    function set(id, val) {
       const el = document.getElementById(id);
-      if (el && value != null) {
-        el.value = value;
-        console.log(`✓ Set ${id}: ${value}`);
-        return true;
+      if (el && val != null) {
+        el.value = val;
+        console.log(`✓ ${id}: ${val}`);
       }
-      return false;
     }
     
-    // Detect form type
     const isSave = document.getElementById('billNumber') !== null;
-    console.log(`=== FORM TYPE: ${isSave ? 'Save Entry' : 'Quick Entry'} ===`);
+    console.log(`Form: ${isSave ? 'Save' : 'Quick'}`);
     
     if (isSave) {
-      // Save Entry: Set identification fields
-      setField('billNumber', data.billNumber);
-      setField('accountNum', data.accountNumber);      // ← accountNum (not accountNumber!)
-      setField('meter', data.meterNumber);             // ← meter (not meterNumber!)
+      set('billNumber', data.billNumber);
+      set('accountNum', data.accountNumber);
+      set('meter', data.meterNumber);
+      set('billFrom', convertDate(data.billFrom));
+      set('billTo', convertDate(data.billTo));
+      set('gross', data.grossUnits);
+      set('importU', data.importUnits);
+      set('exportU', data.exportUnits);
+      set('fixed', data.fixedCharges);
+      set('totalBill', data.totalBill);
+      set('arrears', data.arrears);
+      
+      const oc = (data.solarGenerated || 0) + (data.importUnits || 0) - 
+                 (data.exportUnits || 0) - (data.grossUnits || 0);
+      set('openingCarry', oc);
     }
     
-    // Both forms: Set data fields
-    setField('billFrom', convertDate(data.billFrom));
-    setField('billTo', convertDate(data.billTo));
-    setField('gross', data.grossUnits);                // ← gross (not grossUnits!)
-    setField('importU', data.importUnits);             // ← importU (not importUnits!)
-    setField('exportU', data.exportUnits);             // ← exportU (not exportUnits!)
-    setField('fixed', data.fixedCharges);              // ← fixed (not fixedCharges!)
-    setField('totalBill', data.totalBill);
-    setField('arrears', data.arrears);
-    
-    // Calculate openingCarry if needed
-    // openingCarry = solarGenerated + importUnits - exportUnits - grossUnits
-    if (data.solarGenerated) {
-      const opening = parseInt(data.solarGenerated || 0) + 
-                      parseInt(data.importUnits || 0) - 
-                      parseInt(data.exportUnits || 0) - 
-                      parseInt(data.grossUnits || 0);
-      setField('openingCarry', opening);
-      console.log(`✓ Calculated openingCarry: ${opening}`);
-    }
-    
-    console.log('✅ All fields transferred!');
+    console.log('✅ Done!');
     
     // Close modal
     const modal = document.getElementById('scannerModal');
-    if (modal) modal.style.display = 'none';
+    if (modal) {
+      modal.style.display = 'none';
+    }
+    
+    // ============================================
+    // FIX SCROLL: Re-enable body scroll
+    // ============================================
+    document.body.style.overflow = 'auto';
+    document.body.style.position = 'static';
+    document.documentElement.style.overflow = 'auto';
+    
+    // Remove any modal backdrop
+    const backdrop = document.querySelector('.modal-backdrop');
+    if (backdrop) {
+      backdrop.remove();
+    }
+    
+    // Force scroll to top of form
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+    
+    console.log('✅ Scroll restored!');
   }
   
   if (event.data.type === 'SCAN_CANCELLED') {
     const modal = document.getElementById('scannerModal');
-    if (modal) modal.style.display = 'none';
+    if (modal) {
+      modal.style.display = 'none';
+    }
+    
+    // Also restore scroll on cancel
+    document.body.style.overflow = 'auto';
+    document.body.style.position = 'static';
+    document.documentElement.style.overflow = 'auto';
   }
 });
 // Show scanner button when form mode selected
