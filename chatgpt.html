@@ -225,7 +225,7 @@ input::placeholder { color:#aaa; }
   position: relative;
   z-index: 1;
 }
-
+ 
 /* Badge */
 .intent-badge {
  display: inline-block;
@@ -451,86 +451,296 @@ background: linear-gradient(135deg, #5568d3 0%, #6a3f91 100%);
 #simpleHomeBtn:active {
   transform: scale(0.95);
 }
-/* Gradient Border Style */
-.gradient-input-wrapper {
-  margin-bottom: 1.5rem;
-}
+/* ==========================================
+   COLORFUL CARD INPUT STYLES
+   ========================================== */
 
-.gradient-label {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.card-input-wrapper {
   margin-bottom: 0.75rem;
 }
 
-.gradient-label-text {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #1e293b;
-  background: linear-gradient(135deg, #0ea5e9, #3b82f6);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.gradient-label-hint {
-  font-size: 0.8rem;
-  color: #64748b;
-  font-style: italic;
-}
-
-.gradient-border-box {
-  position: relative;
-  background: linear-gradient(135deg, #0ea5e9, #3b82f6, #8b5cf6);
-  padding: 2px;
-  border-radius: 14px;
+.card-input-container {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
 }
 
-.gradient-border-box:hover {
-  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.2);
+.card-input-container:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-1px);
 }
 
-.gradient-input-inner {
+/* Color schemes for different fields */
+.card-color-blue {
+  background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
+  border: 2px solid #60a5fa;
+}
+
+.card-color-green {
+  background: linear-gradient(135deg, #d1fae5 0%, #ecfdf5 100%);
+  border: 2px solid #34d399;
+}
+
+.card-color-purple {
+  background: linear-gradient(135deg, #e9d5ff 0%, #f5f3ff 100%);
+  border: 2px solid #a78bfa;
+}
+
+.card-color-orange {
+  background: linear-gradient(135deg, #fed7aa 0%, #fef3c7 100%);
+  border: 2px solid #fb923c;
+}
+
+.card-color-red {
+  background: linear-gradient(135deg, #fecaca 0%, #fee2e2 100%);
+  border: 2px solid #f87171;
+}
+
+.card-color-cyan {
+  background: linear-gradient(135deg, #cffafe 0%, #ecfeff 100%);
+  border: 2px solid #22d3ee;
+}
+
+.card-top-bar {
+  height: 4px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+}
+
+.card-content {
+  padding: 0.875rem;
+}
+
+.card-title-row {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.card-input-title {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.card-icon {
+  font-size: 1rem;
+}
+
+.card-hint {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.card-input-field {
+  display: flex;
+  align-items: stretch;
+  gap: 0.5rem;
   background: white;
-  border-radius: 12px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0;
+  transition: all 0.2s ease;
   overflow: hidden;
 }
 
-.gradient-input {
+.card-input-field:focus-within {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.card-input {
   flex: 1;
-  padding: 1rem 1.25rem;
+  padding: 0.75rem 1rem;
   border: none;
-  font-size: 1rem;
-  font-weight: 500;
-  color: #1e293b;
   background: transparent;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #0f172a;
   outline: none;
 }
 
-.gradient-input::placeholder {
+.card-input::placeholder {
   color: #94a3b8;
   font-style: italic;
 }
 
-.gradient-plus-btn {
-  width: 3.5rem;
+.card-action-btn {
+  width: 3rem;
   border: none;
-  background: linear-gradient(135deg, #0ea5e9, #3b82f6);
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
   color: white;
+  font-size: 1.25rem;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.gradient-plus-btn:hover {
-  background: linear-gradient(135deg, #0284c7, #2563eb);
+.card-action-btn:hover {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  transform: scale(1.02);
 }
 
-.gradient-plus-icon {
-  font-size: 1.5rem;
+.card-action-btn:active {
+  transform: scale(0.98);
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .card-content {
+    padding: 0.75rem;
+  }
+  
+  .card-input-title {
+    font-size: 0.8rem;
+  }
+  
+  .card-hint {
+    font-size: 0.7rem;
+  }
+  
+  .card-action-btn {
+    width: 2.5rem;
+    font-size: 1.1rem;
+  }
+}  
+/* Date input specific styles */
+input[type="date"].card-input {
+  cursor: pointer;
+}
+
+input[type="date"].card-input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 0.25rem;
+  border-radius: 4px;
+}
+
+input[type="date"].card-input::-webkit-calendar-picker-indicator:hover {
+  background: #e2e8f0;
+}
+/* ==========================================
+   SECTION CONTAINER STYLES
+   ========================================== */
+
+.section-container {
+  background: white;
+  border: 3px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+}
+
+.section-container:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Different border colors for different sections */
+.section-identity {
+  border-left: 6px solid #8b5cf6;
+  background: linear-gradient(to right, #faf5ff, #ffffff);
+}
+
+.section-period {
+  border-left: 6px solid #f59e0b;
+  background: linear-gradient(to right, #fffbeb, #ffffff);
+}
+
+.section-consumption {
+  border-left: 6px solid #3b82f6;
+  background: linear-gradient(to right, #eff6ff, #ffffff);
+}
+
+/* Section header styles */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.section-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-size: 1.3rem;
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+  border: 2px solid #bfdbfe;
+}
+
+.section-icon-identity {
+  background: linear-gradient(135deg, #f3e8ff, #fae8ff);
+  border-color: #d8b4fe;
+}
+
+.section-icon-period {
+  background: linear-gradient(135deg, #fef3c7, #fef9c3);
+  border-color: #fcd34d;
+}
+
+.section-icon-consumption {
+  background: linear-gradient(135deg, #dbeafe, #eff6ff);
+  border-color: #93c5fd;
+}
+
+.section-title-text {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.section-subtitle {
+  font-size: 0.8rem;
+  color: #64748b;
+  font-weight: 400;
+  display: block;
+  margin-top: 0.2rem;
+}
+
+.section-badge {
+  font-size: 0.7rem;
   font-weight: 600;
+  padding: 0.3rem 0.6rem;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
+
+.badge-required {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.badge-optional {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
 </style>
 </head>
 
@@ -723,16 +933,23 @@ background: linear-gradient(135deg, #5568d3 0%, #6a3f91 100%);
     <div id="limitWarningBox" style="margin-top: 1rem;"></div>
   </div>
 </div>
-<!-- Simple Download Link -->
-<div style="text-align: center; padding: 1rem; background: #f0f9ff; border-radius: 8px; margin-bottom: 1rem;">
-  <p style="margin: 0; color: #0369a1;">
-    📄 Don't have your bill? 
-    <a href="https://uhbvn.org.in/web/portal/view-bill" 
-       target="_blank" 
-       style="color: #0284c7; font-weight: 600; text-decoration: underline;">
-      Download from UHBVN/DHBVN
-    </a>
-  </p>
+<div style="text-align: center; margin: 0.5rem 0;">
+  <div style="display: inline-block; padding: 0.5rem 1.5rem; background: linear-gradient(135deg, #dbeafe, #bfdbfe); border-radius: 30px; box-shadow: 0 3px 8px rgba(59, 130, 246, 0.15);">
+    <div style="color: #0c4a6e; font-size: 0.9rem; font-weight: 700; margin-bottom: 0.3rem;">
+      📄 Don't have your bill?
+    </div>
+    <div style="display: flex; gap: 0.8rem; align-items: center; justify-content: center;">
+      <a href="https://uhbvn.org.in/web/portal/view-bill" target="_blank" 
+         style="display: inline-flex; align-items: center; padding: 0.25rem 0.8rem; background: white; color: #0284c7; font-weight: 700; font-size: 0.85rem; border-radius: 15px; text-decoration: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        ⬇️ UHBVN
+      </a>
+      <span style="color: #94a3b8; font-size: 0.75rem;">or</span>
+      <a href="https://dhbvn.org.in/web/portal/view-bill" target="_blank" 
+         style="display: inline-flex; align-items: center; padding: 0.25rem 0.8rem; background: white; color: #0284c7; font-weight: 700; font-size: 0.85rem; border-radius: 15px; text-decoration: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        ⬇️ DHBVN
+      </a>
+    </div>
+  </div>
 </div>
     
 
@@ -808,85 +1025,264 @@ background: linear-gradient(135deg, #5568d3 0%, #6a3f91 100%);
   <button class="btn btn-secondary w-100 mt-3" onclick="logout()">Logout</button>
 </div>
 
-<!-- IDENTITY -->
-<div class="card p-3 mb-3 d-none" id="identitySection">
-  <h6>Consumer Identification</h6>
-  <label>Bill Number (e.g. 123456)</label>
-  <input id="billNumber" class="form-control mb-2" placeholder="Enter bill number">
-  <label>Meter Number (e.g. 24600455)</label>
-  <input id="meter" class="form-control mb-2" placeholder="Enter meter number">
-  <label>Account Number (e.g. ACC12345)</label>
-  <input id="accountNum" class="form-control" placeholder="Enter account number">
+<!-- IDENTITY SECTION WITH CONTAINER -->
+<div class="d-none" id="identitySection">
+  <div class="section-container section-identity">
+    
+    <!-- Section Header -->
+    <div class="section-header">
+      <div class="section-title">
+        <div class="section-icon section-icon-identity">
+          👤
+        </div>
+        <div>
+          <h6 class="section-title-text">Consumer Identification</h6>
+          <small class="section-subtitle">Enter your bill details for secure storage</small>
+        </div>
+      </div>
+      <span class="section-badge badge-required">Required</span>
+    </div>
+
+    <!-- Bill Number - Indigo Card -->
+    <div class="card-input-wrapper">
+      <div class="card-input-container" style="background: linear-gradient(135deg, #e0e7ff, #eef2ff); border: 2px solid #818cf8;">
+        <div class="card-top-bar"></div>
+        <div class="card-content">
+          <div class="card-title-row">
+            <h6 class="card-input-title">
+              <span class="card-icon">📄</span>
+              Bill Number
+            </h6>
+            <span class="card-hint">e.g. 123456</span>
+          </div>
+          <div class="card-input-field">
+            <input id="billNumber"
+                   type="text"
+                   inputmode="numeric"
+                   class="card-input"
+                   placeholder="Enter bill number">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Meter Number - Teal Card -->
+    <div class="card-input-wrapper">
+      <div class="card-input-container" style="background: linear-gradient(135deg, #ccfbf1, #f0fdfa); border: 2px solid #2dd4bf;">
+        <div class="card-top-bar"></div>
+        <div class="card-content">
+          <div class="card-title-row">
+            <h6 class="card-input-title">
+              <span class="card-icon">📟</span>
+              Meter Number
+            </h6>
+            <span class="card-hint">e.g. 24600455</span>
+          </div>
+          <div class="card-input-field">
+            <input id="meter"
+                   type="text"
+                   inputmode="numeric"
+                   class="card-input"
+                   placeholder="Enter meter number">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Account Number - Pink Card -->
+    <div class="card-input-wrapper">
+      <div class="card-input-container" style="background: linear-gradient(135deg, #fce7f3, #fdf2f8); border: 2px solid #f472b6;">
+        <div class="card-top-bar"></div>
+        <div class="card-content">
+          <div class="card-title-row">
+            <h6 class="card-input-title">
+              <span class="card-icon">🔑</span>
+              Account Number
+            </h6>
+            <span class="card-hint">e.g. ACC12345</span>
+          </div>
+          <div class="card-input-field">
+            <input id="accountNum"
+                   type="text"
+                   class="card-input"
+                   placeholder="Enter account number">
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+<!-- BILL PERIOD SECTION WITH CONTAINER -->
+<div class="d-none" id="billPeriodSection">
+  <div class="section-container section-period">
+    
+    <!-- Section Header -->
+    <div class="section-header">
+      <div class="section-title">
+        <div class="section-icon section-icon-period">
+          📅
+        </div>
+        <div>
+          <h6 class="section-title-text">Bill Period</h6>
+          <small class="section-subtitle">Select billing start and end dates</small>
+        </div>
+      </div>
+      <span class="section-badge badge-required">Required</span>
+    </div>
+
+    <!-- From Date - Amber Card -->
+    <div class="card-input-wrapper">
+      <div class="card-input-container" style="background: linear-gradient(135deg, #fef3c7, #fffbeb); border: 2px solid #fbbf24;">
+        <div class="card-top-bar"></div>
+        <div class="card-content">
+          <div class="card-title-row">
+            <h6 class="card-input-title">
+              <span class="card-icon">📆</span>
+              From Date
+            </h6>
+            <span class="card-hint">Start date</span>
+          </div>
+          <div class="card-input-field">
+            <input id="billFrom"
+                   type="date"
+                   class="card-input"
+                   style="cursor: pointer;">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- To Date - Lime Card -->
+    <div class="card-input-wrapper">
+      <div class="card-input-container" style="background: linear-gradient(135deg, #d9f99d, #ecfccb); border: 2px solid #a3e635;">
+        <div class="card-top-bar"></div>
+        <div class="card-content">
+          <div class="card-title-row">
+            <h6 class="card-input-title">
+              <span class="card-icon">📆</span>
+              To Date
+            </h6>
+            <span class="card-hint">End date</span>
+          </div>
+          <div class="card-input-field">
+            <input id="billTo"
+                   type="date"
+                   class="card-input"
+                   style="cursor: pointer;">
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </div>
 
-<!-- BILL PERIOD -->
-<div class="card p-3 mb-3 d-none" id="billPeriodSection">
-  <h6>Bill Period</h6>
-  <label>From</label>
-  <input type="date" id="billFrom" class="form-control mb-2">
-  <label>To</label>
-  <input type="date" id="billTo" class="form-control">
-</div>
-
-<!-- CONSUMPTION -->
-<div class="card p-3 mb-3 d-none" id="consumptionSection">
-  <h6>Consumption & Charges</h6>
-<!-- Gradient Border Input -->
-<div class="gradient-input-wrapper mb-3">
-  <label class="gradient-label">
-    <span class="gradient-label-text">Gross Units</span>
-    <span class="gradient-label-hint">Enter consumption units</span>
-  </label>
-  <div class="gradient-border-box">
-    <div class="gradient-input-inner">
-      <input id="gross"
-             type="text"
-             inputmode="numeric"
-             class="gradient-input"
-             placeholder="e.g. 1354"
-             oninput="handleNumericInput(this)">
-      <button class="gradient-plus-btn" 
-              type="button"
-              onclick="appendPlus('gross')">
-        <span class="gradient-plus-icon">+</span>
-      </button>
+<!-- CONSUMPTION SECTION WITH CONTAINER -->
+<div class="d-none" id="consumptionSection">
+  <div class="section-container section-consumption">
+    
+    <!-- Section Header -->
+    <div class="section-header">
+      <div class="section-title">
+        <div class="section-icon section-icon-consumption">
+          ⚡
+        </div>
+        <div>
+          <h6 class="section-title-text">Consumption & Charges</h6>
+          <small class="section-subtitle">Enter units and billing amounts</small>
+        </div>
+      </div>
+      <span class="section-badge badge-required">Required</span>
+    </div>
+<!-- Gross Units - Blue Card -->
+<div class="card-input-wrapper">
+  <div class="card-input-container card-color-blue">
+    <div class="card-top-bar"></div>
+    <div class="card-content">
+      <div class="card-title-row">
+        <h6 class="card-input-title">
+          <span class="card-icon">⚡</span>
+          Gross Units
+        </h6>
+        <span class="card-hint">e.g. 1354</span>
+      </div>
+      <div class="card-input-field">
+        <input id="gross"
+               type="text"
+               inputmode="numeric"
+               class="card-input"
+               placeholder="Enter value"
+               oninput="handleNumericInput(this)">
+        <button class="card-action-btn" 
+                type="button"
+                onclick="appendPlus('gross')">
+          +
+        </button>
+      </div>
     </div>
   </div>
 </div>
 
-
-  <label>Import Units (e.g. 1114)</label>
- <div class="input-group mb-2">
-  <input id="importU"
-    type="text"
-    inputmode="numeric"
-    class="form-control"
-    placeholder="Enter value"
-oninput="handleNumericInput(this)"
-onblur="validateUnits()">
-
-  <button class="btn btn-outline-secondary"
-          type="button"
-          onclick="appendPlus('importU')">
-    +
-  </button>
+<!-- Import Units - Green Card -->
+<div class="card-input-wrapper">
+  <div class="card-input-container card-color-green">
+    <div class="card-top-bar"></div>
+    <div class="card-content">
+      <div class="card-title-row">
+        <h6 class="card-input-title">
+          <span class="card-icon">📥</span>
+          Import Units
+        </h6>
+        <span class="card-hint">e.g. 1114</span>
+      </div>
+      <div class="card-input-field">
+        <input id="importU"
+               type="text"
+               inputmode="numeric"
+               class="card-input"
+               placeholder="Enter value"
+               oninput="handleNumericInput(this)"
+               onblur="validateUnits()">
+        <button class="card-action-btn" 
+                type="button"
+                onclick="appendPlus('importU')"
+                style="background: linear-gradient(135deg, #10b981, #059669);">
+          +
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
-
-  <label>Export Units (e.g. 944)</label>
- <div class="input-group mb-2">
-  <input id="exportU"
-    type="text"
-    inputmode="numeric"
-    class="form-control"
-    placeholder="Enter value"
-oninput="handleNumericInput(this)"
-onblur="validateUnits()">
-
-  <button class="btn btn-outline-secondary"
-          type="button"
-          onclick="appendPlus('exportU')">
-    +
-  </button>
+<!-- Export Units - Purple Card -->
+<div class="card-input-wrapper">
+  <div class="card-input-container card-color-purple">
+    <div class="card-top-bar"></div>
+    <div class="card-content">
+      <div class="card-title-row">
+        <h6 class="card-input-title">
+          <span class="card-icon">📤</span>
+          Export Units
+        </h6>
+        <span class="card-hint">e.g. 944</span>
+      </div>
+      <div class="card-input-field">
+        <input id="exportU"
+               type="text"
+               inputmode="numeric"
+               class="card-input"
+               placeholder="Enter value"
+               oninput="handleNumericInput(this)"
+               onblur="validateUnits()">
+        <button class="card-action-btn" 
+                type="button"
+                onclick="appendPlus('exportU')"
+                style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+          +
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 <!-- ==========================================
      ENHANCED OPENING CARRY FORWARD FIELD
@@ -923,58 +1319,95 @@ onblur="validateUnits()">
 </div>
 
   
-  <label>Fixed Charges ₹ (e.g. 1605)</label>
- <div class="input-group mb-2">
-  <input id="fixed"
-    type="text"
-    inputmode="numeric"
-    class="form-control"
-    placeholder="Enter amount"
-oninput="handleNumericInput(this)">
-
-  <button class="btn btn-outline-secondary"
-          type="button"
-          onclick="appendPlus('fixed')">
-    +
-  </button>
+ <!-- Fixed Charges - Orange Card -->
+<div class="card-input-wrapper">
+  <div class="card-input-container card-color-orange">
+    <div class="card-top-bar"></div>
+    <div class="card-content">
+      <div class="card-title-row">
+        <h6 class="card-input-title">
+          <span class="card-icon">₹</span>
+          Fixed Charges
+        </h6>
+        <span class="card-hint">e.g. 1605</span>
+      </div>
+      <div class="card-input-field">
+        <input id="fixed"
+               type="text"
+               inputmode="numeric"
+               class="card-input"
+               placeholder="Enter amount"
+               oninput="handleNumericInput(this)">
+        <button class="card-action-btn" 
+                type="button"
+                onclick="appendPlus('fixed')"
+                style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+          +
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 
-
-  <label>Total Bill Amount ₹ (e.g. 2700)</label>
- <div class="input-group mb-2">
-  <input id="totalBill"
-    type="text"
-    inputmode="numeric"
-    class="form-control"
-    placeholder="Enter amount"
-oninput="handleNumericInput(this)">
-
-  <button class="btn btn-outline-secondary"
-          type="button"
-          onclick="appendPlus('totalBill')">
-    +
-  </button>
+<!-- Total Bill Amount - Red Card -->
+<div class="card-input-wrapper">
+  <div class="card-input-container card-color-red">
+    <div class="card-top-bar"></div>
+    <div class="card-content">
+      <div class="card-title-row">
+        <h6 class="card-input-title">
+          <span class="card-icon">💰</span>
+          Total Bill Amount
+        </h6>
+        <span class="card-hint">e.g. 2700</span>
+      </div>
+      <div class="card-input-field">
+        <input id="totalBill"
+               type="text"
+               inputmode="numeric"
+               class="card-input"
+               placeholder="Enter amount"
+               oninput="handleNumericInput(this)">
+        <button class="card-action-btn" 
+                type="button"
+                onclick="appendPlus('totalBill')"
+                style="background: linear-gradient(135deg, #ef4444, #dc2626);">
+          +
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 
-
- 
-    <label>Arrears ₹ (if any)</label>
- <div class="input-group mb-2">
-  <input id="arrears"
-    type="text"
-    inputmode="numeric"
-    class="form-control"
-    placeholder="Enter amount"
-oninput="handleNumericInput(this)">
-
-  <button class="btn btn-outline-secondary"
-          type="button"
-          onclick="appendPlus('arrears')">
-    +
-  </button>
-</div>
-
-</div>
+ <!-- Arrears - Cyan Card -->
+<div class="card-input-wrapper">
+  <div class="card-input-container card-color-cyan">
+    <div class="card-top-bar"></div>
+    <div class="card-content">
+      <div class="card-title-row">
+        <h6 class="card-input-title">
+          <span class="card-icon">📊</span>
+          Arrears
+        </h6>
+        <span class="card-hint">if any</span>
+      </div>
+      <div class="card-input-field">
+        <input id="arrears"
+               type="text"
+               inputmode="numeric"
+               class="card-input"
+               placeholder="Enter amount"
+               oninput="handleNumericInput(this)">
+        <button class="card-action-btn" 
+                type="button"
+                onclick="appendPlus('arrears')"
+                style="background: linear-gradient(135deg, #06b6d4, #0891b2);">
+          +
+        </button>
+      </div>
+    </div>
+  </div> <!-- Close section-container -->
+</div> <!-- Close consumptionSection -->
 <button id="actionBtn"
         class="btn btn-primary w-100 d-none"
         onclick="calculate()">
@@ -984,7 +1417,7 @@ oninput="handleNumericInput(this)">
 <div id="result" class="mt-4"></div>
 
 </div>
-
+</div>
 <!-- Custom Modal -->
 <div id="customModal" class="custom-modal">
   <div class="modal-content-custom">
@@ -994,8 +1427,7 @@ oninput="handleNumericInput(this)">
     <div id="modalButtons" style="display: flex; gap: 1rem; margin-top: 1.5rem;"></div>
   </div>
 </div>
-
-<footer class="mt-5 py-3 text-center"
+<footer class="mt-3 py-3 text-center"
         style="background:#f8f9fa;border-top:1px solid #dee2e6;">
   <small class="text-muted">
     Developed by <b>National Informatics Centre (NIC), Kurukshetra</b><br>
@@ -1037,44 +1469,78 @@ const result = document.getElementById("result");
 // INTENT SELECTION
 // ==========================================
 function selectIntent(type){
+  console.log('selectIntent called with type:', type);
+  
   entryMode = type;
 
+  // Get all elements
   const intentSection = document.getElementById("intentSection");
   const helper = document.getElementById("helperCards");
   const intentSummary = document.getElementById("intentSummary");
   const intentText = document.getElementById("intentText");
-
-  // Sections
   const consumption = document.getElementById("consumptionSection");
   const identity = document.getElementById("identitySection");
   const billPeriod = document.getElementById("billPeriodSection");
   const authSection = document.getElementById("authSection");
   const dashboardSection = document.getElementById("dashboardSection");
   const carrySec = document.getElementById("carryForwardSection");
-
-  // Button
   const actionBtn = document.getElementById("actionBtn");
+
+  // ==========================================
+  // STEP 1: CLEAR ALL INLINE STYLES
+  // ==========================================
+  console.log('Clearing inline styles...');
   if (consumption) consumption.style.display = '';
   if (identity) identity.style.display = '';
   if (billPeriod) billPeriod.style.display = '';
   if (authSection) authSection.style.display = '';
   if (dashboardSection) dashboardSection.style.display = '';
   if (carrySec) carrySec.style.display = '';
+  if (actionBtn) actionBtn.style.display = '';
 
-  // Hide intent selector cards
-  if (intentSection) intentSection.classList.add("d-none");
+  // ==========================================
+  // STEP 2: HIDE INTENT SECTION
+  // ==========================================
+  console.log('Hiding intent section...');
+  if (intentSection) {
+    intentSection.classList.add("d-none");
+    intentSection.style.display = 'none';
+  }
   if (helper) helper.classList.add("d-none");
 
+  // ==========================================
+  // STEP 3: SHOW APPROPRIATE SECTIONS
+  // ==========================================
+  
   if (type === "dashboard") {
-    // Show authentication for dashboard
-    authSection.classList.remove("d-none");
-    consumption.classList.add("d-none");
-    identity.classList.add("d-none");
-    billPeriod.classList.add("d-none");
-    actionBtn.classList.add("d-none");
-    dashboardSection.classList.add("d-none");
+    console.log('Dashboard mode selected');
+    
+    // Hide form sections
+    if (consumption) consumption.classList.add("d-none");
+    if (identity) identity.classList.add("d-none");
+    if (billPeriod) billPeriod.classList.add("d-none");
+    if (carrySec) carrySec.classList.add("d-none");
+    if (actionBtn) actionBtn.classList.add("d-none");
     if (intentSummary) intentSummary.classList.add("d-none");
+    if (dashboardSection) dashboardSection.classList.add("d-none");
+    
+    // Show auth section
+    if (authSection) authSection.classList.remove("d-none");
+    
+    // Show home button
+    showHomeButton();
+    
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
   } else {
+    // Form mode (one or save)
+    console.log('Form mode selected:', type);
+    
+    // Hide dashboard/auth
+    if (authSection) authSection.classList.add("d-none");
+    if (dashboardSection) dashboardSection.classList.add("d-none");
+    
     // Show intent summary
     if (intentSummary && intentText) {
       intentSummary.classList.remove("d-none");
@@ -1084,48 +1550,50 @@ function selectIntent(type){
           : "✔ <b>Save for Future:</b> Bill details will be stored";
     }
 
-    // Show main sections
-    consumption.classList.remove("d-none");
-    billPeriod.classList.remove("d-none");
-    authSection.classList.add("d-none");
-    dashboardSection.classList.add("d-none");
+    // Show consumption and bill period (always needed)
+    if (consumption) {
+      consumption.classList.remove("d-none");
+      console.log('Consumption section shown');
+    }
+    if (billPeriod) {
+      billPeriod.classList.remove("d-none");
+      console.log('Bill period section shown');
+    }
 
-    // Mode-specific sections
+    // Mode-specific: Identity and Carry Forward
     if (type === "save") {
-      identity.classList.remove("d-none");
-      actionBtn.innerText = "💾 Save & Submit";
-      carrySec.classList.remove("d-none");
+      if (identity) {
+        identity.classList.remove("d-none");
+        console.log('Identity section shown (save mode)');
+      }
+      if (carrySec) {
+        carrySec.classList.remove("d-none");
+        console.log('Carry forward section shown');
+      }
+      if (actionBtn) actionBtn.innerText = "💾 Save & Submit";
     } else {
-      identity.classList.add("d-none");
-      actionBtn.innerText = "🔍 Calculate Saving";
-      carrySec.classList.add("d-none");
-      document.getElementById("openingCarry").value = "";
+      // type === "one"
+      if (identity) identity.classList.add("d-none");
+      if (carrySec) carrySec.classList.add("d-none");
+      const openingCarry = document.getElementById("openingCarry");
+      if (openingCarry) openingCarry.value = "";
+      if (actionBtn) actionBtn.innerText = "🔍 Calculate Saving";
     }
 
-    actionBtn.classList.remove("d-none");
-  }
-if (type === 'one' || type === 'save') {
-    // Show consumption section
-    consumptionSection.classList.remove('d-none');
-    intentSection.style.display = 'none';
-    
-    showHomeButton(); // ✅ ADD THIS
-    
-  } else if (type === 'dashboard') {
-    if (currentUser) {
-      dashboardSection.classList.remove('d-none');
-      intentSection.style.display = 'none';
-      
-      showHomeButton(); // ✅ ADD THIS
-      
-      displayBillsList();
-    } else {
-      authSection.classList.remove('d-none');
-      intentSection.style.display = 'none';
-      
-      showHomeButton(); // ✅ ADD THIS
+    // Show action button
+    if (actionBtn) {
+      actionBtn.classList.remove("d-none");
+      console.log('Action button shown');
     }
+    
+    // Show home button
+    showHomeButton();
+    
+    // Scroll to top smoothly
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
+  
+  console.log('selectIntent completed');
 }
 
 // ==========================================
@@ -4061,7 +4529,8 @@ function goToHome() {
     'identitySection',      // ✅ ADD - Consumer Identification
     'billPeriodSection',    // ✅ ADD - Bill Period
     'carryForwardSection',  // ✅ ADD - Carry Forward
-    'intentSummary'         // ✅ ADD - Summary bar
+    'intentSummary', // ✅ ADD - Summary bar
+    'actionBtn'
   ];
   
   sectionsToHide.forEach(id => {
