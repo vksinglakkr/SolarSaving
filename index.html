@@ -2827,26 +2827,6 @@ async function calculate() {
 
   // ---------- DECLARATIONS ----------
   let g=0, i=0, e=0, f=0, t=0, a=0;
-  // ... rest of your existing code ...
-
-  // At any return statement (errors), add:
-  // RE-ENABLE BUTTON
-  if (actionBtn) {
-    actionBtn.disabled = false;
-    actionBtn.style.opacity = '1';
-    actionBtn.style.cursor = 'pointer';
-    actionBtn.innerText = originalText;
-  }
-  return;
-
-  // ---------- BASIC VALIDATION ----------
-  if (document.querySelector(".is-invalid")) {
-    alert("Please correct highlighted fields");
-    return;
-  }
-
-  // ---------- DECLARATIONS ----------
-  let g=0, i=0, e=0, f=0, t=0, a=0;
   let direct = 0;
   let netGridUnits = 0;
 
