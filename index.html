@@ -5085,6 +5085,8 @@ function showScannerButton() {
   const btn = document.getElementById('openScannerBtn');
   if (btn && (entryMode === 'one' || entryMode === 'save')) {
     btn.classList.remove('d-none');
+    } else {
+    btn.classList.add('d-none');
   }
 }
 
