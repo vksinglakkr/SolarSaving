@@ -17,7 +17,29 @@ body { background:#f4f6fb; }
   padding:12px;
 }
 .header-title { font-weight:700; }
-
+    /* ========================================
+       ADD VERIFICATION MODAL CSS HERE
+       ======================================== */
+    .verification-modal {
+      display: none;
+      position: fixed;
+      z-index: 10000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      overflow: auto;
+    }
+    
+    .verification-content {
+      background-color: #fff;
+      margin: 2% auto;
+      padding: 0;
+      width: 95%;
+      max-width: 1200px;
+      border-radius: 12px;
+    }
 /* Intent cards */
 .intent-card {
   border:2px solid #ddd;
@@ -1453,6 +1475,22 @@ input[type="date"].card-input::-webkit-calendar-picker-indicator:hover {
     </div>
   </div> <!-- Close section-container -->
 </div> <!-- Close consumptionSection -->
+<!-- ✅ ADD THIS BUTTON AFTER FORM FIELDS -->
+    <div style="text-align: center; margin: 15px 0;">
+      <button onclick="showVerificationGuide()" 
+              style="background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%); 
+                     color: white; 
+                     border: none; 
+                     padding: 12px 24px; 
+                     border-radius: 8px; 
+                     font-size: 15px; 
+                     font-weight: bold; 
+                     cursor: pointer;
+                     box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);">
+        📋 How to Verify Bill Data
+      </button>
+    </div>
+    
 <button id="actionBtn"
         class="btn btn-primary w-100 d-none"
         onclick="calculate()">
@@ -4206,7 +4244,50 @@ function downloadAsPDF(summary, bills) {
       `;
     }).join('')}
   </div>
-
+ <!-- ✅ LOCATION 3: Add Modal HTML (before closing </body>) -->
+  
+  <!-- Bill Verification Guide Modal -->
+  <div id="verificationModal" class="verification-modal">
+    <div class="verification-content">
+      <div class="verification-header">
+        <h2>
+          <span>📋</span>
+          <span>Bill Field Verification Guide</span>
+        </h2>
+        <button class="close-verification" onclick="closeVerificationGuide()">&times;</button>
+      </div>
+      
+      <div class="verification-body">
+        <!-- Warning -->
+        <div class="guide-warning">
+          <strong style="color: #856404; font-size: 16px;">⚠️ Important</strong>
+          <p style="color: #856404; margin: 8px 0 0 0;">
+            Please verify highlighted fields with your physical bill.
+          </p>
+        </div>
+        
+        <!-- Guide Image -->
+        <img src="https://raw.githubusercontent.com/vksinglakkr/SolarSaving/main/assests/SolarSanchayDemo.jpg" 
+             alt="Bill Verification Guide" 
+             class="guide-image">
+        
+        <!-- Checklist -->
+        <div class="guide-checklist">
+          <h3>✓ Quick Verification Checklist</h3>
+          <ul>
+            <li><strong>Import/Export Units:</strong> Most critical! Check carefully</li>
+            <li><strong>Bill Amount:</strong> Verify net payable</li>
+            <li><strong>Dates:</strong> Check bill period</li>
+          </ul>
+        </div>
+        
+        <button class="got-it-btn" onclick="closeVerificationGuide()">
+          Got it! ✓
+        </button>
+      </div>
+    </div>
+  </div>
+  
   <div class="footer">
     <p><strong>SolarSanchay</strong> - Haryana Solar Savings Calculator</p>
     <p>NIC, Kurukshetra | Government of Haryana</p>
@@ -4757,7 +4838,58 @@ function closeBillScanner() {
     document.body.style.overflow = 'auto';
   }
 }
-
+    // ========================================
+    // ADD VERIFICATION GUIDE FUNCTIONS HERE
+    // ========================================
+    
+    function showVerificationGuide() {
+      const modal = document.getElementById('verificationModal');
+      if (modal) {
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+      }
+    }
+    
+    function closeVerificationGuide() {
+      const modal = document.getElementById('verificationModal');
+      if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+      }
+    }
+    
+    // Close on outside click
+    window.onclick = function(event) {
+      const modal = document.getElementById('verificationModal');
+      if (event.target === modal) {
+        closeVerificationGuide();
+      }
+    }
+    
+    // Close on ESC key
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        closeVerificationGuide();
+      }
+    });
+    
+    // Your existing message listener...
+    window.addEventListener('message', function(event) {
+      if (event.data.type === 'SCAN_COMPLETE') {
+        const data = event.data.payload;
+        
+        // Set all fields...
+        // ... your existing code ...
+        
+        // ✅ OPTIONAL: Auto-show guide after first scan
+        if (!sessionStorage.getItem('guideShown')) {
+          setTimeout(() => {
+            showVerificationGuide();
+            sessionStorage.setItem('guideShown', 'true');
+          }, 800);
+        }
+      }
+    });
 </script>
  </div>
 </body>
