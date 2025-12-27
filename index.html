@@ -1248,7 +1248,7 @@ input[type="date"].card-input::-webkit-calendar-picker-indicator:hover {
       <div class="card-title-row">
         <h6 class="card-input-title">
           <span class="card-icon">⚡</span>
-          Gross Units
+          Total Consumed Units (Gross Units)
         </h6>
         <span class="card-hint">e.g. 1354</span>
       </div>
@@ -1277,7 +1277,7 @@ input[type="date"].card-input::-webkit-calendar-picker-indicator:hover {
       <div class="card-title-row">
         <h6 class="card-input-title">
           <span class="card-icon">📥</span>
-          Import Units
+          Import Units (KWHI)
         </h6>
         <span class="card-hint">e.g. 1114</span>
       </div>
@@ -1307,7 +1307,7 @@ input[type="date"].card-input::-webkit-calendar-picker-indicator:hover {
       <div class="card-title-row">
         <h6 class="card-input-title">
           <span class="card-icon">📤</span>
-          Export Units
+          Export Units (KWHE)
         </h6>
         <span class="card-hint">e.g. 944</span>
       </div>
@@ -1402,7 +1402,7 @@ input[type="date"].card-input::-webkit-calendar-picker-indicator:hover {
       <div class="card-title-row">
         <h6 class="card-input-title">
           <span class="card-icon">💰</span>
-          Total Bill Amount
+          Total Current Cycle Charges
         </h6>
         <span class="card-hint">e.g. 2700</span>
       </div>
@@ -2119,8 +2119,8 @@ function viewSelectedBill() {
         <b>Total Days:</b> ${days}<br>
 
         <b>Gross Units:</b> ${g} <br>
-        <b>Import Units:</b> ${i} &nbsp; | &nbsp;
-        <b>Export Units:</b> ${e} <br>
+        <b>Import Units (KWHI):</b> ${i} &nbsp; | &nbsp;
+        <b>Export Units (KWHE):</b> ${e} <br>
 
         <b>Direct Solar Used:</b> ${direct} units  
         <i class="text-muted">
@@ -2129,7 +2129,7 @@ function viewSelectedBill() {
         <hr>
 
         <b>Fixed Charges:</b> ₹${f} <br>
-        <b>Total Bill Amount:</b> ₹${t} <br>
+        <b>Total Current Cycle Charges:</b> ₹${t} <br>
 
       <b>Per-Unit Rate:</b> ₹${unitRate ? unitRate.toFixed(2) : "—"}
         <i class="text-muted">
@@ -2244,15 +2244,15 @@ function editSelectedBill() {
       </p>
       
       <div class="mb-3">
-        <label class="form-label">Gross Units *</label>
+        <label class="form-label">Total Consumed Units (Gross Units) *</label>
         <input type="number" class="form-control" id="editGross" value="${bill['Gross Units'] || ''}">
       </div>
       <div class="mb-3">
-        <label class="form-label">Import Units *</label>
+        <label class="form-label">Import Units (KWHI) *</label>
         <input type="number" class="form-control" id="editImport" value="${bill['Import Units'] || ''}">
       </div>
       <div class="mb-3">
-        <label class="form-label">Export Units *</label>
+        <label class="form-label">Export Units (KWHE) *</label>
         <input type="number" class="form-control" id="editExport" value="${bill['Export Units'] || ''}">
       </div>
       <div class="mb-3">
@@ -2749,9 +2749,9 @@ async function calculate() {
         to ${to ? to.toLocaleDateString("en-IN") : "—"} | 
         <b>Days:</b> ${days ?? "—"}<br><br>
 
-        <b>Gross Units:</b> ${g}<br>
-        <b>Import Units:</b> ${i} &nbsp; | &nbsp;
-        <b>Export Units:</b> ${e}<br>
+        <b>Total Consumed Units (Gross Units):</b> ${g}<br>
+        <b>Import Units (KWHI):</b> ${i} &nbsp; | &nbsp;
+        <b>Export Units (KWHE):</b> ${e}<br>
 
         <b>Direct Solar Used:</b> ${direct} units  
         <i class="text-muted">
@@ -2760,7 +2760,7 @@ async function calculate() {
         <hr>
 
         <b>Fixed Charges:</b> ₹${f}<br>
-        <b>Total Bill Amount:</b> ₹${t}<br>
+        <b>Total Current Cycle Charges:</b> ₹${t}<br>
 
         <b>Per-Unit Rate:</b> ${unitRate > 0 ? '₹' + unitRate.toFixed(2) : 'N/A (no energy charges)'}
         ${billableUnits === 0 ? '<br><b>Estimated Rate Used:</b> ₹' + estimatedRate.toFixed(2) + ' <i class="text-muted">(for savings comparison)</i>' : ''}
@@ -2908,9 +2908,9 @@ function shareWhatsApp(data){
   const msg = encodeURIComponent(
 `☀️ SolarSanchay – Solar Saving Result
 
-Gross Units: ${data.gross}
-Import Units: ${data.importU}
-Export Units: ${data.exportU}
+Total Consumed Units (Gross Units): ${data.gross}
+Import Units (KWHI): ${data.importU}
+Export Units (KWHE): ${data.exportU}
 Direct Solar Used: ${data.direct} units
 
 Bill With Solar: ₹${data.withSolar}
@@ -3912,7 +3912,7 @@ function displaySummaryModal(summary, bills) {
         
         <!-- Total Bill Amount -->
         <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
-          <span style="color: #166534; font-weight: 600;">Total Bill Amount:</span>
+          <span style="color: #166534; font-weight: 600;">Total Current Cycle Charges:</span>
           <span style="font-weight: 700; color: #14532d;">₹${summary.totalBillAmount.toLocaleString()}</span>
         </div>
         ${bills.map((b, idx) => `
@@ -4168,7 +4168,7 @@ function downloadAsPDF(summary, bills) {
     <div class="section-title">💰 Financial Summary</div>
     <table>
       <tr>
-        <td>Total Bill Amount:</td>
+        <td>Total Current Cycle Charges:</td>
         <td class="total">₹${summary.totalBillAmount.toLocaleString()}</td>
       </tr>
       <tr>
