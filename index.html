@@ -4027,7 +4027,28 @@ function calculateMultiBillSummary(bills) {
   
   bills.forEach(bill => {
     // === DAYS ===
-    const days = parseInt(bill['Days in Bill Period'] || 30);
+   // === DAYS - CALCULATE FROM BILL DATES ===
+let days = 30; // Default
+
+// Try to get actual days from bill period
+const billFrom = bill['Bill From Date'];
+const billTo = bill['Bill To Date'];
+
+if (billFrom && billTo) {
+  // Parse dates and calculate actual days
+  const fromDate = new Date(billFrom);
+  const toDate = new Date(billTo);
+  const diffTime = toDate - fromDate;
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  
+  if (diffDays > 0) {
+    days = diffDays + 1; // Add 1 to include both start and end dates
+  }
+} else if (bill['Days in Bill Period']) {
+  // Fallback to stored days
+  days = parseInt(bill['Days in Bill Period']);
+}
+
     summary.totalDays += days;
     
     // === UNITS ===
