@@ -4932,11 +4932,8 @@ window.addEventListener('message', function(event) {
     
     console.log('✅ Done!');
     
-    // Close modal
-    const modal = document.getElementById('scannerModal');
-    if (modal) {
-      modal.style.display = 'none';
-    }
+     // Close modal and RESET scanner
+    closeBillScanner();
     
     // ============================================
     // FIX SCROLL: Re-enable body scroll
@@ -4995,6 +4992,20 @@ function closeBillScanner() {
   if (modal) {
     modal.style.display = 'none';
     document.body.style.overflow = 'auto';
+    
+    // RESET SCANNER: Reload iframe to clear previous scan
+    const iframe = document.getElementById('scannerFrame');
+    if (iframe) {
+      // Save the current src
+      const src = iframe.src;
+      // Reset by reloading
+      iframe.src = 'about:blank';
+      setTimeout(() => {
+        iframe.src = src;
+      }, 100);
+      
+      console.log('✓ Scanner reset - ready for next scan');
+    }
   }
 }
     // ========================================
