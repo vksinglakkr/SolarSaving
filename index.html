@@ -2677,8 +2677,7 @@ function resetIntent(){
   userBills = [];
   selectedBillIndex = null;
 
-  document.getElementById("intentSection")?.classList.remove("d-none");
-  document.getElementById("helperCards")?.classList.remove("d-none");
+  // Hide all sections first
   document.getElementById("intentSummary")?.classList.add("d-none");
   document.getElementById("consumptionSection")?.classList.add("d-none");
   document.getElementById("identitySection")?.classList.add("d-none");
@@ -2686,7 +2685,32 @@ function resetIntent(){
   document.getElementById("authSection")?.classList.add("d-none");
   document.getElementById("dashboardSection")?.classList.add("d-none");
   document.getElementById("actionBtn")?.classList.add("d-none");
+  
+  // Show intent section
+  document.getElementById("intentSection")?.classList.remove("d-none");
+  document.getElementById("helperCards")?.classList.remove("d-none");
+  
+  // IMPORTANT: Force display block
+  const intentSection = document.getElementById("intentSection");
+  if (intentSection) {
+    intentSection.style.display = "block";
+  }
+  
+  // Clear active state from cards
+  document.querySelectorAll('.intent-card-modern').forEach(card => {
+    card.classList.remove('active');
+  });
+  
+  // Clear result
   document.getElementById("result").innerHTML = "";
+  
+  // Scroll to top
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
+  
+  console.log('✓ Reset to intent selection');
 }
 
 function validateUnits(){
