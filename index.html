@@ -4986,6 +4986,45 @@ function closeBillScanner() {
         }
       }
     });
+  <!-- Bill Verification Guide Modal -->
+<div id="verificationModal" class="verification-modal">
+  <div class="verification-content">
+    <div class="verification-header">
+      <h2>
+        <span>📋</span>
+        <span>Bill Field Verification Guide</span>
+      </h2>
+      <button class="close-verification" onclick="closeVerificationGuide()">&times;</button>
+    </div>
+    
+    <div class="verification-body">
+      <div class="guide-warning">
+        <strong style="color: #856404; font-size: 16px;">⚠️ Important - Verify Before Saving</strong>
+        <p style="color: #856404; margin: 8px 0 0 0;">
+          Please verify the highlighted fields carefully with your physical bill.
+        </p>
+      </div>
+      
+      <img src="https://raw.githubusercontent.com/vksinglakkr/SolarSaving/main/assests/SolarSanchayDemo.jpg" 
+           alt="Bill Verification Guide" 
+           class="guide-image">
+      
+      <div class="guide-checklist">
+        <h3>✓ Quick Verification Checklist</h3>
+        <ul>
+          <li><strong>Account & Bill Number:</strong> Match exactly</li>
+          <li><strong>Import/Export Units:</strong> MOST IMPORTANT!</li>
+          <li><strong>Bill Amount:</strong> Verify total</li>
+          <li><strong>Dates:</strong> Check period</li>
+        </ul>
+      </div>
+      
+      <button class="got-it-btn" onclick="closeVerificationGuide()">
+        Got it! ✓
+      </button>
+    </div>
+  </div>
+</div>
 </script>
  </div>
 </body>
