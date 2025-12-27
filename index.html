@@ -4293,38 +4293,7 @@ ${bills.map((b, idx) => {
             (₹${summary.totalSavings.toLocaleString()} ÷ ${summary.totalDays} days)
           </div>
         </div>
-      </div>
-      
-      <!-- Bill-wise Summary -->
-      <div style="background: linear-gradient(135deg, #f3f4f6, #e5e7eb); padding: 1rem; border-radius: 8px; border-left: 4px solid #6b7280;">
-        <h6 style="color: #1f2937; font-weight: 700; margin-bottom: 0.75rem;">📈 BILL-WISE SUMMARY</h6>
-        ${bills.map((b, idx) => {
-          const billNum = b['Bill Number'] || b.billNumber;
-          const days = parseInt(b['Days in Bill Period'] || b.days || 30);
-          const gross = parseFloat(b['Gross Units'] || 0);
-          const imp = parseFloat(b['Import Units'] || 0);
-          const exp = parseFloat(b['Export Units'] || 0);
-          const billAmt = parseFloat(b['Total Bill Amount'] || 0);
-          const saving = parseFloat(b['Solar Saving Amount'] || 0);
-          const savingPct = parseFloat(b['Saving Percentage'] || 0);
-          
-          return `
-          <div style="padding: 0.5rem; margin-bottom: 0.5rem; background: white; border-radius: 6px; border: 1px solid #d1d5db;">
-            <div style="font-weight: 700; color: #374151; margin-bottom: 0.5rem;">
-              ${idx + 1}. Bill #${billNum} (${formatBillPeriod(b)})
-            </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.3rem; font-size: 0.85rem;">
-              <div style="color: #6b7280;">Days: <span style="font-weight: 600; color: #374151;">${days}</span></div>
-              <div style="color: #6b7280;">Gross: <span style="font-weight: 600; color: #374151;">${gross} units</span></div>
-              <div style="color: #6b7280;">Import: <span style="font-weight: 600; color: #374151;">${imp} units</span></div>
-              <div style="color: #6b7280;">Export: <span style="font-weight: 600; color: #374151;">${exp} units</span></div>
-              <div style="color: #6b7280;">Bill Amt: <span style="font-weight: 600; color: #374151;">₹${billAmt.toLocaleString()}</span></div>
-              <div style="color: #10b981; font-weight: 600;">Saving: ₹${saving.toLocaleString()} (${savingPct.toFixed(1)}%)</div>
-            </div>
-          </div>
-        `}).join('')}
-      </div>
-      
+      </div>   
     </div>
   `;
   
