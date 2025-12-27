@@ -350,7 +350,20 @@ function displayResults() {
     `;
   } else {
     let html = '<div style="display: grid; grid-template-columns: 1fr; gap: 0.5rem;">';
+        // ADD DISCLAIMER AT TOP OF RESULTS
+    html += `
+      <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 10px 12px; margin-bottom: 16px; border-radius: 6px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 18px;">⚠️</span>
+          <strong style="color: #856404; font-size: 13px;">Verify Before Using</strong>
+        </div>
+        <p style="color: #856404; margin: 6px 0 0 0; font-size: 12px;">
+          AI can make mistakes. Please check all values against your bill.
+        </p>
+      </div>
+    `;
     
+    html += '<div style="display: grid; grid-template-columns: 1fr; gap: 0.5rem;">';
     const fieldLabels = {
       billNumber: '📄 Bill Number',
       meterNumber: '📟 Meter Number',
