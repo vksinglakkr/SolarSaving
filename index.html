@@ -2796,6 +2796,48 @@ function markError(el,msg){
 // ==========================================
 
 async function calculate() {
+  
+  // ========================================
+  // DISABLE BUTTON IMMEDIATELY
+  // ========================================
+  const actionBtn = document.getElementById('actionBtn');
+  let originalText = '';
+  
+  if (actionBtn) {
+    originalText = actionBtn.innerText;
+    actionBtn.disabled = true;
+    actionBtn.style.opacity = '0.6';
+    actionBtn.style.cursor = 'not-allowed';
+    actionBtn.innerText = '⏳ Processing...';
+  }
+
+  // ---------- BASIC VALIDATION ----------
+  if (document.querySelector(".is-invalid")) {
+    alert("Please correct highlighted fields");
+    
+    // RE-ENABLE BUTTON ON ERROR
+    if (actionBtn) {
+      actionBtn.disabled = false;
+      actionBtn.style.opacity = '1';
+      actionBtn.style.cursor = 'pointer';
+      actionBtn.innerText = originalText;
+    }
+    return;
+  }
+
+  // ---------- DECLARATIONS ----------
+  let g=0, i=0, e=0, f=0, t=0, a=0;
+  // ... rest of your existing code ...
+
+  // At any return statement (errors), add:
+  // RE-ENABLE BUTTON
+  if (actionBtn) {
+    actionBtn.disabled = false;
+    actionBtn.style.opacity = '1';
+    actionBtn.style.cursor = 'pointer';
+    actionBtn.innerText = originalText;
+  }
+  return;
 
   // ---------- BASIC VALIDATION ----------
   if (document.querySelector(".is-invalid")) {
@@ -3167,6 +3209,11 @@ async function calculate() {
       { text: 'Close', type: 'secondary', action: closeModal }
     ]
   );
+if (actionBtn) {
+    actionBtn.disabled = true;
+    actionBtn.style.opacity = '0.5';
+    actionBtn.innerText = entryMode === 'save' ? '✅ Saved' : '✅ Calculated';
+  }
 }
 
 function shareWhatsApp(data){
