@@ -4230,7 +4230,7 @@ function displaySummaryModal(summary, bills) {
         ${bills.map((b, idx) => `
           <div style="padding-left: 1rem; font-size: 0.85rem; color: #166534; padding: 0.2rem 0;">
             ↳ Bill ${idx + 1}: ₹${parseFloat(b['Total Bill Amount'] || 0).toLocaleString()}
-          </div>
+          </div> 
         `).join('')}
         
         <!-- Without Solar -->
