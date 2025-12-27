@@ -4383,50 +4383,7 @@ function downloadAsPDF(summary, bills) {
       `;
     }).join('')}
   </div>
- <!-- ✅ LOCATION 3: Add Modal HTML (before closing </body>) -->
-  
-  <!-- Bill Verification Guide Modal -->
-  <div id="verificationModal" class="verification-modal">
-    <div class="verification-content">
-      <div class="verification-header">
-        <h2>
-          <span>📋</span>
-          <span>Bill Field Verification Guide</span>
-        </h2>
-        <button class="close-verification" onclick="closeVerificationGuide()">&times;</button>
-      </div>
-      
-      <div class="verification-body">
-        <!-- Warning -->
-        <div class="guide-warning">
-          <strong style="color: #856404; font-size: 16px;">⚠️ Important</strong>
-          <p style="color: #856404; margin: 8px 0 0 0;">
-            Please verify highlighted fields with your physical bill.
-          </p>
-        </div>
-        
-        <!-- Guide Image -->
-        <img src="https://raw.githubusercontent.com/vksinglakkr/SolarSaving/main/assests/SolarSanchayDemo.jpg" 
-             alt="Bill Verification Guide" 
-             class="guide-image">
-        
-        <!-- Checklist -->
-        <div class="guide-checklist">
-          <h3>✓ Quick Verification Checklist</h3>
-          <ul>
-            <li><strong>Import/Export Units:</strong> Most critical! Check carefully</li>
-            <li><strong>Bill Amount:</strong> Verify net payable</li>
-            <li><strong>Dates:</strong> Check bill period</li>
-          </ul>
-        </div>
-        
-        <button class="got-it-btn" onclick="closeVerificationGuide()">
-          Got it! ✓
-        </button>
-      </div>
-    </div>
-  </div>
-  
+ 
   <div class="footer">
     <p><strong>SolarSanchay</strong> - Haryana Solar Savings Calculator</p>
     <p>NIC, Kurukshetra | Government of Haryana</p>
