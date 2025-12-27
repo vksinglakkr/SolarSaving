@@ -931,8 +931,13 @@ input[type="date"].card-input::-webkit-calendar-picker-indicator:hover {
     <div class="d-flex align-items-center">
       <img src="assests/haryana-logo.jpg" style="height:55px;margin-right:12px">
       <div>
-        <div class="header-title">SolarSanchay – Haryana</div>
-        <small class="text-muted">Solar Savings Estimation Tool</small>
+<div class="header-title">🌞 SolarSanchay</div>
+<small class="text-muted">
+  From Units to ₹ Savings — Making Solar Benefits Visible<br>
+  <span style="font-size:0.75rem">
+    A citizen-centric Digital India initiative
+  </span>
+</small>
       </div>
     </div>
     <div class="govt-text text-muted">NIC, Kurukshetra</div>
@@ -952,7 +957,7 @@ input[type="date"].card-input::-webkit-calendar-picker-indicator:hover {
     <div class="col-md-4">
       <div class="intent-card-modern intent-card-blue" id="intentOne" onclick="selectIntent('one')">
         <div class="intent-icon">⚡</div>
-        <h6 class="intent-title">Quick Calculator</h6>
+        <h6 class="intent-title">Instant Solar Benefit Check</h6>
         <p class="intent-desc">Instant solar savings estimation</p>
         <div class="intent-badge">No Registration Required</div>
         <div class="intent-hover-effect"></div>
@@ -1420,7 +1425,7 @@ input[type="date"].card-input::-webkit-calendar-picker-indicator:hover {
           ⚡
         </div>
         <div>
-          <h6 class="section-title-text">Consumption & Charges</h6>
+          <h6 class="section-title-text">Before Solar vs After Solar Analysis</h6>
           <small class="section-subtitle">Enter units and billing amounts</small>
         </div>
       </div>
@@ -1658,10 +1663,29 @@ input[type="date"].card-input::-webkit-calendar-picker-indicator:hover {
 <button id="actionBtn"
         class="btn btn-primary w-100 d-none"
         onclick="calculate()">
-  Calculate Solar Saving
+  Calculate Solar Benefit
 </button>
 
 <div id="result" class="mt-4"></div>
+<div id="awardSummary" class="result-box d-none"
+     style="border-left:6px solid #198754;background:#f0fdf4;">
+  
+  <h6 style="font-weight:800;color:#14532d;">
+    🌞 Solar Benefit Summary (This Bill)
+  </h6>
+
+  <p>💸 <b>Estimated Saving:</b> ₹ <span id="awardSaving">—</span></p>
+  <p>⚡ <b>Solar Units Offset:</b> <span id="awardUnits">—</span> kWh</p>
+  <p>📉 <b>Bill Reduction:</b> <span id="awardPercent">—</span>%</p>
+  <p>🧾 <b>Net Payable With Solar:</b> ₹ <span id="awardPayable">—</span></p>
+
+  <hr>
+
+  <p class="fw-bold text-success">
+    ✅ Without solar, your bill would have been approx ₹
+    <span id="awardWithoutSolar">—</span>
+  </p>
+</div>
 
 </div>
 </div>
@@ -3189,6 +3213,16 @@ async function calculate() {
       { text: 'Close', type: 'secondary', action: closeModal }
     ]
   );
+// ===== Award Summary Hook (UI only) =====
+document.getElementById("awardSaving").innerText = solarSaving || 0;
+document.getElementById("awardUnits").innerText = exportU || 0;
+document.getElementById("awardPercent").innerText =
+  withoutSolarBill > 0 ? ((solarSaving / withoutSolarBill) * 100).toFixed(1) : 0;
+document.getElementById("awardPayable").innerText = totalBill || 0;
+document.getElementById("awardWithoutSolar").innerText = withoutSolarBill || 0;
+
+document.getElementById("awardSummary").classList.remove("d-none");
+
 if (actionBtn) {
     actionBtn.disabled = true;
     actionBtn.style.opacity = '0.5';
