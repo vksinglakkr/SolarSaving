@@ -503,6 +503,10 @@ body {
     padding: 15px;
   }
 }
+@media (max-width: 768px) {
+  a[href*="SolarSanchay-Guide"] { flex: 1; min-width: 120px; text-align: center; }
+}
+a[href*="SolarSanchay-Guide"]:hover { transform: translateY(-2px); }
 
 /* ========================================
    LEGACY INTENT CARDS (Keep for compatibility)
@@ -1532,7 +1536,42 @@ input::placeholder {
       और जागरूकता से सोलर अपनाने की सूचित निर्णय की ओर बढ़ते हैं।
     </p>
   </div>
-</div><div class="footer">
+</div>
+<!-- DOCUMENT DOWNLOAD BANNER -->
+<div class="container" style="margin: 1.5rem auto;">
+  <div style="background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%); 
+              border-radius: 12px; 
+              border-left: 6px solid #1e40af; 
+              padding: 1.25rem; 
+              box-shadow: 0 4px 12px rgba(30, 64, 175, 0.15);
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              flex-wrap: wrap;
+              gap: 1rem;">
+    
+    <div style="flex: 1; min-width: 200px;">
+      <h4 style="color: #1e40af; font-weight: 700; margin: 0 0 0.5rem 0; font-size: 1.1rem;">
+        📚 Complete User Guide Available
+      </h4>
+      <p style="color: #64748b; margin: 0; font-size: 0.9rem;">
+        Learn about features, benefits, and how to use SolarSanchay
+      </p>
+    </div>
+    
+    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+      <a href="docs/SolarSanchay-Guide.pdf" download
+         style="background: linear-gradient(135deg, #dc2626, #b91c1c); 
+                color: white; padding: 0.75rem 1.5rem; border-radius: 8px; 
+                text-decoration: none; font-weight: 700; font-size: 0.9rem;
+                box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);">
+        📄 PDF
+      </a>
+     </div>
+  </div>
+</div>
+
+<div class="footer">
   Developed by <b>National Informatics Centre (NIC), Kurukshetra</b><br>
   for <b>District Administration, Kurukshetra</b><br>
   <span class="small">A scalable Digital India initiative for solar transparency</span>
