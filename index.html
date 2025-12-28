@@ -10,17 +10,53 @@
 <style>
 body { background:#f4f6fb; }
 
-/* Header */
-.header {
-  background:#fff;
-  border-bottom:3px solid #0b5ed7;
-  padding:12px;
+/* ========================================
+   STANDARD CONTAINER FOR ALL SECTIONS
+   ======================================== */
+.section-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
 }
+
+@media (max-width: 768px) {
+  .section-container {
+    padding: 0 0.875rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .section-container {
+    padding: 0 0.75rem;
+  }
+}
+
+/* ========================================
+   HEADER - PROFESSIONAL STYLING
+   ======================================== */
+.header {
+  background: #fff;
+  border-bottom: 3px solid #1e40af;        /* ← FIXED: Softer professional blue */
+  padding: 12px;
+  margin: 16px 16px 0 16px;                /* ← ADDED: Space from edges */
+  border-radius: 12px 12px 0 0;            /* ← ADDED: Rounded top corners */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); /* ← ADDED: Subtle depth */
+}
+
 .header-title { 
   font-weight: 700; 
-  font-size: 2.2rem;
+  font-size: clamp(1.5rem, 4vw, 2.2rem);   /* ← FIXED: Responsive scaling */
   color: #1e3a8a;
   letter-spacing: 0.5px;
+}
+
+/* Mobile adjustment for header */
+@media (max-width: 768px) {
+  .header {
+    margin: 12px 12px 0 12px;              /* ← Less margin on mobile */
+    padding: 10px;
+    border-radius: 8px 8px 0 0;            /* ← Smaller radius on mobile */
+  }
 }
 .verification-modal {
   display: none;
