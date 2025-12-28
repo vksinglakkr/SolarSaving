@@ -1705,6 +1705,21 @@ function selectIntent(type){
   downloadMessage.classList.remove("d-none");
   downloadMessage.style.display = '';  // ← THIS IS THE KEY!
 }
+if (policyInfo) {
+  policyInfo.classList.remove("d-none");
+  policyInfo.style.display = '';
+}
+
+if (scanBtn) {
+  scanBtn.classList.remove("d-none");
+  scanBtn.style.display = '';
+}
+
+// ↓↓↓ HIDE: Quotes (not needed in form mode) ↓↓↓
+if (quotes) {
+  quotes.classList.add("d-none");
+  quotes.style.display = 'none';
+}
 
     // Show consumption and bill period (always needed)
     if (consumption) {
