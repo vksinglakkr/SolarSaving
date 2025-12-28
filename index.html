@@ -1418,7 +1418,15 @@ input::placeholder {
 </div>
 <!-- Quote Section - Place BEFORE Last Updated line -->
       
- <div id="intentSummary" style="text-align: center; margin: 0.5rem 0;">
+<!-- DIV 1: Shows selected mode (One-time or Save) -->
+<div id="intentSummary" class="d-none" style="text-align: center; margin: 0.5rem 0;">
+    <small id="intentText" style="color: #6c757d;">
+      <!-- This gets filled by JavaScript with mode info -->
+    </small>
+</div>
+
+<!-- DIV 2: Shows download links (what you want to toggle) -->
+<div id="downloadMessage" class="d-none" style="text-align: center; margin: 0.5rem 0;">
     <small style="color: #6c757d;">
       📄 Don't have your bill? Download from 
       <a href="https://uhbvn.org.in/web/portal/view-bill" target="_blank">UHBVN</a> or 
@@ -1619,6 +1627,7 @@ function selectIntent(type){
   const dashboardSection = document.getElementById("dashboardSection");
   const carrySec = document.getElementById("carryForwardSection");
   const actionBtn = document.getElementById("actionBtn");
+  const downloadMessage = document.getElementById("downloadMessage");
 
   // ==========================================
   // STEP 1: CLEAR ALL INLINE STYLES
@@ -1657,6 +1666,7 @@ function selectIntent(type){
     if (actionBtn) actionBtn.classList.add("d-none");
     if (intentSummary) intentSummary.classList.add("d-none");
     if (dashboardSection) dashboardSection.classList.add("d-none");
+       if (downloadMessage) downloadMessage.classList.add("d-none");
     
     // Show auth section
     if (authSection) authSection.classList.remove("d-none");
@@ -1682,6 +1692,11 @@ function selectIntent(type){
         type === "one"
           ? "✔ <b>One-time Analysis:</b> No data will be saved"
           : "✔ <b>Save for Future:</b> Bill details will be stored";
+    }
+   // ↓↓↓ ADD THIS ↓↓↓
+    // Show download message
+    if (downloadMessage) {
+      downloadMessage.classList.remove("d-none");
     }
 
     // Show consumption and bill period (always needed)
@@ -4708,7 +4723,8 @@ function goToHome() {
     'billPeriodSection',    // ✅ ADD - Bill Period
     'carryForwardSection',  // ✅ ADD - Carry Forward
     'intentSummary', // ✅ ADD - Summary bar
-    'actionBtn'
+    'actionBtn',
+     'downloadMessage' 
   ];
   
   sectionsToHide.forEach(id => {
