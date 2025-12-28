@@ -416,6 +416,75 @@ input::placeholder { color:#aaa; }
 }
 
 /* ========================================
+   MOBILE OPTIMIZATION - COMPACT CARDS
+   ======================================== */
+@media (max-width: 768px) {
+  /* Compact cards */
+  .intent-card-modern {
+    min-height: 85px !important;       /* ← SMALL! */
+    padding: 0.75rem 0.5rem !important;
+    margin-bottom: 0.75rem;
+    border-radius: 10px;
+  }
+  
+  /* Small icon */
+  .intent-icon {
+    font-size: 1.75rem !important;     /* ← TINY ICON! */
+    margin-bottom: 0.25rem !important;
+    animation: none;                   /* No animation on mobile */
+  }
+  
+  /* Compact text */
+  .intent-title {
+    font-size: 0.85rem !important;     /* ← SMALL TEXT! */
+    margin-bottom: 0.15rem !important;
+    font-weight: 600;
+  }
+  
+  .intent-desc {
+    font-size: 0.65rem !important;     /* ← TINY DESC! */
+    margin-bottom: 0 !important;
+    line-height: 1.2;
+  }
+  
+  /* Hide badge completely on mobile */
+  .intent-badge {
+    display: none !important;
+  }
+  
+  /* Reduce section title */
+  #intentSection h6 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  /* Tighter spacing */
+  .container {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+}
+
+/* Extra small phones */
+@media (max-width: 576px) {
+  .intent-card-modern {
+    min-height: 80px !important;
+    padding: 0.625rem 0.5rem !important;
+  }
+  
+  .intent-icon {
+    font-size: 1.5rem !important;
+  }
+  
+  .intent-title {
+    font-size: 0.8rem !important;
+  }
+  
+  .intent-desc {
+    font-size: 0.6rem !important;
+  }
+}
+/* ========================================
    RESPONSIVE OPTIMIZATIONS
    ======================================== */
 
@@ -649,54 +718,6 @@ background: linear-gradient(135deg, #5568d3 0%, #6a3f91 100%);
   box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3), 0 9px 18px rgba(0, 0, 0, 0.15);
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .intent-card-modern {
-    min-height: 240px; /* Taller for better touch */
-    padding: 2rem 1.5rem; /* More padding */
-    margin-bottom: 1rem;
-    border-radius: 16px; /* Rounder corners */
-  }
-  .container {
-    padding-left: 8px !important;
-    padding-right: 8px !important;
-  }
-  
-  .intent-icon {
-    font-size: 4.5rem; /* 72px - very prominent */
-    margin-bottom: 1rem;
-  }
-  
-  .intent-title {
-    font-size: 1.5rem; /* 24px - bold and clear */
-    margin-bottom: 0.5rem;
-    font-weight: 800;
-  }
-  
-  .intent-desc {
-    font-size: 1rem; /* 16px - easy to read */
-    margin-bottom: 1rem;
-    line-height: 1.6;
-  }
-  /* Visible badge */
-  .intent-badge {
-    font-size: 0.875rem; /* 14px - clearly visible */
-    padding: 0.5rem 1.2rem;
-    border-radius: 20px;
-  }
-    
-  /* Stronger hover on mobile */
-  .intent-card-modern:active {
-    transform: scale(0.97);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-  }
-  
-  /* Section title bigger */
-  #intentSection h6 {
-    font-size: 1.3rem !important;
-    margin-bottom: 1.5rem !important;
-  }
-}
 
 /* Accessibility - Focus State */
 .intent-card-modern:focus {
@@ -1174,37 +1195,34 @@ input[type="date"].card-input::-webkit-calendar-picker-indicator:hover {
   
   <div class="row g-3">
     <!-- Card 1: One-time Check -->
-    <div class="col-md-4">
-      <div class="intent-card-modern intent-card-blue" id="intentOne" onclick="selectIntent('one')">
-        <div class="intent-icon">⚡</div>
-        <h6 class="intent-title">Instant Solar Benefit Check</h6>
-        <p class="intent-desc">Instant solar savings estimation</p>
-        <div class="intent-badge">No Registration Required</div>
-        <div class="intent-hover-effect"></div>
-      </div>
-    </div>
+<div class="col-md-4">
+  <div class="intent-card-modern intent-card-blue" id="intentOne" onclick="selectIntent('one')">
+    <div class="intent-icon">⚡</div>
+    <h6 class="intent-title">Quick Check</h6>
+    <p class="intent-desc">Instant estimate</p>
+    <div class="intent-hover-effect"></div>
+  </div>
+</div>
 
     <!-- Card 2: Save for Future -->
-    <div class="col-md-4">
-      <div class="intent-card-modern intent-card-green" id="intentSave" onclick="selectIntent('save')">
-        <div class="intent-icon">💾</div>
-        <h6 class="intent-title">Save & Track</h6>
-        <p class="intent-desc">Maintain complete bill history</p>
-        <div class="intent-badge">Secure Storage</div>
-        <div class="intent-hover-effect"></div>
-      </div>
-    </div>
+<div class="col-md-4">
+  <div class="intent-card-modern intent-card-green" id="intentSave" onclick="selectIntent('save')">
+    <div class="intent-icon">💾</div>
+    <h6 class="intent-title">Save Bills</h6>
+    <p class="intent-desc">Track history</p>
+    <div class="intent-hover-effect"></div>
+  </div>
+</div>
 
     <!-- Card 3: Dashboard -->
-    <div class="col-md-4">
-      <div class="intent-card-modern intent-card-purple" id="intentDashboard" onclick="selectIntent('dashboard')">
-        <div class="intent-icon">📊</div>
-        <h6 class="intent-title">My Dashboard</h6>
-        <p class="intent-desc">View, edit & manage records</p>
-        <div class="intent-badge">Full Control</div>
-        <div class="intent-hover-effect"></div>
-      </div>
-    </div>
+<div class="col-md-4">
+  <div class="intent-card-modern intent-card-purple" id="intentDashboard" onclick="selectIntent('dashboard')">
+    <div class="intent-icon">📊</div>
+    <h6 class="intent-title">Dashboard</h6>
+    <p class="intent-desc">View records</p>
+    <div class="intent-hover-effect"></div>
+  </div>
+</div>
   </div>
 </div>
 <div style="text-align: center; margin: 1rem 0;">
