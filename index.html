@@ -1184,6 +1184,53 @@ input::placeholder {
     font-size: 1.15rem;
   }
 }   
+/* ========================================
+   CONTAINER CONSISTENCY FIX
+   ======================================== */
+
+/* Ensure all containers have same max-width and padding */
+.container {
+  max-width: 1200px;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Intent section specific */
+#intentSection {
+  width: 100%;
+}
+
+#intentSection .row {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* Document banner - match container width */
+.doc-banner-wrapper {
+  max-width: 100%;
+}
+
+/* Quotes section - match container width */
+div[style*="background: linear-gradient(135deg, #e0f2fe"] {
+  max-width: 100%;
+}
+
+/* Responsive padding */
+@media (max-width: 768px) {
+  .container {
+    padding-left: 0.875rem;
+    padding-right: 0.875rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .container {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+}
 </style>
 </head>
 <body>
@@ -2010,7 +2057,7 @@ input::placeholder {
 </div>
    
 <!-- DOCUMENT DOWNLOAD BANNER - FULLY RESPONSIVE -->
-<div class="container" style="margin: 1.5rem auto; padding: 0 1rem;">
+<div class="container" style="margin: 1.5rem auto;">
   <div class="doc-banner-wrapper">
     
     <!-- Text Content -->
