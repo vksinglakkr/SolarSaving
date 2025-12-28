@@ -1434,7 +1434,7 @@ input::placeholder {
     </small>
 </div>
 <!-- COLLAPSIBLE POLICY INFORMATION -->
-<div style="margin: 1rem 0;">
+<div id="policyInfoSection" class="d-none" style="margin: 1rem 0;">
   <!-- Collapsed View (Default) -->
   <div id="policyInfoCollapsed" 
        style="display: flex; align-items: center; justify-content: space-between; 
@@ -1511,7 +1511,7 @@ input::placeholder {
         style="background:#f8f9fa;border-top:1px solid #dee2e6;">
 <!-- Quote Section - Full Width Simple -->
 <div class="container">
-  <div class="p-4" style="background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%); border-radius: 12px; border-left: 6px solid #0284c7; box-shadow: 0 2px 12px rgba(2, 132, 199, 0.1);">
+  <div id="quotesSection" class="p-4" style="background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%); border-radius: 12px; border-left: 6px solid #0284c7; box-shadow: 0 2px 12px rgba(2, 132, 199, 0.1);">
     
     <!-- Quote -->
     <p class="text-center mb-3" style="font-size: 1.15rem; color: #1e3a8a; font-weight: 500; font-style: italic; line-height: 1.8;">
@@ -1628,6 +1628,9 @@ function selectIntent(type){
   const carrySec = document.getElementById("carryForwardSection");
   const actionBtn = document.getElementById("actionBtn");
   const downloadMessage = document.getElementById("downloadMessage");
+  const policyInfo = document.getElementById("policyInfoSection");
+  const scanBtn = document.getElementById("openScannerBtn");
+  const quotes = document.getElementById("quotesSection");
 
   // ==========================================
   // STEP 1: CLEAR ALL INLINE STYLES
@@ -1667,6 +1670,9 @@ function selectIntent(type){
     if (intentSummary) intentSummary.classList.add("d-none");
     if (dashboardSection) dashboardSection.classList.add("d-none");
        if (downloadMessage) downloadMessage.classList.add("d-none");
+     if (policyInfo) policyInfo.classList.add("d-none");     // 1. Hide policy info
+    if (scanBtn) scanBtn.classList.add("d-none");           // 2. Hide scan button
+    if (quotes) quotes.classList.add("d-none");       
     
     // Show auth section
     if (authSection) authSection.classList.remove("d-none");
@@ -1695,9 +1701,10 @@ function selectIntent(type){
     }
    // ↓↓↓ ADD THIS ↓↓↓
     // Show download message
-    if (downloadMessage) {
-      downloadMessage.classList.remove("d-none");
-    }
+   if (downloadMessage) {
+  downloadMessage.classList.remove("d-none");
+  downloadMessage.style.display = '';  // ← THIS IS THE KEY!
+}
 
     // Show consumption and bill period (always needed)
     if (consumption) {
@@ -1741,7 +1748,7 @@ function selectIntent(type){
     // Scroll to top smoothly
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
-  showScannerButton();
+//  showScannerButton();
   console.log('selectIntent completed');
 }
 
@@ -4724,7 +4731,9 @@ function goToHome() {
     'carryForwardSection',  // ✅ ADD - Carry Forward
     'intentSummary', // ✅ ADD - Summary bar
     'actionBtn',
-     'downloadMessage' 
+     'downloadMessage',
+     'policyInfoSection',
+'openScannerBtn'
   ];
   
   sectionsToHide.forEach(id => {
@@ -4741,6 +4750,11 @@ function goToHome() {
     intentSection.classList.remove('d-none');
     intentSection.style.display = 'block';
   }
+const quotes = document.getElementById('quotesSection');
+if (quotes) {
+  quotes.classList.remove('d-none');
+  quotes.style.display = 'block';
+}
   
   // Hide home button
   document.getElementById('simpleHomeBtn').style.display = 'none';
