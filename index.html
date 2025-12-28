@@ -1497,7 +1497,7 @@ div[style*="background: linear-gradient(135deg, #e0f2fe"] {
 </div>
   </div>
 </div>
-<div class="container my-3">
+<div class="container my-3" id="billHelpers">
   <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); 
               border: 2px solid #0ea5e9; 
               border-radius: 12px; 
@@ -2415,7 +2415,7 @@ function selectIntent(type){
   const scanBtn = document.getElementById("openScannerBtn");
   const quotes = document.getElementById("quotesSection");
   const userGuide = document.getElementById("userGuideBanner"); 
-   
+const billHelpers = document.getElementById("billHelpers");   
 
   // ==========================================
   // STEP 1: CLEAR ALL INLINE STYLES
@@ -2459,7 +2459,7 @@ function selectIntent(type){
     if (scanBtn) scanBtn.classList.add("d-none");           // 2. Hide scan button
     if (quotes) quotes.classList.add("d-none");       
     if (userGuide) userGuide.classList.add("d-none");
-     
+    if (billHelpers) billHelpers.classList.add("d-none");     
     // Show auth section
     if (authSection) authSection.classList.remove("d-none");
     
@@ -2506,6 +2506,10 @@ if (quotes) {
   quotes.classList.add("d-none");
   quotes.style.display = 'none';
 }
+if (billHelpers) {                           // ADD THIS
+    billHelpers.classList.remove("d-none");    // ADD THIS
+    billHelpers.style.display = '';            // ADD THIS
+  }        
 if (userGuide) {                           // ADD THIS
     userGuide.classList.add("d-none");       // ADD THIS
     userGuide.style.display = 'none';        // ADD THIS
@@ -5538,7 +5542,8 @@ function goToHome() {
     'actionBtn',
      'downloadMessage',
      'policyInfoSection',
-'openScannerBtn'
+'openScannerBtn',
+   'billHelpers'
   ];
   
   sectionsToHide.forEach(id => {
