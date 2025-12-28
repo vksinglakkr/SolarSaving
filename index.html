@@ -713,6 +713,93 @@ input::placeholder {
     animation: none;
   }
 }
+/* Banner Container */
+.doc-banner-wrapper {
+  background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+  border-radius: 12px;
+  border-left: 6px solid #1e40af;
+  padding: 1.25rem;
+  box-shadow: 0 4px 12px rgba(30, 64, 175, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+/* Text Section */
+.doc-banner-text {
+  flex: 1;
+  min-width: 200px;
+}
+
+/* Button Container */
+.doc-banner-buttons {
+  display: flex;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+/* Button Styles */
+.doc-btn {
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.9rem;
+  display: inline-block;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+  white-space: nowrap;
+}
+
+.doc-btn-pdf {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.doc-btn-word {
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.doc-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* TABLET (768px and below) */
+@media (max-width: 768px) {
+  .doc-banner-wrapper {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.5rem 1rem;
+  }
+  
+  .doc-banner-text {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+  
+  .doc-banner-buttons {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* MOBILE (480px and below) */
+@media (max-width: 480px) {
+  .doc-banner-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .doc-btn {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    font-size: 0.95rem;
+  }
+}   
 </style>
 </head>
 <body>
@@ -1537,20 +1624,13 @@ input::placeholder {
     </p>
   </div>
 </div>
-<!-- DOCUMENT DOWNLOAD BANNER -->
-<div class="container" style="margin: 1.5rem auto;">
-  <div style="background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%); 
-              border-radius: 12px; 
-              border-left: 6px solid #1e40af; 
-              padding: 1.25rem; 
-              box-shadow: 0 4px 12px rgba(30, 64, 175, 0.15);
-              display: flex;
-              align-items: center;
-              justify-content: space-between;
-              flex-wrap: wrap;
-              gap: 1rem;">
+   
+<!-- DOCUMENT DOWNLOAD BANNER - FULLY RESPONSIVE -->
+<div class="container" style="margin: 1.5rem auto; padding: 0 1rem;">
+  <div class="doc-banner-wrapper">
     
-    <div style="flex: 1; min-width: 200px;">
+    <!-- Text Content -->
+    <div class="doc-banner-text">
       <h4 style="color: #1e40af; font-weight: 700; margin: 0 0 0.5rem 0; font-size: 1.1rem;">
         📚 Complete User Guide Available
       </h4>
@@ -1559,17 +1639,18 @@ input::placeholder {
       </p>
     </div>
     
-    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-      <a href="docs/SolarSanchay-Guide.pdf" target="_blank"
-         style="background: linear-gradient(135deg, #dc2626, #b91c1c); 
-                color: white; padding: 0.75rem 1.5rem; border-radius: 8px; 
-                text-decoration: none; font-weight: 700; font-size: 0.9rem;
-                box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);">
+    <!-- Button Container -->
+    <div class="doc-banner-buttons">
+      <a href="docs/SolarSanchay-Guide.pdf" 
+         target="_blank"
+         class="doc-btn doc-btn-pdf">
         📄 View PDF
       </a>
      </div>
+    
   </div>
 </div>
+
 
 <div class="footer">
   Developed by <b>National Informatics Centre (NIC), Kurukshetra</b><br>
