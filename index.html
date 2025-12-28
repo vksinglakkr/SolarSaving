@@ -2059,7 +2059,7 @@ div[style*="background: linear-gradient(135deg, #e0f2fe"] {
 </div>
    
 <!-- DOCUMENT DOWNLOAD BANNER - FULLY RESPONSIVE -->
-<div class="container" style="margin: 1.5rem auto;">
+<div class="container" style="margin: 1.5rem auto;" id="userGuideBanner">
   <div class="doc-banner-wrapper">
     
     <!-- Text Content -->
@@ -2184,6 +2184,8 @@ function selectIntent(type){
   const policyInfo = document.getElementById("policyInfoSection");
   const scanBtn = document.getElementById("openScannerBtn");
   const quotes = document.getElementById("quotesSection");
+  const userGuide = document.getElementById("userGuideBanner"); 
+   
 
   // ==========================================
   // STEP 1: CLEAR ALL INLINE STYLES
@@ -2226,7 +2228,8 @@ function selectIntent(type){
      if (policyInfo) policyInfo.classList.add("d-none");     // 1. Hide policy info
     if (scanBtn) scanBtn.classList.add("d-none");           // 2. Hide scan button
     if (quotes) quotes.classList.add("d-none");       
-    
+    if (userGuide) userGuide.classList.add("d-none");
+     
     // Show auth section
     if (authSection) authSection.classList.remove("d-none");
     
@@ -2273,6 +2276,10 @@ if (quotes) {
   quotes.classList.add("d-none");
   quotes.style.display = 'none';
 }
+if (userGuide) {                           // ADD THIS
+    userGuide.classList.add("d-none");       // ADD THIS
+    userGuide.style.display = 'none';        // ADD THIS
+}         
 
     // Show consumption and bill period (always needed)
     if (consumption) {
@@ -5323,6 +5330,11 @@ if (quotes) {
   quotes.classList.remove('d-none');
   quotes.style.display = 'block';
 }
+const userGuide = document.getElementById('userGuideBanner');  // ADD THIS
+if (userGuide) {                                               // ADD THIS
+  userGuide.classList.remove('d-none');                        // ADD THIS
+  userGuide.style.display = 'block';                           // ADD THIS
+}    
   
   // Hide home button
   document.getElementById('simpleHomeBtn').style.display = 'none';
