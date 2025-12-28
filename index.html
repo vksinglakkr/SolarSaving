@@ -271,7 +271,7 @@ body {
   .intent-card-modern {
     min-height: 95px !important;
     padding: 0.875rem 0.625rem !important;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
     border-radius: 10px;
   }
   
@@ -299,15 +299,17 @@ body {
   }
   
   /* Row spacing */
+@media (max-width: 768px) {
   #intentSection .row {
-    margin-left: -0.5rem;
-    margin-right: -0.5rem;
+    margin-left: -0.375rem;        /* ← REDUCED */
+    margin-right: -0.375rem;
   }
   
   #intentSection .row > [class*='col-'] {
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
+    padding-left: 0.375rem;        /* ← REDUCED */
+    padding-right: 0.375rem;
   }
+}
   
   /* Container spacing */
   .container {
