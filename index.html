@@ -1393,6 +1393,22 @@ div[style*="background: linear-gradient(135deg, #e0f2fe"] {
     font-size: 0.7rem;
   }
 }
+.bill-helper-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.bill-helper-btn:active {
+  transform: translateY(0);
+}
+
+/* Mobile: Stack vertically */
+@media (max-width: 640px) {
+  .bill-helper-btn {
+    width: 100% !important;
+    flex: none !important;
+  }
+}
 </style>
 </head>
 <body>
@@ -1813,6 +1829,97 @@ div[style*="background: linear-gradient(135deg, #e0f2fe"] {
       </div>
     </div>
 
+  </div>
+</div>
+<div class="container my-3">
+  <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); 
+              border: 2px solid #0ea5e9; 
+              border-radius: 12px; 
+              padding: 1rem 1.25rem;
+              box-shadow: 0 2px 8px rgba(14, 165, 233, 0.15);">
+    
+    <!-- Title -->
+    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+      <span style="font-size: 1.25rem;">💡</span>
+      <strong style="color: #0c4a6e; font-size: 1rem;">Bill Entry Helpers</strong>
+    </div>
+    
+    <!-- Three Helper Buttons in One Row -->
+    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+      
+      <!-- Scan Button -->
+      <button id="openScannerBtn" 
+              onclick="openBillScanner()"
+              class="bill-helper-btn"
+              style="flex: 1; 
+                     min-width: 140px;
+                     padding: 0.625rem 1rem; 
+                     background: linear-gradient(135deg, #10b981, #059669); 
+                     color: white; 
+                     border: none; 
+                     border-radius: 8px; 
+                     font-weight: 700; 
+                     font-size: 0.875rem;
+                     cursor: pointer;
+                     box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+                     transition: all 0.3s;
+                     white-space: nowrap;">
+        📷 Scan Bill
+      </button>
+      
+      <!-- Download Link -->
+      <a href="https://uhbvn.org.in/web/portal/view-bill" 
+         target="_blank"
+         class="bill-helper-btn"
+         style="flex: 1; 
+                min-width: 140px;
+                padding: 0.625rem 1rem; 
+                background: linear-gradient(135deg, #3b82f6, #2563eb); 
+                color: white; 
+                border: none; 
+                border-radius: 8px; 
+                font-weight: 700; 
+                font-size: 0.875rem;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+                transition: all 0.3s;
+                white-space: nowrap;">
+        📄 Download Bill
+      </a>
+      
+      <!-- Verify Guide -->
+      <button onclick="openVerificationGuide()" 
+              class="bill-helper-btn"
+              style="flex: 1; 
+                     min-width: 140px;
+                     padding: 0.625rem 1rem; 
+                     background: linear-gradient(135deg, #f59e0b, #d97706); 
+                     color: white; 
+                     border: none; 
+                     border-radius: 8px; 
+                     font-weight: 700; 
+                     font-size: 0.875rem;
+                     cursor: pointer;
+                     box-shadow: 0 2px 6px rgba(245, 158, 11, 0.3);
+                     transition: all 0.3s;
+                     white-space: nowrap;">
+        📚 Verify Guide
+      </button>
+      
+    </div>
+    
+    <!-- Small hint text -->
+    <div style="margin-top: 0.75rem; text-align: center;">
+      <small style="color: #64748b; font-size: 0.8rem;">
+        Need your bill? Download from 
+        <a href="https://uhbvn.org.in/web/portal/view-bill" target="_blank" style="color: #0ea5e9; text-decoration: underline;">UHBVN</a> or 
+        <a href="https://dhbvn.org.in/web/portal/view-bill" target="_blank" style="color: #0ea5e9; text-decoration: underline;">DHBVN</a>
+      </small>
+    </div>
+    
   </div>
 </div>
 
