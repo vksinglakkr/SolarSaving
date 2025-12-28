@@ -297,7 +297,218 @@ body {
   .intent-badge {
     display: none !important;
   }
+  /* ========================================
+   CARD INPUT STYLES - BEAUTIFUL FORM FIELDS
+   ======================================== */
+
+/* Card Wrapper */
+.card-input-wrapper {
+  margin-bottom: 1rem;
+}
+
+/* Card Container - Modern Design */
+.card-input-container {
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-input-container:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+/* Top Bar Accent */
+.card-top-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: currentColor;
+  opacity: 0.7;
+}
+
+/* Card Content */
+.card-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* Title Row */
+.card-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+/* Card Title */
+.card-input-title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+  color: #1e3a8a;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Card Icon (in title) */
+.card-icon {
+  font-size: 1.25rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+/* Hint Text */
+.card-hint {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-style: italic;
+}
+
+/* Input Field Container */
+.card-input-field {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* The Actual Input Field */
+.card-input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  background: white;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.card-input:focus {
+  border-color: #1e40af;
+  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+  transform: scale(1.02);
+}
+
+.card-input:hover {
+  border-color: rgba(30, 64, 175, 0.3);
+}
+
+.card-input::placeholder {
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+/* Action Button (+ button next to input) */
+.card-action-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: none;
+  color: white;
+  font-size: 1.25rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-action-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.card-action-btn:active {
+  transform: scale(0.95);
+}
+
+/* Color Variants for Different Cards */
+.card-color-blue {
+  background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
+  border: 2px solid #3b82f6;
+}
+
+.card-color-teal {
+  background: linear-gradient(135deg, #ccfbf1 0%, #f0fdfa 100%);
+  border: 2px solid #14b8a6;
+}
+
+.card-color-purple {
+  background: linear-gradient(135deg, #e9d5ff 0%, #f3e8ff 100%);
+  border: 2px solid #a855f7;
+}
+
+.card-color-yellow {
+  background: linear-gradient(135deg, #fef3c7 0%, #fffbeb 100%);
+  border: 2px solid #f59e0b;
+}
+
+.card-color-green {
+  background: linear-gradient(135deg, #d9f99d 0%, #ecfccb 100%);
+  border: 2px solid #84cc16;
+}
+
+.card-color-pink {
+  background: linear-gradient(135deg, #fce7f3 0%, #fdf2f8 100%);
+  border: 2px solid #ec4899;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .card-input-container {
+    padding: 0.875rem;
+  }
   
+  .card-input-title {
+    font-size: 0.9rem;
+  }
+  
+  .card-icon {
+    font-size: 1.1rem;
+  }
+  
+  .card-hint {
+    font-size: 0.7rem;
+  }
+  
+  .card-input {
+    padding: 0.625rem 0.75rem;
+    font-size: 0.9rem;
+  }
+  
+  .card-action-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .card-input-wrapper {
+    margin-bottom: 0.75rem;
+  }
+  
+  .card-input-container {
+    padding: 0.75rem;
+  }
+  
+  .card-input-title {
+    font-size: 0.85rem;
+  }
+  
+  .card-input {
+    font-size: 0.85rem;
+  }
+}
   /* Row spacing */
 @media (max-width: 768px) {
   #intentSection .row {
