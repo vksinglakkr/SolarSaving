@@ -8,15 +8,551 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
-body { background:#f4f6fb; }
-
-/* Header */
-.header {
-  background:#fff;
-  border-bottom:3px solid #0b5ed7;
-  padding:12px;
+/* ========================================
+   GLOBAL STYLES
+   ======================================== */
+body { 
+  background: #f4f6fb; 
+  margin: 0;
+  padding: 0;
 }
-.header-title { font-weight:700; }
+
+/* ========================================
+   STANDARD CONTAINER FOR ALL SECTIONS
+   ======================================== */
+.section-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+@media (max-width: 768px) {
+  .section-container {
+    padding: 0 0.875rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .section-container {
+    padding: 0 0.75rem;
+  }
+}
+
+/* ========================================
+   HEADER - PROFESSIONAL STYLING
+   ======================================== */
+.header {
+  background: #fff;
+  border-bottom: 3px solid #1e40af;
+  padding: 12px;
+  margin: 16px 16px 0 16px;
+  border-radius: 12px 12px 0 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.header-title { 
+  font-weight: 700; 
+  font-size: clamp(1.5rem, 4vw, 2.2rem);
+  color: #1e3a8a;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+.header-title small {
+  display: block;
+  font-size: 0.6em;
+  font-weight: 400;
+  margin-top: 0.25rem;
+  opacity: 0.7;
+  color: #4b5563;
+}
+
+@media (max-width: 768px) {
+  .header {
+    margin: 12px 12px 0 12px;
+    padding: 10px;
+    border-radius: 8px 8px 0 0;
+  }
+  
+  .header-title small {
+    opacity: 0.6;
+    font-size: 0.55em;
+  }
+}
+
+/* ========================================
+   SECTION HEADING
+   ======================================== */
+.intent-section-heading {
+  font-size: 1.4rem;
+  color: #1e3a8a;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .intent-section-heading {
+    font-size: 1rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .intent-section-heading {
+    font-size: 0.95rem !important;
+  }
+}
+
+/* ========================================
+   INTENT CARDS - CONSOLIDATED
+   ======================================== */
+.intent-card-modern {
+  position: relative;
+  background: white;
+  border-radius: 12px;
+  padding: 1rem 0.875rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  border: 2px solid #e5e7eb;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  text-align: center;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.intent-card-modern:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  border-color: #1e40af;
+}
+
+.intent-card-modern:active {
+  transform: translateY(-2px) scale(0.98);
+}
+
+.intent-card-modern:focus {
+  outline: 3px solid #fbbf24;
+  outline-offset: 3px;
+}
+
+/* Icon */
+.intent-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.625rem;
+  animation: float 3s ease-in-out infinite;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.1));
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-7.5px); }
+}
+
+/* Title */
+.intent-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  color: inherit;
+  position: relative;
+  z-index: 1;
+  line-height: 1.2;
+}
+
+/* Description */
+.intent-desc {
+  font-size: 0.7rem;
+  opacity: 0.85;
+  margin-bottom: 0.5rem;
+  position: relative;
+  z-index: 1;
+  line-height: 1.3;
+}
+
+/* Badge */
+.intent-badge {
+  display: inline-block;
+  padding: 0.3rem 0.75rem;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 15px;
+  font-size: 0.5625rem;
+  font-weight: 600;
+  box-shadow: 0 1.5px 3px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 1;
+}
+
+/* Hover effect */
+.intent-hover-effect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.3));
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.intent-card-modern:hover .intent-hover-effect {
+  opacity: 1;
+}
+
+/* Color Variants */
+.intent-card-blue {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.intent-card-blue:hover {
+  background: linear-gradient(135deg, #5568d3 0%, #6a3f91 100%);
+}
+
+.intent-card-blue .intent-badge {
+  color: #667eea;
+}
+
+.intent-card-green {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  color: white;
+}
+
+.intent-card-green:hover {
+  background: linear-gradient(135deg, #0e8278 0%, #2ed96c 100%);
+}
+
+.intent-card-green .intent-badge {
+  color: #11998e;
+}
+
+.intent-card-purple {
+  background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
+  color: white;
+}
+
+.intent-card-purple:hover {
+  background: linear-gradient(135deg, #d60868 0%, #e65f00 100%);
+}
+
+.intent-card-purple .intent-badge {
+  color: #ee0979;
+}
+
+.intent-card-modern.active {
+  border-color: white;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3), 0 9px 18px rgba(0, 0, 0, 0.15);
+}
+
+/* ========================================
+   MOBILE RESPONSIVENESS - CONSOLIDATED
+   ======================================== */
+
+/* Tablet */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .intent-card-modern {
+    min-height: 110px;
+    padding: 0.875rem 0.75rem;
+  }
+  
+  .intent-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .intent-card-modern {
+    min-height: 95px !important;
+    padding: 0.875rem 0.625rem !important;
+    margin-bottom: 0.5rem;
+    border-radius: 10px;
+  }
+  
+  .intent-icon {
+    font-size: 1.75rem !important;
+    margin-bottom: 0.3rem !important;
+    animation: none;
+  }
+  
+  .intent-title {
+    font-size: 0.95rem !important;
+    margin-bottom: 0.2rem !important;
+    font-weight: 600;
+  }
+  
+  .intent-desc {
+    font-size: 0.75rem !important;
+    margin-bottom: 0 !important;
+    line-height: 1.3;
+    opacity: 0.9;
+  }
+  
+  .intent-badge {
+    display: none !important;
+  }
+  /* ========================================
+   CARD INPUT STYLES - BEAUTIFUL FORM FIELDS
+   ======================================== */
+
+/* Card Wrapper */
+.card-input-wrapper {
+  margin-bottom: 1rem;
+}
+
+/* Card Container - Modern Design */
+.card-input-container {
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-input-container:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+/* Top Bar Accent */
+.card-top-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: currentColor;
+  opacity: 0.7;
+}
+
+/* Card Content */
+.card-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* Title Row */
+.card-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+/* Card Title */
+.card-input-title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+  color: #1e3a8a;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Card Icon (in title) */
+.card-icon {
+  font-size: 1.25rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+/* Hint Text */
+.card-hint {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-style: italic;
+}
+
+/* Input Field Container */
+.card-input-field {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* The Actual Input Field */
+.card-input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  background: white;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.card-input:focus {
+  border-color: #1e40af;
+  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+  transform: scale(1.02);
+}
+
+.card-input:hover {
+  border-color: rgba(30, 64, 175, 0.3);
+}
+
+.card-input::placeholder {
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+/* Action Button (+ button next to input) */
+.card-action-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: none;
+  color: white;
+  font-size: 1.25rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-action-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.card-action-btn:active {
+  transform: scale(0.95);
+}
+
+/* Color Variants for Different Cards */
+.card-color-blue {
+  background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
+  border: 2px solid #3b82f6;
+}
+
+.card-color-teal {
+  background: linear-gradient(135deg, #ccfbf1 0%, #f0fdfa 100%);
+  border: 2px solid #14b8a6;
+}
+
+.card-color-purple {
+  background: linear-gradient(135deg, #e9d5ff 0%, #f3e8ff 100%);
+  border: 2px solid #a855f7;
+}
+
+.card-color-yellow {
+  background: linear-gradient(135deg, #fef3c7 0%, #fffbeb 100%);
+  border: 2px solid #f59e0b;
+}
+
+.card-color-green {
+  background: linear-gradient(135deg, #d9f99d 0%, #ecfccb 100%);
+  border: 2px solid #84cc16;
+}
+
+.card-color-pink {
+  background: linear-gradient(135deg, #fce7f3 0%, #fdf2f8 100%);
+  border: 2px solid #ec4899;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .card-input-container {
+    padding: 0.875rem;
+  }
+  
+  .card-input-title {
+    font-size: 0.9rem;
+  }
+  
+  .card-icon {
+    font-size: 1.1rem;
+  }
+  
+  .card-hint {
+    font-size: 0.7rem;
+  }
+  
+  .card-input {
+    padding: 0.625rem 0.75rem;
+    font-size: 0.9rem;
+  }
+  
+  .card-action-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .card-input-wrapper {
+    margin-bottom: 0.75rem;
+  }
+  
+  .card-input-container {
+    padding: 0.75rem;
+  }
+  
+  .card-input-title {
+    font-size: 0.85rem;
+  }
+  
+  .card-input {
+    font-size: 0.85rem;
+  }
+}
+  /* Row spacing */
+@media (max-width: 768px) {
+  #intentSection .row {
+    margin-left: -0.375rem;        /* ← REDUCED */
+    margin-right: -0.375rem;
+  }
+  
+  #intentSection .row > [class*='col-'] {
+    padding-left: 0.375rem;        /* ← REDUCED */
+    padding-right: 0.375rem;
+  }
+}
+  
+  /* Container spacing */
+  .container {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+}
+
+/* Extra small phones */
+@media (max-width: 576px) {
+  .intent-card-modern {
+    min-height: 90px !important;
+    padding: 0.75rem 0.5rem !important;
+  }
+  
+  .intent-icon {
+    font-size: 1.5rem !important;
+    margin-bottom: 0.25rem !important;
+  }
+  
+  .intent-title {
+    font-size: 0.9rem !important;
+  }
+  
+  .intent-desc {
+    font-size: 0.7rem !important;
+  }
+}
+
+/* ========================================
+   VERIFICATION MODAL
+   ======================================== */
 .verification-modal {
   display: none;
   position: fixed;
@@ -163,19 +699,7 @@ body { background:#f4f6fb; }
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
-.quote-section {
-  background: linear-gradient(135deg, #eff6ff, #dbeafe);
-  border-left: 6px solid #3b82f6; border-radius: 24px;
-  padding: 32px; box-shadow: 0 8px 24px rgba(59, 130, 246, 0.15);
-  position: relative; overflow: hidden;
-}
 
-.quote-section::before {
-  content: '"'; position: absolute; top: -20px; left: 20px;
-  font-size: 120px; color: rgba(59, 130, 246, 0.1);
-  font-family: Georgia, serif;
-}
-/* Responsive */
 @media (max-width: 768px) {
   .verification-content {
     width: 98%;
@@ -190,36 +714,69 @@ body { background:#f4f6fb; }
     padding: 15px;
   }
 }
-/* Intent cards */
+@media (max-width: 768px) {
+  a[href*="SolarSanchay-Guide"] { flex: 1; min-width: 120px; text-align: center; }
+}
+a[href*="SolarSanchay-Guide"]:hover { transform: translateY(-2px); }
+
+/* ========================================
+   LEGACY INTENT CARDS (Keep for compatibility)
+   ======================================== */
 .intent-card {
-  border:2px solid #ddd;
-  border-radius:12px;
-  padding:16px;
-  cursor:pointer;
-  transition:0.2s;
-  background:#fff;
+  border: 2px solid #ddd;
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  transition: 0.2s;
+  background: #fff;
 }
-.intent-card:hover { border-color:#0b5ed7; }
+
+.intent-card:hover { 
+  border-color: #0b5ed7; 
+}
+
 .intent-card.active {
-  border-color:#0b5ed7;
-  background:#eef4ff;
+  border-color: #0b5ed7;
+  background: #eef4ff;
 }
-.intent-card h6 { font-weight:700; }
 
-/* Forms */
-label { font-weight:600; }
-input::placeholder { color:#aaa; }
+.intent-card h6 { 
+  font-weight: 700; 
+}
 
-/* Result */
+/* ========================================
+   FORMS
+   ======================================== */
+label { 
+  font-weight: 600; 
+}
+
+input::placeholder { 
+  color: #aaa; 
+}
+
+.is-invalid { 
+  border-color: #dc3545; 
+}
+
+.invalid-feedback { 
+  display: block; 
+}
+
+/* ========================================
+   RESULT BOX
+   ======================================== */
 .result-box {
-  background:#fff;
-  border-radius:12px;
-  padding:16px;
-  margin-bottom:14px;
-  box-shadow:0 2px 8px rgba(0,0,0,0.06);
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
-/* Bill Card */
+/* ========================================
+   BILL CARD
+   ======================================== */
 .bill-card {
   background: white;
   border: 2px solid #e2e8f0;
@@ -229,16 +786,20 @@ input::placeholder { color:#aaa; }
   cursor: pointer;
   transition: all 0.3s;
 }
+
 .bill-card:hover {
   border-color: #0b5ed7;
   box-shadow: 0 4px 12px rgba(11, 94, 215, 0.1);
 }
+
 .bill-card.selected {
   border-color: #0b5ed7;
   background: #eef4ff;
 }
 
-/* Stat Cards */
+/* ========================================
+   STAT CARDS
+   ======================================== */
 .stat-card {
   padding: 1.5rem;
   border-radius: 12px;
@@ -247,7 +808,9 @@ input::placeholder { color:#aaa; }
   margin-bottom: 1rem;
 }
 
-/* Modal */
+/* ========================================
+   MODALS
+   ======================================== */
 .custom-modal {
   position: fixed;
   top: 0;
@@ -260,9 +823,11 @@ input::placeholder { color:#aaa; }
   justify-content: center;
   z-index: 1000;
 }
+
 .custom-modal.show {
   display: flex;
 }
+
 .modal-content-custom {
   background: white;
   padding: 2rem;
@@ -273,7 +838,9 @@ input::placeholder { color:#aaa; }
   overflow-y: auto;
 }
 
-/* Spinner */
+/* ========================================
+   SPINNER
+   ======================================== */
 .spinner {
   border: 3px solid #f3f4f6;
   border-top: 3px solid #0b5ed7;
@@ -283,303 +850,45 @@ input::placeholder { color:#aaa; }
   animation: spin 1s linear infinite;
   margin: 0 auto;
 }
+
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
 
-/* Validation */
-.is-invalid { border-color:#dc3545; }
-.invalid-feedback { display:block; }
-
-/* Mobile */
-@media (max-width:768px){
-  .govt-text { display:none; }
-}
-.helper-wrapper {
-  background: #f3f7ff;
-  border: 2px dashed #6c8cff;
+/* ========================================
+   HOME BUTTON
+   ======================================== */
+#simpleHomeBtn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.4);
 }
 
-.helper-card {
-  border: 2px solid #6c8cff;
-  background: #ffffff;
-}
- /* Modern Intent Cards - Government Award-Winning Design */
-.intent-card-modern {
- position: relative;
-  background: white;
-  border-radius: 12px;
-  padding: 1.5rem 1.125rem;
-  cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: hidden;
-  border: 2px solid transparent;
-  box-shadow: 0 3px 4.5px rgba(0, 0, 0, 0.07);
-  text-align: center;
-  min-height: 180px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+#simpleHomeBtn:active {
+  transform: scale(0.95);
 }
 
-.intent-card-modern:hover {
- transform: translateY(-6px);
-  box-shadow: 0 9px 18px rgba(0, 0, 0, 0.15);
-  border-color: currentColor;
-}
-
-.intent-card-modern:active {
- transform: translateY(-3px) scale(0.98);
-}
-/* Alternative: Digital India Theme */
-.intent-card-blue-di {
-  background: linear-gradient(135deg, #FF9933 0%, #FFFFFF 50%, #138808 100%); /* Tricolor */
-  color: #1e3a8a;
-}
-
-.intent-card-green-di {
-  background: linear-gradient(135deg, #0c4a6e 0%, #0369a1 100%); /* Deep Blue */
-  color: white;
-}
-
-.intent-card-purple-di {
-  background: linear-gradient(135deg, #15803d 0%, #16a34a 100%); /* Green */
-  color: white;
-}
-/* Hover Effect Background */
-.intent-hover-effect {
- position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.3));
-  opacity: 0;
-  transition: opacity 0.3s;
-  pointer-events: none;
-}
-
-.intent-card-modern:hover .intent-hover-effect {
-  opacity: 1;
-}
-
-/* Icon Styling */
-.intent-icon {
- font-size: 2.625rem;
-  margin-bottom: 0.75rem;
-  animation: float 3s ease-in-out infinite;
-  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.1));
-}
-
-@keyframes float {
-0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-7.5px); }
-}
-
-/* Title */
-.intent-title {
-  font-size: 0.975rem;
-  font-weight: 700;
-  margin-bottom: 0.375rem;
-  color: inherit;
-  position: relative;
-  z-index: 1;
-}
-
-/* Description */
-.intent-desc {
-  font-size: 0.675rem;
-  opacity: 0.85;
-  margin-bottom: 0.75rem;
-  line-height: 1.5;
-  position: relative;
-  z-index: 1;
-}
- 
-/* Badge */
-.intent-badge {
- display: inline-block;
-  padding: 0.3rem 0.75rem;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 15px;
-  font-size: 0.5625rem;
-  font-weight: 600;
-  box-shadow: 0 1.5px 3px rgba(0, 0, 0, 0.1);
-  position: relative;
-  z-index: 1;
-}
-
-/* Color Variants - Blue (Quick Calculator) */
-.intent-card-blue {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-}
-
-.intent-card-blue:hover {
-background: linear-gradient(135deg, #5568d3 0%, #6a3f91 100%);
-}
-
-.intent-card-blue .intent-badge {
-  color: #667eea;
-}
-
-/* Color Variants - Green (Save & Track) */
-.intent-card-green {
-  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-  color: white;
-}
-
-.intent-card-green:hover {
-  background: linear-gradient(135deg, #0e8278 0%, #2ed96c 100%);
-}
-
-.intent-card-green .intent-badge {
-  color: #11998e;
-}
-
-/* Color Variants - Purple (Dashboard) */
-.intent-card-purple {
-  background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
-  color: white;
-}
-
-.intent-card-purple:hover {
-  background: linear-gradient(135deg, #d60868 0%, #e65f00 100%);
-}
-
-.intent-card-purple .intent-badge {
-  color: #ee0979;
-}
-
-/* Active State */
-.intent-card-modern.active {
- border-color: white;
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3), 0 9px 18px rgba(0, 0, 0, 0.15);
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .intent-card-modern {
-    min-height: 240px; /* Taller for better touch */
-    padding: 2rem 1.5rem; /* More padding */
-    margin-bottom: 1rem;
-    border-radius: 16px; /* Rounder corners */
-  }
-  .container {
-    padding-left: 8px !important;
-    padding-right: 8px !important;
-  }
-  
-  .intent-icon {
-    font-size: 4.5rem; /* 72px - very prominent */
-    margin-bottom: 1rem;
-  }
-  
-  .intent-title {
-    font-size: 1.5rem; /* 24px - bold and clear */
-    margin-bottom: 0.5rem;
-    font-weight: 800;
-  }
-  
-  .intent-desc {
-    font-size: 1rem; /* 16px - easy to read */
-    margin-bottom: 1rem;
-    line-height: 1.6;
-  }
-  /* Visible badge */
-  .intent-badge {
-    font-size: 0.875rem; /* 14px - clearly visible */
-    padding: 0.5rem 1.2rem;
-    border-radius: 20px;
-  }
-    
-  /* Stronger hover on mobile */
-  .intent-card-modern:active {
-    transform: scale(0.97);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-  }
-  
-  /* Section title bigger */
-  #intentSection h6 {
-    font-size: 1.3rem !important;
-    margin-bottom: 1.5rem !important;
-  }
-}
-
-/* Accessibility - Focus State */
-.intent-card-modern:focus {
-  outline: 3px solid #fbbf24;
-  outline-offset: 3px; /* was 4px */
-}
-
-/* Print Styles */
-@media print {
-  .intent-card-modern {
-   break-inside: avoid;
-    page-break-inside: avoid;
-    box-shadow: none;
-    border: 2px solid #333;
-  }
-    .intent-icon {
-    animation: none;
-  }
-} 
-/* ==========================================
-   OPTION 2: 2-COLUMN LAYOUT
-   Add this class to container: "two-column-layout"
-   ========================================== */
-
-@media (max-width: 768px) {
-  .two-column-layout .row.g-3 {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.75rem;
-  }
-  
-  /* First two cards in 2 columns */
-  .two-column-layout .row.g-3 > .col-md-4:nth-child(1),
-  .two-column-layout .row.g-3 > .col-md-4:nth-child(2) {
-    grid-column: span 1;
-  }
-  
-  /* Third card spans full width */
-  .two-column-layout .row.g-3 > .col-md-4:nth-child(3) {
-    grid-column: span 2;
-  }
-  
-  /* Smaller cards for 2-column */
-  .two-column-layout .intent-card-modern {
-    min-height: 200px;
-    padding: 1.5rem 1rem;
-  }
-  
-  .two-column-layout .intent-icon {
-    font-size: 3rem; /* 48px */
-  }
-  
-  .two-column-layout .intent-title {
-    font-size: 1.1rem; /* 17.6px */
-  }
-  
-  .two-column-layout .intent-desc {
-    font-size: 0.8rem; /* 12.8px */
-  }
-  
-  .two-column-layout .intent-badge {
-    font-size: 0.7rem; /* 11.2px */
-    padding: 0.35rem 0.8rem;
-  }
-}
-/* Carry Forward Warning Styles */
+/* ========================================
+   CARRY FORWARD WARNING
+   ======================================== */
 .carry-warning {
   padding: 0.5rem;
   border-radius: 8px;
   margin-top: 0.5rem;
   font-size: 0.9rem;
   border-left: 4px solid;
-  animation: slideIn 0.3s ease-out;
+  animation: slideInWarning 0.3s ease-out;
+}
+
+@keyframes slideInWarning {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .carry-warning-info {
@@ -600,322 +909,508 @@ background: linear-gradient(135deg, #5568d3 0%, #6a3f91 100%);
   color: #0f5132;
 }
 
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
+/* ========================================
+   PRINT STYLES
+   ======================================== */
+@media print {
+  .intent-card-modern {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    box-shadow: none;
+    border: 2px solid #333;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  
+  .intent-icon {
+    animation: none;
+  }
+}
+/* Banner Container */
+.doc-banner-wrapper {
+  background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+  border-radius: 12px;
+  border-left: 6px solid #1e40af;
+  padding: 1.25rem;
+  box-shadow: 0 4px 12px rgba(30, 64, 175, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+/* Text Section */
+.doc-banner-text {
+  flex: 1;
+  min-width: 200px;
+}
+
+/* Button Container */
+.doc-banner-buttons {
+  display: flex;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+/* Button Styles */
+.doc-btn {
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.9rem;
+  display: inline-block;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+  white-space: nowrap;
+}
+
+.doc-btn-pdf {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.doc-btn-word {
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.doc-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* TABLET (768px and below) */
+@media (max-width: 768px) {
+  .doc-banner-wrapper {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.5rem 1rem;
+  }
+  
+  .doc-banner-text {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+  
+  .doc-banner-buttons {
+    width: 100%;
+    justify-content: center;
   }
 }
 
-/* Tooltip enhancement */
-[title] {
-  position: relative;
-}
-#simpleHomeBtn:hover {
-  transform: scale(1.1);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.4);
-}
-
-#simpleHomeBtn:active {
-  transform: scale(0.95);
-}
-/* ==========================================
-   COLORFUL CARD INPUT STYLES
-   ========================================== */
+/* MOBILE (480px and below) */
+@media (max-width: 480px) {
+  .doc-banner-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .doc-btn {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    font-size: 0.95rem;
+  }
+}   
+/* ========================================
+   CARD INPUT STYLES
+   ======================================== */
 
 .card-input-wrapper {
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
 }
 
 .card-input-container {
   border-radius: 12px;
-  overflow: hidden;
+  padding: 1.25rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .card-input-container:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-  transform: translateY(-1px);
-}
-
-/* Color schemes for different fields */
-.card-color-blue {
-  background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
-  border: 2px solid #60a5fa;
-}
-
-.card-color-green {
-  background: linear-gradient(135deg, #d1fae5 0%, #ecfdf5 100%);
-  border: 2px solid #34d399;
-}
-
-.card-color-purple {
-  background: linear-gradient(135deg, #e9d5ff 0%, #f5f3ff 100%);
-  border: 2px solid #a78bfa;
-}
-
-.card-color-orange {
-  background: linear-gradient(135deg, #fed7aa 0%, #fef3c7 100%);
-  border: 2px solid #fb923c;
-}
-
-.card-color-red {
-  background: linear-gradient(135deg, #fecaca 0%, #fee2e2 100%);
-  border: 2px solid #f87171;
-}
-
-.card-color-cyan {
-  background: linear-gradient(135deg, #cffafe 0%, #ecfeff 100%);
-  border: 2px solid #22d3ee;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
 }
 
 .card-top-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+  background: currentColor;
+  opacity: 0.7;
 }
 
 .card-content {
-  padding: 0.875rem;
+  position: relative;
+  z-index: 1;
 }
 
 .card-title-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
 }
 
 .card-input-title {
-  margin: 0;
-  font-size: 0.875rem;
+  font-size: 1.1rem;
   font-weight: 700;
-  color: #1e293b;
+  margin: 0;
+  color: #1e3a8a;
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.5rem;
 }
 
 .card-icon {
-  font-size: 1rem;
+  font-size: 1.5rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
 .card-hint {
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   color: #64748b;
-  font-weight: 400;
   font-style: italic;
 }
 
 .card-input-field {
   display: flex;
-  align-items: stretch;
   gap: 0.5rem;
-  background: white;
-  border: 2px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 0;
-  transition: all 0.2s ease;
-  overflow: hidden;
-}
-
-.card-input-field:focus-within {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  align-items: center;
 }
 
 .card-input {
   flex: 1;
-  padding: 0.75rem 1rem;
-  border: none;
-  background: transparent;
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: #0f172a;
+  padding: 0.875rem 1rem;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  background: white;
+  transition: all 0.3s ease;
   outline: none;
+}
+
+.card-input:focus {
+  border-color: #1e40af;
+  box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.1);
+  transform: scale(1.01);
+}
+
+.card-input:hover {
+  border-color: rgba(30, 64, 175, 0.3);
 }
 
 .card-input::placeholder {
   color: #94a3b8;
-  font-style: italic;
+  font-weight: 400;
 }
 
 .card-action-btn {
-  width: 3rem;
+  width: 45px;
+  height: 45px;
+  border-radius: 8px;
   border: none;
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
   color: white;
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .card-action-btn:hover {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  transform: scale(1.02);
+  transform: scale(1.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 
 .card-action-btn:active {
-  transform: scale(0.98);
+  transform: scale(0.95);
 }
 
-/* Responsive adjustments */
-@media (max-width: 576px) {
-  .card-content {
-    padding: 0.75rem;
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .card-input-container {
+    padding: 1rem;
   }
   
   .card-input-title {
-    font-size: 0.8rem;
+    font-size: 0.95rem;
+  }
+  
+  .card-icon {
+    font-size: 1.25rem;
   }
   
   .card-hint {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
+  }
+  
+  .card-input {
+    padding: 0.75rem;
+    font-size: 0.95rem;
   }
   
   .card-action-btn {
-    width: 2.5rem;
-    font-size: 1.1rem;
+    width: 38px;
+    height: 38px;
+    font-size: 1.25rem;
   }
-}  
-/* Date input specific styles */
-input[type="date"].card-input {
-  cursor: pointer;
 }
 
-input[type="date"].card-input::-webkit-calendar-picker-indicator {
-  cursor: pointer;
-  font-size: 1.1rem;
-  padding: 0.25rem;
-  border-radius: 4px;
+@media (max-width: 480px) {
+  .card-input-container {
+    padding: 0.875rem;
+  }
+  
+  .card-input-title {
+    font-size: 0.9rem;
+  }
+  
+  .card-input {
+    padding: 0.625rem 0.75rem;
+    font-size: 0.9rem;
+  }
+  
+  .card-action-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 1.15rem;
+  }
+}   
+/* ========================================
+   CONTAINER CONSISTENCY FIX
+   ======================================== */
+
+/* Ensure all containers have same max-width and padding */
+.container {
+  max-width: 1200px;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-input[type="date"].card-input::-webkit-calendar-picker-indicator:hover {
-  background: #e2e8f0;
+/* Intent section specific */
+#intentSection {
+  width: 100%;
 }
-/* ==========================================
-   SECTION CONTAINER STYLES
-   ========================================== */
 
+#intentSection .row {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* Document banner - match container width */
+.doc-banner-wrapper {
+  max-width: 100%;
+}
+
+/* Quotes section - match container width */
+div[style*="background: linear-gradient(135deg, #e0f2fe"] {
+  max-width: 100%;
+}
+
+/* Responsive padding */
+@media (max-width: 768px) {
+  .container {
+    padding-left: 0.875rem;
+    padding-right: 0.875rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .container {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+}
+/* ========================================
+   SECTION HEADER STYLES
+   ======================================== */
+
+/* Section Container */
 .section-container {
-  background: white;
-  border: 3px solid #e2e8f0;
-  border-radius: 16px;
-  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.section-identity {
+  /* Specific styles for identity section if needed */
+}
+
+/* Section Header - Main Container */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border: 2px solid #e2e8f0;
+  border-left: 6px solid #3b82f6;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
   margin-bottom: 1.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   transition: all 0.3s ease;
 }
 
-.section-container:hover {
-  border-color: #cbd5e1;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+.section-header:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
 }
 
-/* Different border colors for different sections */
-.section-identity {
-  border-left: 6px solid #8b5cf6;
-  background: linear-gradient(to right, #faf5ff, #ffffff);
-}
-
-.section-period {
-  border-left: 6px solid #f59e0b;
-  background: linear-gradient(to right, #fffbeb, #ffffff);
-}
-
-.section-consumption {
-  border-left: 6px solid #3b82f6;
-  background: linear-gradient(to right, #eff6ff, #ffffff);
-}
-
-/* Section header styles */
-.section-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1.25rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 2px solid #e5e7eb;
-}
-
+/* Section Title Container (Icon + Text) */
 .section-title {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  margin: 0;
+  gap: 1rem;
+  flex: 1;
 }
 
+/* Section Icon */
 .section-icon {
-  width: 2.5rem;
-  height: 2.5rem;
+  font-size: 2.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 10px;
-  font-size: 1.3rem;
-  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
-  border: 2px solid #bfdbfe;
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
+  border: 2px solid #3b82f6;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+  flex-shrink: 0;
 }
 
 .section-icon-identity {
-  background: linear-gradient(135deg, #f3e8ff, #fae8ff);
-  border-color: #d8b4fe;
+  /* Specific styling for identity icon */
+  background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
+  border-color: #3b82f6;
 }
 
-.section-icon-period {
-  background: linear-gradient(135deg, #fef3c7, #fef9c3);
-  border-color: #fcd34d;
-}
-
-.section-icon-consumption {
-  background: linear-gradient(135deg, #dbeafe, #eff6ff);
-  border-color: #93c5fd;
-}
-
+/* Section Title Text */
 .section-title-text {
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   font-weight: 700;
-  color: #1e293b;
+  color: #1e3a8a;
+  margin: 0;
+  line-height: 1.2;
 }
 
+/* Section Subtitle */
 .section-subtitle {
-  font-size: 0.8rem;
-  color: #64748b;
-  font-weight: 400;
   display: block;
-  margin-top: 0.2rem;
+  font-size: 0.875rem;
+  color: #64748b;
+  margin-top: 0.25rem;
+  font-weight: 400;
 }
 
+/* Section Badge */
 .section-badge {
-  font-size: 0.7rem;
-  font-weight: 600;
-  padding: 0.3rem 0.6rem;
-  border-radius: 12px;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
 }
 
 .badge-required {
-  background: #fee2e2;
-  color: #991b1b;
+  background: linear-gradient(135deg, #fef3c7 0%, #fffbeb 100%);
+  color: #92400e;
+  border: 2px solid #f59e0b;
 }
 
 .badge-optional {
-  background: #dbeafe;
-  color: #1e40af;
+  background: linear-gradient(135deg, #e0e7ff 0%, #eef2ff 100%);
+  color: #3730a3;
+  border: 2px solid #818cf8;
 }
 
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .section-header {
+    padding: 0.875rem 1rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .section-title {
+    gap: 0.75rem;
+  }
+  
+  .section-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 2rem;
+  }
+  
+  .section-title-text {
+    font-size: 1.1rem;
+  }
+  
+  .section-subtitle {
+    font-size: 0.8rem;
+  }
+  
+  .section-badge {
+    align-self: flex-end;
+    padding: 0.4rem 0.875rem;
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .section-header {
+    padding: 0.75rem 0.875rem;
+  }
+  
+  .section-icon {
+    width: 45px;
+    height: 45px;
+    font-size: 1.75rem;
+  }
+  
+  .section-title-text {
+    font-size: 1rem;
+  }
+  
+  .section-subtitle {
+    font-size: 0.75rem;
+  }
+  
+  .section-badge {
+    padding: 0.35rem 0.75rem;
+    font-size: 0.7rem;
+  }
+}
+.bill-helper-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.bill-helper-btn:active {
+  transform: translateY(0);
+}
+
+/* Mobile: Stack vertically */
+@media (max-width: 640px) {
+  .bill-helper-btn {
+    width: 100% !important;
+    flex: none !important;
+  }
+}
 </style>
 </head>
-
 <body>
 <button id="simpleHomeBtn" 
         onclick="goToHome()" 
@@ -937,21 +1432,29 @@ input[type="date"].card-input::-webkit-calendar-picker-indicator:hover {
 </button>
   <div class="container">  
 <!-- HEADER -->
-<div class="header">
-  <div class="container d-flex align-items-center justify-content-between">
-    <div class="d-flex align-items-center">
-      <img src="assests/haryana-logo.jpg" style="height:55px;margin-right:12px">
-      <div>
-<div class="header-title">🌞 SolarSanchay</div>
-<small class="text-muted">
-  From Units to ₹ Savings — Making Solar Benefits Visible<br>
-  <span style="font-size:0.75rem">
-    A citizen-centric Digital India initiative
-  </span>
-</small>
+<!-- CLEAN PROFESSIONAL HEADER -->
+<div class="header" style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); border-bottom: 3px solid #fbbf24; padding: 1.5rem 0;">
+  <div class="container">
+    <div class="d-flex align-items-center justify-content-between">
+      
+      <!-- Left: Title with Sun Icon -->
+      <div class="d-flex align-items-center gap-3">
+        <div style="font-size: 2.5rem;">🌞</div>
+        <div>
+          <h1 style="color: #ffffff; font-size: 2.2rem; font-weight: 800; margin: 0; text-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+            SolarSanchay
+          </h1>
+       <small class="d-none d-md-block">From Units to ₹ Savings – Making Solar Benefits Visible</small>
+    <small class="d-block d-md-none">Solar Savings Calculator</small>
+              </div>
       </div>
+      
+      <!-- Right: Haryana Logo -->
+      <div>
+        <img src="assests/haryana-logo.jpg" style="height: 80px; border-radius: 12px; border: 3px solid #fbbf24; box-shadow: 0 4px 16px rgba(251, 191, 36, 0.3);" alt="Haryana">
+      </div>
+      
     </div>
-    <div class="govt-text text-muted">NIC, Kurukshetra</div>
   </div>
 </div>
 
@@ -959,62 +1462,133 @@ input[type="date"].card-input::-webkit-calendar-picker-indicator:hover {
 
 <!-- UPDATED HTML -->
 <div id="intentSection">
-  <h6 class="mb-3 text-center" style="font-size: 1.1rem; color: #1e3a8a; font-weight: 600;">
-    🌟 Select Your Service
-  </h6>
-  
+<h6 class="mb-3 text-center intent-section-heading">
+  🚀 How would you like to proceed?
+</h6>  
   <div class="row g-3">
     <!-- Card 1: One-time Check -->
-    <div class="col-md-4">
-      <div class="intent-card-modern intent-card-blue" id="intentOne" onclick="selectIntent('one')">
-        <div class="intent-icon">⚡</div>
-        <h6 class="intent-title">Instant Solar Benefit Check</h6>
-        <p class="intent-desc">Instant solar savings estimation</p>
-        <div class="intent-badge">No Registration Required</div>
-        <div class="intent-hover-effect"></div>
-      </div>
-    </div>
-
-    <!-- Card 2: Save for Future -->
-    <div class="col-md-4">
-      <div class="intent-card-modern intent-card-green" id="intentSave" onclick="selectIntent('save')">
-        <div class="intent-icon">💾</div>
-        <h6 class="intent-title">Save & Track</h6>
-        <p class="intent-desc">Maintain complete bill history</p>
-        <div class="intent-badge">Secure Storage</div>
-        <div class="intent-hover-effect"></div>
-      </div>
-    </div>
-
-    <!-- Card 3: Dashboard -->
-    <div class="col-md-4">
-      <div class="intent-card-modern intent-card-purple" id="intentDashboard" onclick="selectIntent('dashboard')">
-        <div class="intent-icon">📊</div>
-        <h6 class="intent-title">My Dashboard</h6>
-        <p class="intent-desc">View, edit & manage records</p>
-        <div class="intent-badge">Full Control</div>
-        <div class="intent-hover-effect"></div>
-      </div>
-    </div>
+<div class="col-md-4">
+  <div class="intent-card-modern intent-card-blue" id="intentOne" onclick="selectIntent('one')">
+    <div class="intent-icon">⚡</div>
+    <h6 class="intent-title">Quick Check</h6>
+    <p class="intent-desc">Instant estimate</p>
+    <div class="intent-hover-effect"></div>
   </div>
 </div>
-<div style="text-align: center; margin: 1rem 0;">
-  <button id="openScannerBtn" 
-          onclick="openBillScanner()"
-          class="d-none"
-          style="padding: 0.75rem 2rem; 
-                 background: linear-gradient(135deg, #10b981, #059669); 
-                 color: white; 
-                 border: none; 
-                 border-radius: 25px; 
-                 font-weight: 700; 
-                 font-size: 1rem; 
-                 cursor: pointer; 
-                 box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-                 transition: all 0.3s;">
-    📸 Scan Bill to Auto-Fill
-  </button>
+
+    <!-- Card 2: Save for Future -->
+<div class="col-md-4">
+  <div class="intent-card-modern intent-card-green" id="intentSave" onclick="selectIntent('save')">
+    <div class="intent-icon">💾</div>
+    <h6 class="intent-title">Save Bills</h6>
+    <p class="intent-desc">Track history</p>
+    <div class="intent-hover-effect"></div>
+  </div>
 </div>
+
+    <!-- Card 3: Dashboard -->
+<div class="col-md-4">
+  <div class="intent-card-modern intent-card-purple" id="intentDashboard" onclick="selectIntent('dashboard')">
+    <div class="intent-icon">📊</div>
+    <h6 class="intent-title">Dashboard</h6>
+    <p class="intent-desc">View records</p>
+    <div class="intent-hover-effect"></div>
+  </div>
+</div>
+  </div>
+</div>
+<div class="container my-3 d-none" id="billHelpers">
+  <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); 
+              border: 2px solid #0ea5e9; 
+              border-radius: 12px; 
+              padding: 1rem 1.25rem;
+              box-shadow: 0 2px 8px rgba(14, 165, 233, 0.15);">
+    
+    <!-- Title -->
+    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+      <span style="font-size: 1.25rem;">💡</span>
+      <strong style="color: #0c4a6e; font-size: 1rem;">Bill Entry Helpers</strong>
+    </div>
+    
+    <!-- Three Helper Buttons in One Row -->
+    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+      
+      <!-- Scan Button -->
+      <button id="openScannerBtn" 
+              onclick="openBillScanner()"
+              class="bill-helper-btn"
+              style="flex: 1; 
+                     min-width: 140px;
+                     padding: 0.625rem 1rem; 
+                     background: linear-gradient(135deg, #10b981, #059669); 
+                     color: white; 
+                     border: none; 
+                     border-radius: 8px; 
+                     font-weight: 700; 
+                     font-size: 0.875rem;
+                     cursor: pointer;
+                     box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+                     transition: all 0.3s;
+                     white-space: nowrap;">
+        📷 Scan Bill
+      </button>
+      
+      <!-- Download Link -->
+      <a href="https://uhbvn.org.in/web/portal/view-bill" 
+         target="_blank"
+         class="bill-helper-btn"
+         style="flex: 1; 
+                min-width: 140px;
+                padding: 0.625rem 1rem; 
+                background: linear-gradient(135deg, #3b82f6, #2563eb); 
+                color: white; 
+                border: none; 
+                border-radius: 8px; 
+                font-weight: 700; 
+                font-size: 0.875rem;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+                transition: all 0.3s;
+                white-space: nowrap;">
+        📄 Download Bill
+      </a>
+      
+      <!-- Verify Guide -->
+      <button onclick="openVerificationGuide()" 
+              class="bill-helper-btn"
+              style="flex: 1; 
+                     min-width: 140px;
+                     padding: 0.625rem 1rem; 
+                     background: linear-gradient(135deg, #f59e0b, #d97706); 
+                     color: white; 
+                     border: none; 
+                     border-radius: 8px; 
+                     font-weight: 700; 
+                     font-size: 0.875rem;
+                     cursor: pointer;
+                     box-shadow: 0 2px 6px rgba(245, 158, 11, 0.3);
+                     transition: all 0.3s;
+                     white-space: nowrap;">
+        📚 Verify Guide
+      </button>
+      
+    </div>
+    
+    <!-- Small hint text -->
+    <div style="margin-top: 0.75rem; text-align: center;">
+      <small style="color: #64748b; font-size: 0.8rem;">
+        Need your bill? Download from 
+        <a href="https://uhbvn.org.in/web/portal/view-bill" target="_blank" style="color: #0ea5e9; text-decoration: underline;">UHBVN</a> or 
+        <a href="https://dhbvn.org.in/web/portal/view-bill" target="_blank" style="color: #0ea5e9; text-decoration: underline;">DHBVN</a>
+      </small>
+    </div>
+    
+  </div>
+</div>
+
 
 <!-- SCANNER MODAL CONTAINER -->
 <div id="scannerModal" style="display: none; 
@@ -1332,7 +1906,6 @@ input[type="date"].card-input::-webkit-calendar-picker-indicator:hover {
 
   </div>
 </div>
-
 <!-- CONSUMPTION SECTION WITH CONTAINER -->
 <div class="d-none" id="consumptionSection">
   <div class="section-container section-consumption">
@@ -1564,20 +2137,6 @@ input[type="date"].card-input::-webkit-calendar-picker-indicator:hover {
   </div> <!-- Close section-container -->
 </div> <!-- Close consumptionSection -->
 <!-- ✅ ADD THIS BUTTON AFTER FORM FIELDS -->
-    <div style="text-align: center; margin: 15px 0;">
-      <button onclick="showVerificationGuide()" 
-              style="background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%); 
-                     color: white; 
-                     border: none; 
-                     padding: 12px 24px; 
-                     border-radius: 8px; 
-                     font-size: 15px; 
-                     font-weight: bold; 
-                     cursor: pointer;
-                     box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);">
-        📋 How to Verify Bill Data
-      </button>
-    </div>
     
 <button id="actionBtn"
         class="btn btn-primary w-100 d-none"
@@ -1619,15 +2178,16 @@ input[type="date"].card-input::-webkit-calendar-picker-indicator:hover {
 </div>
 <!-- Quote Section - Place BEFORE Last Updated line -->
       
- <div id="intentSummary" style="text-align: center; margin: 0.5rem 0;">
-    <small style="color: #6c757d;">
-      📄 Don't have your bill? Download from 
-      <a href="https://uhbvn.org.in/web/portal/view-bill" target="_blank">UHBVN</a> or 
-      <a href="https://dhbvn.org.in/web/portal/view-bill" target="_blank">DHBVN</a>
+<!-- DIV 1: Shows selected mode (One-time or Save) -->
+<div id="intentSummary" class="d-none" style="text-align: center; margin: 0.5rem 0;">
+    <small id="intentText" style="color: #6c757d;">
+      <!-- This gets filled by JavaScript with mode info -->
     </small>
 </div>
+
 <!-- COLLAPSIBLE POLICY INFORMATION -->
-<div style="margin: 1rem 0;">
+<div class="container">
+   <div id="policyInfoSection" class="d-none" style="margin: 1rem 0;">
   <!-- Collapsed View (Default) -->
   <div id="policyInfoCollapsed" 
        style="display: flex; align-items: center; justify-content: space-between; 
@@ -1700,37 +2260,62 @@ input[type="date"].card-input::-webkit-calendar-picker-indicator:hover {
     </div>
   </div>
 </div>
-<footer class="mt-3 py-3 text-center"
+</div>
+   <footer class="mt-1 py-3 text-center"
         style="background:#f8f9fa;border-top:1px solid #dee2e6;">
-<!-- Quote Section - Place ABOVE "Developed by NIC" -->
-<div style="max-width: 900px; margin: 0 auto 1.5rem auto; padding: 2.5rem 2rem; background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%); border-radius: 16px; border-left: 6px solid #0284c7; box-shadow: 0 4px 16px rgba(2, 132, 199, 0.15); position: relative;">
-  
-  <!-- Opening Quote Mark -->
-  <div style="position: absolute; top: 1rem; left: 1.5rem; font-size: 4rem; color: #bae6fd; font-family: Georgia, serif; line-height: 1; opacity: 0.6;">
-    "
+<!-- Quote Section - Full Width Simple -->
+<div class="container">
+  <div id="quotesSection" class="p-4" style="background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%); border-radius: 12px; border-left: 6px solid #0284c7; box-shadow: 0 2px 12px rgba(2, 132, 199, 0.1);">
+    
+    <!-- Quote -->
+    <p class="text-center mb-3" style="font-size: 1.15rem; color: #1e3a8a; font-weight: 500; font-style: italic; line-height: 1.8;">
+      सूर्य की रोशनी को बचत में बदलना — जब नागरिक स्पष्ट रूप से देख सकें कि सोलर क्या वापस देता है।
+    </p>
+    
+    <!-- Attribution -->
+    <p class="text-center mb-3" style="color: #0c4a6e; font-size: 0.9rem; font-weight: 600;">
+      – सोलरसंचय दर्शन
+    </p>
+    
+    <!-- Line -->
+    <hr style="width: 100px; height: 2px; background: #0284c7; border: none; margin: 1rem auto;">
+    
+    <!-- Description -->
+    <p class="text-center mb-0" style="font-size: 0.85rem; color: #0369a1; line-height: 1.6; max-width: 800px; margin: 0 auto;">
+      जब ऊर्जा डेटा को सरल तरीके से प्रस्तुत किया जाता है, तो नागरिक अनुमान से जागरूकता की ओर,<br class="d-none d-md-block">
+      और जागरूकता से सोलर अपनाने की सूचित निर्णय की ओर बढ़ते हैं।
+    </p>
   </div>
-  
-  <!-- Quote Text -->
-  <p style="font-size: 1.25rem; color: #1e3a8a; text-align: center; line-height: 1.8; margin: 0 0 1rem 0; font-weight: 500; font-style: italic; position: relative; z-index: 1; padding: 0 2rem;">
-    सूर्य की रोशनी को बचत में बदलना — जब नागरिक स्पष्ट रूप से देख सकें कि सोलर क्या वापस देता है।
-  </p>
-  
-  <!-- Attribution -->
-  <p style="text-align: right; color: #0c4a6e; font-size: 0.95rem; margin: 0.5rem 2rem 1rem 0; font-weight: 500;">
-    – सोलरसंचय दर्शन
-  </p>
-  
-  <!-- Description -->
-  <p style="text-align: center; font-size: 0.9rem; color: #0369a1; margin: 0; line-height: 1.7; font-weight: 400; padding: 0 1rem;">
-    जब ऊर्जा डेटा को सरल तरीके से प्रस्तुत किया जाता है, तो नागरिक अनुमान से जागरूकता की ओर,<br>
-    और जागरूकता से सोलर अपनाने की सूचित निर्णय की ओर बढ़ते हैं।
-  </p>
-  
-  <!-- Closing Quote Mark -->
-  <div style="position: absolute; bottom: 1rem; right: 1.5rem; font-size: 4rem; color: #bae6fd; font-family: Georgia, serif; line-height: 1; opacity: 0.6; transform: rotate(180deg);">
-    "
+</div>
+   
+<!-- DOCUMENT DOWNLOAD BANNER - FULLY RESPONSIVE -->
+<div class="container" style="margin: 1.5rem auto;" id="userGuideBanner">
+  <div class="doc-banner-wrapper">
+    
+    <!-- Text Content -->
+    <div class="doc-banner-text">
+      <h4 style="color: #1e40af; font-weight: 700; margin: 0 0 0.5rem 0; font-size: 1.1rem;">
+        📚 Complete User Guide Available
+      </h4>
+      <p style="color: #64748b; margin: 0; font-size: 0.9rem;">
+        Learn about features, benefits, and how to use SolarSanchay
+      </p>
+    </div>
+    
+    <!-- Button Container -->
+    <div class="doc-banner-buttons">
+      <a href="docs/SolarSanchay-Guide.pdf" 
+         target="_blank"
+         class="doc-btn doc-btn-pdf">
+        📄 View PDF
+      </a>
+     </div>
+    
   </div>
-</div><div class="footer">
+</div>
+
+
+<div class="footer">
   Developed by <b>National Informatics Centre (NIC), Kurukshetra</b><br>
   for <b>District Administration, Kurukshetra</b><br>
   <span class="small">A scalable Digital India initiative for solar transparency</span>
@@ -1825,6 +2410,12 @@ function selectIntent(type){
   const dashboardSection = document.getElementById("dashboardSection");
   const carrySec = document.getElementById("carryForwardSection");
   const actionBtn = document.getElementById("actionBtn");
+  const downloadMessage = document.getElementById("downloadMessage");
+  const policyInfo = document.getElementById("policyInfoSection");
+  const scanBtn = document.getElementById("openScannerBtn");
+  const quotes = document.getElementById("quotesSection");
+  const userGuide = document.getElementById("userGuideBanner"); 
+const billHelpers = document.getElementById("billHelpers");   
 
   // ==========================================
   // STEP 1: CLEAR ALL INLINE STYLES
@@ -1863,7 +2454,12 @@ function selectIntent(type){
     if (actionBtn) actionBtn.classList.add("d-none");
     if (intentSummary) intentSummary.classList.add("d-none");
     if (dashboardSection) dashboardSection.classList.add("d-none");
-    
+       if (downloadMessage) downloadMessage.classList.add("d-none");
+     if (policyInfo) policyInfo.classList.add("d-none");     // 1. Hide policy info
+    if (scanBtn) scanBtn.classList.add("d-none");           // 2. Hide scan button
+    if (quotes) quotes.classList.add("d-none");       
+    if (userGuide) userGuide.classList.add("d-none");
+    if (billHelpers) billHelpers.classList.add("d-none");     
     // Show auth section
     if (authSection) authSection.classList.remove("d-none");
     
@@ -1889,6 +2485,35 @@ function selectIntent(type){
           ? "✔ <b>One-time Analysis:</b> No data will be saved"
           : "✔ <b>Save for Future:</b> Bill details will be stored";
     }
+   // ↓↓↓ ADD THIS ↓↓↓
+    // Show download message
+   if (downloadMessage) {
+  downloadMessage.classList.remove("d-none");
+  downloadMessage.style.display = '';  // ← THIS IS THE KEY!
+}
+if (policyInfo) {
+  policyInfo.classList.remove("d-none");
+  policyInfo.style.display = '';
+}
+
+if (scanBtn) {
+  scanBtn.classList.remove("d-none");
+  scanBtn.style.display = '';
+}
+
+// ↓↓↓ HIDE: Quotes (not needed in form mode) ↓↓↓
+if (quotes) {
+  quotes.classList.add("d-none");
+  quotes.style.display = 'none';
+}
+if (billHelpers) {                           // ADD THIS
+    billHelpers.classList.remove("d-none");    // ADD THIS
+    billHelpers.style.display = '';            // ADD THIS
+  }        
+if (userGuide) {                           // ADD THIS
+    userGuide.classList.add("d-none");       // ADD THIS
+    userGuide.style.display = 'none';        // ADD THIS
+}         
 
     // Show consumption and bill period (always needed)
     if (consumption) {
@@ -1932,7 +2557,7 @@ function selectIntent(type){
     // Scroll to top smoothly
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
-  showScannerButton();
+//  showScannerButton();
   console.log('selectIntent completed');
 }
 
@@ -4914,7 +5539,11 @@ function goToHome() {
     'billPeriodSection',    // ✅ ADD - Bill Period
     'carryForwardSection',  // ✅ ADD - Carry Forward
     'intentSummary', // ✅ ADD - Summary bar
-    'actionBtn'
+    'actionBtn',
+     'downloadMessage',
+     'policyInfoSection',
+'openScannerBtn',
+   'billHelpers'
   ];
   
   sectionsToHide.forEach(id => {
@@ -4931,6 +5560,16 @@ function goToHome() {
     intentSection.classList.remove('d-none');
     intentSection.style.display = 'block';
   }
+const quotes = document.getElementById('quotesSection');
+if (quotes) {
+  quotes.classList.remove('d-none');
+  quotes.style.display = 'block';
+}
+const userGuide = document.getElementById('userGuideBanner');  // ADD THIS
+if (userGuide) {                                               // ADD THIS
+  userGuide.classList.remove('d-none');                        // ADD THIS
+  userGuide.style.display = 'block';                           // ADD THIS
+}    
   
   // Hide home button
   document.getElementById('simpleHomeBtn').style.display = 'none';
@@ -5073,6 +5712,8 @@ function showScannerButton() {
   const btn = document.getElementById('openScannerBtn');
   if (btn && (entryMode === 'one' || entryMode === 'save')) {
     btn.classList.remove('d-none');
+    } else {
+    btn.classList.add('d-none');
   }
 }
 
