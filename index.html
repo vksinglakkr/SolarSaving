@@ -1231,6 +1231,168 @@ div[style*="background: linear-gradient(135deg, #e0f2fe"] {
     padding-right: 0.75rem;
   }
 }
+/* ========================================
+   SECTION HEADER STYLES
+   ======================================== */
+
+/* Section Container */
+.section-container {
+  margin-bottom: 1.5rem;
+}
+
+.section-identity {
+  /* Specific styles for identity section if needed */
+}
+
+/* Section Header - Main Container */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border: 2px solid #e2e8f0;
+  border-left: 6px solid #3b82f6;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+}
+
+.section-header:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Section Title Container (Icon + Text) */
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+}
+
+/* Section Icon */
+.section-icon {
+  font-size: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
+  border: 2px solid #3b82f6;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+  flex-shrink: 0;
+}
+
+.section-icon-identity {
+  /* Specific styling for identity icon */
+  background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
+  border-color: #3b82f6;
+}
+
+/* Section Title Text */
+.section-title-text {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e3a8a;
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* Section Subtitle */
+.section-subtitle {
+  display: block;
+  font-size: 0.875rem;
+  color: #64748b;
+  margin-top: 0.25rem;
+  font-weight: 400;
+}
+
+/* Section Badge */
+.section-badge {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
+
+.badge-required {
+  background: linear-gradient(135deg, #fef3c7 0%, #fffbeb 100%);
+  color: #92400e;
+  border: 2px solid #f59e0b;
+}
+
+.badge-optional {
+  background: linear-gradient(135deg, #e0e7ff 0%, #eef2ff 100%);
+  color: #3730a3;
+  border: 2px solid #818cf8;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .section-header {
+    padding: 0.875rem 1rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .section-title {
+    gap: 0.75rem;
+  }
+  
+  .section-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 2rem;
+  }
+  
+  .section-title-text {
+    font-size: 1.1rem;
+  }
+  
+  .section-subtitle {
+    font-size: 0.8rem;
+  }
+  
+  .section-badge {
+    align-self: flex-end;
+    padding: 0.4rem 0.875rem;
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .section-header {
+    padding: 0.75rem 0.875rem;
+  }
+  
+  .section-icon {
+    width: 45px;
+    height: 45px;
+    font-size: 1.75rem;
+  }
+  
+  .section-title-text {
+    font-size: 1rem;
+  }
+  
+  .section-subtitle {
+    font-size: 0.75rem;
+  }
+  
+  .section-badge {
+    padding: 0.35rem 0.75rem;
+    font-size: 0.7rem;
+  }
+}
 </style>
 </head>
 <body>
