@@ -5251,11 +5251,16 @@ function generateSolarAnalysis() {
   
   // Method 1: Try 'Days in Bill Period' field
   console.log('Method 1: Trying "Days in Bill Period" field...');
-  bills.forEach((bill, index) => {
-    const days = parseInt(bill['Days in Bill Period']) || 0;
-    console.log(`  Bill ${index + 1}: Days field = "${bill['Days in Bill Period']}" → ${days} days`);
-    totalDays += days;
-  });
+ bills.forEach((bill, index) => {
+  const days = parseInt(bill['Days in Bill Period']) 
+            || parseInt(bill['Days in Billing Period'])
+            || parseInt(bill['Bill Days'])
+            || parseInt(bill['Days'])
+            || parseInt(bill['Period Days'])
+            || 0;
+  console.log(`  Bill ${index + 1}: ${days} days`);
+  totalDays += days;
+});
   console.log('Method 1 result:', totalDays, 'days');
   
   // Method 2: If failed, try calculating from From/To dates
