@@ -5243,15 +5243,12 @@ function generateSolarAnalysis() {
   const totalBillAmount = bills.reduce((sum, b) => sum + parseFloat(b['Total Bill Amount'] || 0), 0);
   const totalFixedCharges = bills.reduce((sum, b) => sum + parseFloat(b['Fixed Charges'] || 0), 0);
   
-  // Calculate total days - try multiple methods
+  // Calculate total days
   let totalDays = 0;
-  
-  // Method 1: Sum of "Billing Days" field
   bills.forEach((bill) => {
     totalDays += parseInt(bill['Billing Days']) || 0;
   });
   
-  // Method 2: If failed, calculate from dates
   if (totalDays === 0) {
     bills.forEach((bill) => {
       const fromDate = new Date(bill['Bill From Date']);
@@ -5262,7 +5259,6 @@ function generateSolarAnalysis() {
     });
   }
   
-  // Method 3: Fallback
   if (totalDays === 0) {
     totalDays = bills.length * 60;
   }
@@ -5283,33 +5279,56 @@ function generateSolarAnalysis() {
   const avgDailyExport = (totalExport / totalDays).toFixed(1);
   const avgNetImport = (netImport / totalDays).toFixed(1);
   
-  // Financial calculations - from ACTUAL bills
+  // Financial calculations from ACTUAL bills
   const dailyBill = totalBillAmount / totalDays;
   const dailyFixed = totalFixedCharges / totalDays;
   const dailyVariable = (totalBillAmount - totalFixedCharges) / totalDays;
   const monthlyFixed = totalFixedCharges / bills.length;
   
-  // Determine recommendation
+  // Calculate battery metrics first
+  const batteryCapacity = Math.round(parseFloat(avgDailyExport) * 0.8);
+  const batterySaving = Math.round(dailyVariable * 0.8);
+  const batteryCost = batteryCapacity * 15000;
+  const batteryPayback = Math.round(batteryCost / (batterySaving * 365));
+  
+  // Determine recommendation based on battery viability
   let recommendation = '';
   let reason = '';
   let color = '';
   let priority = '';
   
   if (exportRatio > 70) {
-    recommendation = '🔋 BATTERY STORAGE RECOMMENDED';
-    reason = `You generate ${avgDailyGeneration} units/day but export ${avgDailyExport} units/day back to grid (${exportRatio}% wasted). A battery will store this daytime surplus for nighttime use, reducing your electricity bill.`;
-    color = '#3b82f6';
-    priority = 'battery';
+    // Check if battery is financially viable (payback <= 15 years)
+    if (batteryPayback <= 15) {
+      recommendation = '🔋 BATTERY STORAGE RECOMMENDED';
+      reason = `You generate ${avgDailyGeneration} units/day but export ${avgDailyExport} units/day (${exportRatio}%). Battery storage will store this daytime surplus for nighttime use. Payback period: ${batteryPayback} years.`;
+      color = '#3b82f6';
+      priority = 'battery';
+    } else {
+      // Battery not viable - system working well
+      const gridReduction = (100 - (Math.abs(parseFloat(avgNetImport)) / parseFloat(avgDailyConsumption)) * 100).toFixed(0);
+      recommendation = '✅ SYSTEM WORKING WELL';
+      reason = `You generate ${avgDailyGeneration} units/day and export ${exportRatio}% to grid. Your net import is only ${Math.abs(avgNetImport)} units/day (${gridReduction}% grid reduction achieved). Battery would take ${batteryPayback} years to pay back, which is not financially viable. Consider adding ${Math.round(Math.abs(parseFloat(avgNetImport)) * 1.2)} units/day capacity for complete self-sufficiency.`;
+      color = '#10b981';
+      priority = 'small-addition';
+    }
   }
   else if (exportRatio > 40 && exportRatio <= 70) {
-    recommendation = '🔋 BATTERY BENEFICIAL';
-    reason = `You export ${exportRatio}% of solar generation. Battery storage will help you use this energy at night instead of buying from grid.`;
-    color = '#3b82f6';
-    priority = 'battery';
+    if (batteryPayback <= 15) {
+      recommendation = '🔋 BATTERY BENEFICIAL';
+      reason = `You export ${exportRatio}% of solar generation. Battery storage will help you use this energy at night. Payback: ${batteryPayback} years.`;
+      color = '#3b82f6';
+      priority = 'battery';
+    } else {
+      recommendation = '✅ BALANCED SYSTEM';
+      reason = `Your system shows good balance. Export ${exportRatio}%, net import ${Math.abs(avgNetImport)} units/day. Battery payback (${batteryPayback} years) not viable currently.`;
+      color = '#10b981';
+      priority = 'optimal';
+    }
   }
   else if (exportRatio <= 40 && avgDailyImport > avgDailyGeneration * 0.6) {
     recommendation = '⬆️ ADD MORE SOLAR PANELS';
-    reason = `Your solar generates ${avgDailyGeneration} units/day but you need ${avgDailyConsumption} units/day. Adding more panels will reduce grid dependency and lower bills.`;
+    reason = `Your solar generates ${avgDailyGeneration} units/day but you need ${avgDailyConsumption} units/day. Adding more panels will reduce grid dependency significantly.`;
     color = '#f59e0b';
     priority = 'panels';
   }
@@ -5321,25 +5340,12 @@ function generateSolarAnalysis() {
   }
   else {
     recommendation = '✅ GOOD SYSTEM';
-    reason = `Your solar system is working well. Export (${exportRatio}%) and import levels show reasonable balance.`;
+    reason = `Your solar system is working well with reasonable balance.`;
     color = '#10b981';
     priority = 'optimal';
   }
   
-  // Battery savings calculation (if applicable)
-  let batterySaving = 0;
-  let batteryCapacity = 0;
-  let batteryCost = 0;
-  let paybackYears = 0;
-  
-  if (priority === 'battery') {
-    batteryCapacity = Math.round(parseFloat(avgDailyExport) * 0.8);
-    batterySaving = Math.round(dailyVariable * 0.8); // Can save 80% of variable charges
-    batteryCost = batteryCapacity * 15000; // ₹15,000 per kWh
-    paybackYears = Math.round(batteryCost / (batterySaving * 365));
-  }
-  
-  // Additional panels calculation (if applicable)
+  // Additional panels calculation (if needed)
   let additionalCapacity = 0;
   let panelsNeeded = 0;
   let panelsSaving = 0;
@@ -5347,11 +5353,13 @@ function generateSolarAnalysis() {
   if (priority === 'panels') {
     additionalCapacity = Math.round(parseFloat(avgDailyImport) * 0.7);
     panelsNeeded = Math.ceil(additionalCapacity / 4);
-    // Savings = reduced variable charges (approximate)
     panelsSaving = Math.round((additionalCapacity / totalImport) * (totalBillAmount - totalFixedCharges) / totalDays);
+  } else if (priority === 'small-addition') {
+    additionalCapacity = Math.round(Math.abs(parseFloat(avgNetImport)) * 1.2);
+    panelsNeeded = Math.ceil(additionalCapacity / 4);
   }
   
-  // Format bill period
+  // Format bill periods
   const firstBillPeriod = formatBillPeriod(bills[0]);
   const lastBillPeriod = formatBillPeriod(bills[bills.length - 1]);
   
@@ -5359,24 +5367,20 @@ function generateSolarAnalysis() {
   const analysisHTML = `
     <div style="text-align: left; max-height: 70vh; overflow-y: auto; font-family: system-ui; line-height: 1.6;">
       
-      <!-- Header -->
       <h4 style="color: #1e40af; margin-bottom: 1rem; border-bottom: 3px solid #1e40af; padding-bottom: 0.5rem; font-size: 1.2rem;">
         🔍 Solar Performance Analysis
       </h4>
       
-      <!-- Period Info -->
       <div style="background: linear-gradient(135deg, #dbeafe, #e0f2fe); padding: 0.75rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.9rem;">
         <strong>Analysis Period:</strong> ${totalDays} days (${bills.length} bills)<br>
         <strong>Date Range:</strong> ${firstBillPeriod} to ${lastBillPeriod}
       </div>
       
-      <!-- Main Recommendation -->
       <div style="background: ${color}; color: white; padding: 1.25rem; border-radius: 10px; margin-bottom: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
         <h5 style="margin: 0 0 0.75rem 0; font-size: 1.1rem; font-weight: 700;">${recommendation}</h5>
         <p style="margin: 0; font-size: 0.95rem; line-height: 1.6; opacity: 0.95;">${reason}</p>
       </div>
       
-      <!-- Performance Summary -->
       <div style="background: linear-gradient(135deg, #fef3c7, #fef9e7); padding: 1rem; border-radius: 10px; margin-bottom: 1rem; border-left: 4px solid #f59e0b;">
         <h6 style="color: #92400e; font-weight: 700; margin: 0 0 0.75rem 0; font-size: 1rem;">☀️ Solar Performance</h6>
         
@@ -5407,7 +5411,6 @@ function generateSolarAnalysis() {
         </div>
       </div>
       
-      <!-- Grid Summary -->
       <div style="background: linear-gradient(135deg, #e0e7ff, #e5e7eb); padding: 1rem; border-radius: 10px; margin-bottom: 1rem; border-left: 4px solid #6366f1;">
         <h6 style="color: #312e81; font-weight: 700; margin: 0 0 0.75rem 0; font-size: 1rem;">⚡ Grid Interaction</h6>
         
@@ -5426,7 +5429,6 @@ function generateSolarAnalysis() {
         </div>
       </div>
       
-      <!-- Financial Summary -->
       <div style="background: linear-gradient(135deg, #dcfce7, #d1fae5); padding: 1rem; border-radius: 10px; margin-bottom: 1rem; border-left: 4px solid #10b981;">
         <h6 style="color: #065f46; font-weight: 700; margin: 0 0 0.75rem 0; font-size: 1rem;">💰 Your Electricity Bill</h6>
         
@@ -5452,7 +5454,6 @@ function generateSolarAnalysis() {
       </div>
       
       ${priority === 'battery' ? `
-      <!-- Battery Recommendation -->
       <div style="background: linear-gradient(135deg, #dbeafe, #bfdbfe); padding: 1.25rem; border-radius: 10px; border: 2px solid #3b82f6;">
         <h6 style="color: #1e40af; font-weight: 700; margin: 0 0 1rem 0; font-size: 1.05rem;">🔋 Battery Storage Solution</h6>
         
@@ -5490,19 +5491,71 @@ function generateSolarAnalysis() {
             </tr>
             <tr>
               <td style="padding: 0.4rem 0;"><strong>Payback Period:</strong></td>
-              <td style="text-align: right; font-weight: 700; color: #1e40af; font-size: 1.1rem;">${paybackYears} years</td>
+              <td style="text-align: right; font-weight: 700; color: #1e40af; font-size: 1.1rem;">${batteryPayback} years</td>
             </tr>
           </table>
         </div>
         
         <div style="background: #fef3c7; padding: 0.75rem; border-radius: 6px; margin-top: 1rem; font-size: 0.85rem; color: #92400e;">
-          <strong>⚠️ Note:</strong> Fixed charges (₹${Math.round(dailyFixed)}/day) will remain even after battery installation. Battery reduces only variable charges.
+          <strong>⚠️ Note:</strong> Fixed charges (₹${Math.round(dailyFixed)}/day) will remain even after battery installation.
+        </div>
+      </div>
+      ` : ''}
+      
+      ${priority === 'small-addition' ? `
+      <div style="background: linear-gradient(135deg, #fef3c7, #fde68a); padding: 1.25rem; border-radius: 10px; border: 2px solid #f59e0b;">
+        <h6 style="color: #92400e; font-weight: 700; margin: 0 0 1rem 0; font-size: 1.05rem;">☀️ Minor Capacity Addition (Optional)</h6>
+        
+        <div style="background: white; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+          <div style="font-size: 0.9rem; line-height: 1.8; color: #374151;">
+            <strong style="color: #92400e;">Current Status:</strong><br>
+            Your system is performing excellently! Net import is only ${Math.abs(avgNetImport)} units/day (${((Math.abs(parseFloat(avgNetImport)) / parseFloat(avgDailyConsumption)) * 100).toFixed(1)}% of consumption). You've already achieved ${(100 - (Math.abs(parseFloat(avgNetImport)) / parseFloat(avgDailyConsumption)) * 100).toFixed(0)}% grid reduction.
+          </div>
+        </div>
+        
+        <div style="background: white; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+          <div style="font-size: 0.9rem; line-height: 1.8; color: #374151;">
+            <strong style="color: #92400e;">Optional Improvement:</strong><br>
+            For 100% self-sufficiency, add <strong>${panelsNeeded} panel(s)</strong> (approximately ${additionalCapacity} units/day capacity).
+          </div>
+        </div>
+        
+        <div style="background: #f0fdf4; padding: 1rem; border-radius: 8px; border-left: 3px solid #10b981;">
+          <table style="width: 100%; font-size: 0.9rem;">
+            <tr>
+              <td style="padding: 0.4rem 0;">Additional Capacity:</td>
+              <td style="text-align: right; font-weight: 700;">${additionalCapacity} units/day</td>
+            </tr>
+            <tr>
+              <td style="padding: 0.4rem 0;">Estimated Panels:</td>
+              <td style="text-align: right; font-weight: 700;">${panelsNeeded} panel(s)</td>
+            </tr>
+            <tr>
+              <td style="padding: 0.4rem 0;">Estimated Cost:</td>
+              <td style="text-align: right; font-weight: 700;">₹${Math.round(panelsNeeded * 25000).toLocaleString()}</td>
+            </tr>
+            <tr>
+              <td style="padding: 0.4rem 0;">Current Variable Cost:</td>
+              <td style="text-align: right; font-weight: 700;">₹${Math.round(dailyVariable)}/day</td>
+            </tr>
+            <tr>
+              <td style="padding: 0.4rem 0;">After Addition:</td>
+              <td style="text-align: right; font-weight: 700; color: #10b981;">~₹${Math.round(dailyFixed)}/day</td>
+            </tr>
+            <tr style="border-top: 2px solid #d1fae5;">
+              <td style="padding: 0.4rem 0;"><strong>Payback Period:</strong></td>
+              <td style="text-align: right; font-weight: 700; color: #10b981; font-size: 1.1rem;">${Math.round((panelsNeeded * 25000) / (dailyVariable * 365))} years</td>
+            </tr>
+          </table>
+        </div>
+        
+        <div style="background: #dbeafe; padding: 0.75rem; border-radius: 6px; margin-top: 1rem; font-size: 0.85rem; color: #1e3a8a;">
+          <strong>💡 Recommendation:</strong> This is optional. Your current system is already ${(100 - (Math.abs(parseFloat(avgNetImport)) / parseFloat(avgDailyConsumption)) * 100).toFixed(0)}% efficient. Add capacity only if you want complete energy independence.
         </div>
       </div>
       ` : ''}
       
       ${priority === 'panels' ? `
-      <!-- Add Panels Recommendation -->
       <div style="background: linear-gradient(135deg, #fef3c7, #fde68a); padding: 1.25rem; border-radius: 10px; border: 2px solid #f59e0b;">
         <h6 style="color: #92400e; font-weight: 700; margin: 0 0 1rem 0; font-size: 1.05rem;">☀️ Expand Solar Capacity</h6>
         
@@ -5516,7 +5569,7 @@ function generateSolarAnalysis() {
         <div style="background: white; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
           <div style="font-size: 0.9rem; line-height: 1.8; color: #374151;">
             <strong style="color: #92400e;">The Solution:</strong><br>
-            Add approximately <strong>${panelsNeeded} more solar panels</strong> to generate an additional ${additionalCapacity} units/day.
+            Add approximately <strong>${panelsNeeded} solar panels</strong> to generate an additional ${additionalCapacity} units/day.
           </div>
         </div>
         
@@ -5531,28 +5584,27 @@ function generateSolarAnalysis() {
               <td style="text-align: right; font-weight: 700;">${panelsNeeded} panels</td>
             </tr>
             <tr>
-              <td style="padding: 0.4rem 0;">Potential Daily Saving:</td>
+              <td style="padding: 0.4rem 0;">Daily Saving:</td>
               <td style="text-align: right; font-weight: 700; color: #10b981; font-size: 1.1rem;">₹${panelsSaving}</td>
             </tr>
             <tr>
-              <td style="padding: 0.4rem 0;">Potential Yearly Saving:</td>
+              <td style="padding: 0.4rem 0;">Yearly Saving:</td>
               <td style="text-align: right; font-weight: 700;">₹${Math.round(panelsSaving * 365)}</td>
             </tr>
           </table>
         </div>
         
         <div style="background: #dbeafe; padding: 0.75rem; border-radius: 6px; margin-top: 1rem; font-size: 0.85rem; color: #1e3a8a;">
-          <strong>💡 Tip:</strong> Consult with your solar installer for exact panel requirements and costs.
+          <strong>💡 Tip:</strong> Consult with your solar installer for exact requirements and current market prices.
         </div>
       </div>
       ` : ''}
       
       ${priority === 'optimal' ? `
-      <!-- Optimal System -->
       <div style="background: linear-gradient(135deg, #dcfce7, #bbf7d0); padding: 1.25rem; border-radius: 10px; text-align: center; border: 2px solid #10b981;">
         <div style="font-size: 2rem; margin-bottom: 0.5rem;">✨</div>
         <h6 style="color: #065f46; margin: 0 0 0.5rem 0; font-size: 1.1rem;">System Performing Excellently!</h6>
-        <p style="margin: 0; color: #166534; font-size: 0.95rem;">Your solar setup is well-balanced with your consumption pattern. Continue monitoring for seasonal variations.</p>
+        <p style="margin: 0; color: #166534; font-size: 0.95rem;">Your solar setup is well-balanced. Continue monitoring for seasonal variations.</p>
       </div>
       ` : ''}
       
@@ -5565,9 +5617,9 @@ function generateSolarAnalysis() {
     analysisHTML,
     [
       { 
-        text: '📱 Share Report', 
+        text: '📱 Share', 
         type: 'success', 
-        action: () => shareAnalysisReport(recommendation, batterySaving, batteryCapacity, paybackYears) 
+        action: () => shareAnalysisReport(recommendation, batterySaving, batteryCapacity, batteryPayback, priority) 
       },
       { 
         text: '✕ Close', 
@@ -5578,48 +5630,21 @@ function generateSolarAnalysis() {
   );
 }
 
-// Share function (if needed)
-function shareAnalysisReport(recommendation, saving, capacity, payback) {
-  const message = `🔍 Solar Performance Analysis
+function shareAnalysisReport(recommendation, saving, capacity, payback, priority) {
+  let message = `🔍 Solar Performance Analysis\n\n${recommendation}\n\n`;
   
-${recommendation}
-
-${saving > 0 ? `💰 Potential Saving: ₹${saving}/day
-🔋 Battery Capacity: ${capacity} kWh
-⏱️ Payback: ${payback} years` : ''}
-
-Generated by SolarSanchay
-Government of Haryana`;
-  
-  if (navigator.share) {
-    navigator.share({
-      title: 'Solar Performance Analysis',
-      text: message
-    });
-  } else {
-    alert('Share feature not available. Copy the report from screen.');
+  if (priority === 'battery') {
+    message += `💰 Saving: ₹${saving}/day\n🔋 Battery: ${capacity} kWh\n⏱️ Payback: ${payback} years`;
+  } else if (priority === 'small-addition') {
+    message += `System already ${(100 - (Math.abs(parseFloat(avgNetImport)) / parseFloat(avgDailyConsumption)) * 100).toFixed(0)}% efficient!`;
   }
-}
-// Share function (if needed)
-function shareAnalysisReport(recommendation, saving, capacity, payback) {
-  const message = `🔍 Solar Performance Analysis
   
-${recommendation}
-
-${saving > 0 ? `💰 Potential Saving: ₹${saving}/day
-🔋 Battery Capacity: ${capacity} kWh
-⏱️ Payback: ${payback} years` : ''}
-
-Generated by SolarSanchay
-Government of Haryana`;
+  message += `\n\nGenerated by SolarSanchay\nGovernment of Haryana`;
   
   if (navigator.share) {
-    navigator.share({
-      title: 'Solar Performance Analysis',
-      text: message
-    });
+    navigator.share({ title: 'Solar Analysis', text: message });
   } else {
-    alert('Share feature not available. Copy the report from screen.');
+    alert('Share feature not available.');
   }
 }
 function shareAnalysisViaWhatsApp(recommendation, reason, selfConsumption, importRatio, exportRatio) {
