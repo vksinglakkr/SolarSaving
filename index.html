@@ -5259,12 +5259,7 @@ function generateSolarAnalysis() {
   // Method 1: Try 'Days in Bill Period' field
   console.log('Method 1: Trying "Days in Bill Period" field...');
  bills.forEach((bill, index) => {
-  const days = parseInt(bill['Days in Bill Period']) 
-            || parseInt(bill['Days in Billing Period'])
-            || parseInt(bill['Bill Days'])
-            || parseInt(bill['Days'])
-            || parseInt(bill['Period Days'])
-            || 0;
+ const days = parseInt(bill['Billing Days']) || 0;
   console.log(`  Bill ${index + 1}: ${days} days`);
   totalDays += days;
 });
@@ -5276,8 +5271,8 @@ function generateSolarAnalysis() {
     totalDays = 0;
     
     bills.forEach((bill, index) => {
-      const fromDate = new Date(bill['From Date']);
-      const toDate = new Date(bill['To Date']);
+     const fromDate = new Date(bill['Bill From Date']);
+const toDate = new Date(bill['Bill To Date']);
       
       if (!isNaN(fromDate) && !isNaN(toDate)) {
         const days = Math.ceil((toDate - fromDate) / (1000 * 60 * 60 * 24));
@@ -5294,8 +5289,8 @@ function generateSolarAnalysis() {
   if (totalDays === 0 || isNaN(totalDays)) {
     console.log('Method 2 FAILED! Trying Method 3: Full date range...');
     
-    const firstBillFrom = new Date(bills[0]['From Date']);
-    const lastBillTo = new Date(bills[bills.length - 1]['To Date']);
+   const firstBillFrom = new Date(bills[0]['Bill From Date']);
+const lastBillTo = new Date(bills[bills.length - 1]['Bill To Date']);
     
     if (!isNaN(firstBillFrom) && !isNaN(lastBillTo)) {
       totalDays = Math.ceil((lastBillTo - firstBillFrom) / (1000 * 60 * 60 * 24));
