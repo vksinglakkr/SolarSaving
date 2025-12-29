@@ -278,9 +278,9 @@ async function cropBillImage(file) {
         
        // CROP SETTINGS - Based on UHBVN bill layout
         const cropTopPercent = 0.10;      // All lines need 8 spaces
-        const cropBottomPercent = 0.45;   // (or 2 tabs)
+        const cropBottomPercent = 0.55;   // (or 2 tabs)
         const cropLeftPercent = 0.03;
-        const cropRightPercent = 0.03;
+        const cropRightPercent = 0.02;
         
         const cropTop = Math.floor(originalHeight * cropTopPercent);
         const cropBottom = Math.floor(originalHeight * cropBottomPercent);
