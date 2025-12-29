@@ -321,7 +321,26 @@ async function cropBillImage(file) {
             console.log('  Original:', (file.size / 1024).toFixed(0), 'KB');
             console.log('  Cropped:', (croppedFile.size / 1024).toFixed(0), 'KB');
             console.log('  Reduction:', (((file.size - croppedFile.size) / file.size) * 100).toFixed(0), '%');
-            
+             // ===== ADD THIS NEW CODE =====
+    // Show cropped preview
+    const previewUrl = URL.createObjectURL(blob);
+    const previewImg = document.getElementById('previewImg');
+    if (previewImg) {
+      previewImg.src = previewUrl;
+      previewImg.style.border = '3px solid #10b981';
+      previewImg.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.3)';
+      
+      // Add label
+      const existingLabel = document.getElementById('cropLabel');
+      if (existingLabel) existingLabel.remove();
+      
+      const label = document.createElement('div');
+      label.id = 'cropLabel';
+      label.style.cssText = 'background: #10b981; color: white; padding: 8px; border-radius: 6px; margin-top: 10px; text-align: center; font-weight: 600;';
+      label.innerHTML = `✂️ Cropped: ${(file.size / 1024).toFixed(0)} KB → ${(croppedFile.size / 1024).toFixed(0)} KB (${(((file.size - croppedFile.size) / file.size) * 100).toFixed(0)}% smaller)`;
+      
+      previewImg.parentElement.appendChild(label);
+    }
             resolve(croppedFile);
           },
           'image/jpeg',
