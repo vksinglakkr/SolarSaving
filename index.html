@@ -5236,101 +5236,97 @@ function generateSolarAnalysis() {
     return;
   }
   
-  // Calculate metrics
+  // Calculate total units
   const totalGross = bills.reduce((sum, b) => sum + parseFloat(b['Gross Units'] || 0), 0);
   const totalImport = bills.reduce((sum, b) => sum + parseFloat(b['Import Units'] || 0), 0);
   const totalExport = bills.reduce((sum, b) => sum + parseFloat(b['Export Units'] || 0), 0);
-  const totalDays = bills.reduce((sum, b) => sum + parseInt(b['Days in Bill Period'] || 30), 0);
   
-  // Solar generation
+  // Calculate total days - WITH FIX
+  let totalDays = bills.reduce((sum, b) => {
+    const days = parseInt(b['Days in Bill Period']) || 0;
+    return sum + days;
+  }, 0);
+  
+  // Fallback: If days calculation fails, calculate from date ranges
+  if (totalDays < 30 || totalDays === 0) {
+    const firstBillFrom = new Date(bills[0]['From Date']);
+    const lastBillTo = new Date(bills[bills.length - 1]['To Date']);
+    totalDays = Math.ceil((lastBillTo - firstBillFrom) / (1000 * 60 * 60 * 24));
+  }
+  
+  // Solar calculations
   const solarGenerated = totalGross - totalImport + totalExport;
   const selfConsumption = totalGross - totalImport;
+  const netImport = totalImport - totalExport;
   
-  // Calculate ratios
+  // Calculate percentages
   const selfConsumptionRatio = (selfConsumption / solarGenerated * 100).toFixed(1);
   const exportRatio = (totalExport / solarGenerated * 100).toFixed(1);
   const importRatio = (totalImport / totalGross * 100).toFixed(1);
   
-  // Net position
-  const netImport = totalImport - totalExport; // Positive = net importer
-  const netImportPerDay = (netImport / totalDays).toFixed(1);
-  
-  // Daily averages
+  // Daily averages - CORRECTED WITH RIGHT DAYS
   const avgDailyGeneration = (solarGenerated / totalDays).toFixed(1);
   const avgDailyConsumption = (totalGross / totalDays).toFixed(1);
   const avgDailyImport = (totalImport / totalDays).toFixed(1);
   const avgDailyExport = (totalExport / totalDays).toFixed(1);
+  const avgNetImport = (netImport / totalDays).toFixed(1);
   
-  // CORRECTED RECOMMENDATION LOGIC
+  // Determine recommendation
   let recommendation = '';
   let reason = '';
   let color = '';
-  let priority = ''; // battery, panels, timing, optimal
+  let priority = '';
   
-  // Decision tree based on export ratio (most important factor)
-  
-  // Case 1: High export (>70%) - System oversized OR timing issue
+  // Decision logic based on export ratio
   if (exportRatio > 70) {
     recommendation = '🔋 BATTERY STORAGE RECOMMENDED';
-    reason = `Your solar generates ${avgDailyGeneration} units/day but you export ${avgDailyExport} units/day (${exportRatio}% of generation). This shows excellent solar capacity but poor timing alignment. Battery storage will shift daytime surplus to nighttime use, eliminating most grid imports.`;
+    reason = `Your solar generates ${avgDailyGeneration} units/day but you export ${avgDailyExport} units/day (${exportRatio}% of generation). This shows excellent solar capacity but timing mismatch. Battery storage will shift daytime surplus to nighttime use, eliminating most grid imports.`;
     color = '#3b82f6';
     priority = 'battery';
   }
-  
-  // Case 2: Medium-high export (40-70%) - Battery beneficial
-  else if (exportRatio > 40) {
+  else if (exportRatio > 40 && exportRatio <= 70) {
     recommendation = '🔋 BATTERY STORAGE BENEFICIAL';
-    reason = `You export ${exportRatio}% of solar generation. A battery system will help you use this excess energy at night, reducing grid dependency.`;
+    reason = `You export ${exportRatio}% of your solar generation (${avgDailyExport} units/day). Battery storage will help you use this excess energy at night, reducing grid dependency.`;
     color = '#3b82f6';
     priority = 'battery';
   }
-  
-  // Case 3: Low export, high import (import > 60% of consumption) - Need more solar
   else if (exportRatio <= 40 && importRatio > 60) {
     recommendation = '⬆️ INCREASE SOLAR CAPACITY';
-    reason = `You import ${importRatio}% of your consumption from grid. Your solar generation (${avgDailyGeneration} units/day) covers only ${(100 - importRatio).toFixed(0)}% of needs. Additional solar panels will significantly reduce electricity bills.`;
+    reason = `You import ${importRatio}% of your consumption from grid (${avgDailyImport} units/day). Your solar generation (${avgDailyGeneration} units/day) covers only ${(100 - importRatio).toFixed(0)}% of needs. Additional solar panels will significantly reduce electricity bills.`;
     color = '#f59e0b';
     priority = 'panels';
   }
-  
-  // Case 4: Balanced system (export 20-40%, import 40-60%)
   else if (exportRatio >= 20 && exportRatio <= 40 && importRatio >= 40 && importRatio <= 60) {
     recommendation = '✅ WELL-BALANCED SYSTEM';
-    reason = `Your solar capacity is well-matched to consumption. Export (${exportRatio}%) and import (${importRatio}%) levels show good balance. Consider battery storage for further optimization or shift usage to daytime hours.`;
+    reason = `Your solar capacity is well-matched to consumption. Export (${exportRatio}%) and import (${importRatio}%) levels show good balance. Consider battery storage for further optimization.`;
     color = '#10b981';
     priority = 'optimal';
   }
-  
-  // Case 5: Very low export (<20%), medium-low import (30-60%) - Timing optimization
   else if (exportRatio < 20 && importRatio >= 30 && importRatio <= 60) {
     recommendation = '⏰ OPTIMIZE USAGE TIMING';
-    reason = `Your self-consumption rate is good (${selfConsumptionRatio}%), but you still import ${importRatio}% from grid. Shifting more activities to peak solar hours (10 AM - 4 PM) can increase savings without additional investment.`;
+    reason = `Your self-consumption is ${selfConsumptionRatio}%, but you still import ${importRatio}% from grid. Shifting activities to peak solar hours (10 AM - 4 PM) can increase savings without additional investment.`;
     color = '#8b5cf6';
     priority = 'timing';
   }
-  
-  // Case 6: Excellent system (export <20%, import <30%)
   else if (exportRatio < 20 && importRatio < 30) {
     recommendation = '⭐ EXCELLENT OPTIMIZATION';
-    reason = `Outstanding performance! You're using ${selfConsumptionRatio}% of solar directly and importing only ${importRatio}% from grid. Your system and usage pattern are highly optimized.`;
+    reason = `Outstanding! You're using ${selfConsumptionRatio}% of solar directly and importing only ${importRatio}% from grid. Your system and usage are highly optimized.`;
     color = '#10b981';
     priority = 'optimal';
   }
-  
-  // Default case
   else {
-    recommendation = '⚖️ SYSTEM REVIEW NEEDED';
-    reason = `Your usage pattern shows mixed signals. Consider consulting with a solar expert for personalized recommendations.`;
+    recommendation = '⚖️ BALANCED SYSTEM';
+    reason = `Your system shows reasonable balance between generation and consumption.`;
     color = '#6366f1';
     priority = 'optimal';
   }
   
-  // Generate insights based on priority
+  // Generate insights
   const insights = [];
   
   if (priority === 'battery') {
     const batteryCapacity = Math.round(avgDailyExport * 0.8);
-    const potentialSaving = Math.round(avgDailyImport * 7); // Assuming ₹7/unit
+    const potentialSaving = Math.round(avgDailyImport * 7);
     insights.push(`🔋 <strong>Battery Impact:</strong> A ${batteryCapacity} kWh battery could store your daytime surplus (${avgDailyExport} units/day) for nighttime use, potentially saving ₹${potentialSaving}/day.`);
     
     if (selfConsumptionRatio < 30) {
@@ -5352,38 +5348,33 @@ function generateSolarAnalysis() {
   // Net position insight
   if (netImport > 0) {
     const gridReduction = ((totalGross - netImport) / totalGross * 100).toFixed(0);
-    insights.push(`📊 <strong>Net Position:</strong> After solar offsetting, you import only ${netImportPerDay} units/day net (${gridReduction}% reduction from ${avgDailyConsumption} units/day total consumption). ${priority === 'battery' ? 'Battery could eliminate most of this.' : priority === 'panels' ? 'Additional panels could further reduce this.' : 'This is excellent!'}`);
+    insights.push(`📊 <strong>Net Position:</strong> After solar offsetting, you import only ${avgNetImport} units/day net (${gridReduction}% reduction from ${avgDailyConsumption} units/day total consumption). ${priority === 'battery' ? 'Battery could eliminate most of this.' : priority === 'panels' ? 'Additional panels could reduce this further.' : 'This is excellent!'}`);
   } else {
-    insights.push(`📊 <strong>Net Position:</strong> You're a net energy contributor! Sending ${Math.abs(netImportPerDay)} units/day to grid.`);
+    insights.push(`📊 <strong>Net Position:</strong> You're a net energy contributor! Sending ${Math.abs(avgNetImport)} units/day to grid.`);
   }
   
-  // High self-consumption praise
   if (selfConsumptionRatio > 70) {
-    insights.push(`✨ <strong>Excellent Usage Pattern:</strong> You're consuming ${selfConsumptionRatio}% of solar directly during generation hours - this is outstanding!`);
+    insights.push(`✨ <strong>Excellent Usage:</strong> You're consuming ${selfConsumptionRatio}% of solar directly - this is outstanding timing!`);
   }
   
-  // Generate report HTML
+  // Generate HTML report
   const analysisHTML = `
     <div style="text-align: left; max-height: 70vh; overflow-y: auto; font-family: system-ui; line-height: 1.6;">
       
-      <!-- Header -->
       <h4 style="color: #0b5ed7; margin-bottom: 1rem; border-bottom: 2px solid #0b5ed7; padding-bottom: 0.5rem;">
         🔍 Solar Performance Analysis
       </h4>
       
-      <!-- Analysis Period -->
       <div style="background: #f0f9ff; padding: 0.75rem; border-radius: 6px; margin-bottom: 1rem; font-size: 0.9rem;">
         <strong>Period:</strong> ${totalDays} days (${bills.length} bills) &nbsp;|&nbsp; 
         <strong>Range:</strong> ${formatBillPeriod(bills[0])} to ${formatBillPeriod(bills[bills.length - 1])}
       </div>
       
-      <!-- Recommendation Box -->
       <div style="background: ${color}22; border-left: 4px solid ${color}; padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
         <h5 style="color: ${color}; margin: 0 0 0.5rem 0;">${recommendation}</h5>
         <p style="margin: 0; color: #333; font-size: 0.95rem; line-height: 1.6;">${reason}</p>
       </div>
       
-      <!-- Key Metrics -->
       <div style="background: linear-gradient(135deg, #e0e7ff, #c7d2fe); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
         <h6 style="color: #312e81; font-weight: 700; margin-bottom: 0.75rem; font-size: 0.95rem;">📊 Performance Summary</h6>
         
@@ -5410,13 +5401,12 @@ function generateSolarAnalysis() {
           </tr>
           <tr style="background: ${netImport > 0 ? '#fef3c7' : '#dcfce7'}; border-radius: 4px;">
             <td style="padding: 0.5rem; font-weight: 700;">${netImport > 0 ? '⚖️ Net Grid Import' : '✅ Net Grid Export'}</td>
-            <td colspan="2" style="text-align: right; padding: 0.5rem; font-weight: 700; color: ${netImport > 0 ? '#f59e0b' : '#10b981'};">${Math.abs(netImportPerDay)} units/day</td>
+            <td colspan="2" style="text-align: right; padding: 0.5rem; font-weight: 700; color: ${netImport > 0 ? '#f59e0b' : '#10b981'};">${Math.abs(avgNetImport)} units/day</td>
           </tr>
         </table>
       </div>
       
       ${insights.length > 0 ? `
-      <!-- Insights -->
       <div style="background: linear-gradient(135deg, #dcfce7, #bbf7d0); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
         <h6 style="color: #14532d; font-weight: 700; margin-bottom: 0.75rem; font-size: 0.95rem;">💡 Key Insights</h6>
         ${insights.map(insight => `
@@ -5425,7 +5415,6 @@ function generateSolarAnalysis() {
       </div>
       ` : ''}
       
-      <!-- Actions -->
       ${priority !== 'optimal' ? `
       <div style="background: #f3f4f6; padding: 1rem; border-radius: 8px;">
         <h6 style="color: #1f2937; font-weight: 700; margin-bottom: 0.75rem; font-size: 0.95rem;">🎯 Recommended Action</h6>
@@ -5436,7 +5425,7 @@ function generateSolarAnalysis() {
           <div style="font-size: 0.85rem; margin-top: 0.5rem; color: #475569;">
             • Capacity: <strong>${Math.round(avgDailyExport * 0.8)} kWh</strong><br>
             • Benefit: Store ${avgDailyExport} units/day surplus, use at night<br>
-            • Saving: ~₹${Math.round(avgDailyImport * 7)}/day from reduced grid imports<br>
+            • Saving: ~₹${Math.round(avgDailyImport * 7)}/day from reduced imports<br>
             • Payback: ${Math.round(Math.round(avgDailyExport * 0.8) * 12000 / (avgDailyImport * 7 * 365))} years (approx)
           </div>
         </div>
@@ -5469,7 +5458,7 @@ function generateSolarAnalysis() {
       ` : `
       <div style="background: linear-gradient(135deg, #dcfce7, #d9f99d); padding: 1rem; border-radius: 8px; text-align: center;">
         <h6 style="color: #14532d; margin: 0;">✨ Your system is performing excellently!</h6>
-        <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; color: #166534;">Continue current usage pattern and monitor seasonal variations.</p>
+        <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; color: #166534;">Continue current usage and monitor seasonal variations.</p>
       </div>
       `}
       
@@ -5494,7 +5483,6 @@ function generateSolarAnalysis() {
     ]
   );
 }
-
 function shareAnalysisViaWhatsApp(recommendation, reason, selfConsumption, importRatio, exportRatio) {
   const text = `
 *🔍 SolarSanchay - Capacity Analysis*
