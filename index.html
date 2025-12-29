@@ -5236,22 +5236,75 @@ function generateSolarAnalysis() {
     return;
   }
   
+  // DEBUG: Show what we have
+  console.log('=== BILL DATA DEBUG ===');
+  console.log('Number of bills:', bills.length);
+  console.log('Bills:', bills);
+  
   // Calculate total units
   const totalGross = bills.reduce((sum, b) => sum + parseFloat(b['Gross Units'] || 0), 0);
   const totalImport = bills.reduce((sum, b) => sum + parseFloat(b['Import Units'] || 0), 0);
   const totalExport = bills.reduce((sum, b) => sum + parseFloat(b['Export Units'] || 0), 0);
   
-  // Calculate total days - WITH FIX
-  let totalDays = bills.reduce((sum, b) => {
-    const days = parseInt(b['Days in Bill Period']) || 0;
-    return sum + days;
-  }, 0);
+  // BULLETPROOF DAYS CALCULATION
+  let totalDays = 0;
   
-  // Fallback: If days calculation fails, calculate from date ranges
-  if (totalDays < 30 || totalDays === 0) {
+  // Method 1: Try 'Days in Bill Period' field
+  console.log('Method 1: Trying "Days in Bill Period" field...');
+  bills.forEach((bill, index) => {
+    const days = parseInt(bill['Days in Bill Period']) || 0;
+    console.log(`  Bill ${index + 1}: Days field = "${bill['Days in Bill Period']}" → ${days} days`);
+    totalDays += days;
+  });
+  console.log('Method 1 result:', totalDays, 'days');
+  
+  // Method 2: If failed, try calculating from From/To dates
+  if (totalDays === 0 || isNaN(totalDays)) {
+    console.log('Method 1 FAILED! Trying Method 2: Date calculation...');
+    totalDays = 0;
+    
+    bills.forEach((bill, index) => {
+      const fromDate = new Date(bill['From Date']);
+      const toDate = new Date(bill['To Date']);
+      
+      if (!isNaN(fromDate) && !isNaN(toDate)) {
+        const days = Math.ceil((toDate - fromDate) / (1000 * 60 * 60 * 24));
+        console.log(`  Bill ${index + 1}: ${bill['From Date']} to ${bill['To Date']} = ${days} days`);
+        totalDays += days;
+      } else {
+        console.log(`  Bill ${index + 1}: Invalid dates!`);
+      }
+    });
+    console.log('Method 2 result:', totalDays, 'days');
+  }
+  
+  // Method 3: If still failed, use date range
+  if (totalDays === 0 || isNaN(totalDays)) {
+    console.log('Method 2 FAILED! Trying Method 3: Full date range...');
+    
     const firstBillFrom = new Date(bills[0]['From Date']);
     const lastBillTo = new Date(bills[bills.length - 1]['To Date']);
-    totalDays = Math.ceil((lastBillTo - firstBillFrom) / (1000 * 60 * 60 * 24));
+    
+    if (!isNaN(firstBillFrom) && !isNaN(lastBillTo)) {
+      totalDays = Math.ceil((lastBillTo - firstBillFrom) / (1000 * 60 * 60 * 24));
+      console.log('Method 3 result:', totalDays, 'days');
+    }
+  }
+  
+  // Method 4: Last resort - use bills × 60 days average
+  if (totalDays === 0 || isNaN(totalDays)) {
+    console.log('Method 3 FAILED! Using fallback: 60 days per bill...');
+    totalDays = bills.length * 60;
+    console.log('Method 4 result:', totalDays, 'days');
+  }
+  
+  console.log('=== FINAL TOTAL DAYS:', totalDays, '===');
+  
+  // Verify we have valid days
+  if (totalDays === 0 || isNaN(totalDays) || totalDays < 0) {
+    alert('ERROR: Could not calculate bill period days! Check console for details.');
+    console.error('FATAL: totalDays is invalid:', totalDays);
+    return;
   }
   
   // Solar calculations
@@ -5264,12 +5317,19 @@ function generateSolarAnalysis() {
   const exportRatio = (totalExport / solarGenerated * 100).toFixed(1);
   const importRatio = (totalImport / totalGross * 100).toFixed(1);
   
-  // Daily averages - CORRECTED WITH RIGHT DAYS
+  // Daily averages - NOW SAFE
   const avgDailyGeneration = (solarGenerated / totalDays).toFixed(1);
   const avgDailyConsumption = (totalGross / totalDays).toFixed(1);
   const avgDailyImport = (totalImport / totalDays).toFixed(1);
   const avgDailyExport = (totalExport / totalDays).toFixed(1);
   const avgNetImport = (netImport / totalDays).toFixed(1);
+  
+  console.log('=== CALCULATED AVERAGES ===');
+  console.log('Solar:', avgDailyGeneration, 'units/day');
+  console.log('Consumption:', avgDailyConsumption, 'units/day');
+  console.log('Import:', avgDailyImport, 'units/day');
+  console.log('Export:', avgDailyExport, 'units/day');
+  console.log('Net Import:', avgNetImport, 'units/day');
   
   // Determine recommendation
   let recommendation = '';
@@ -5277,7 +5337,6 @@ function generateSolarAnalysis() {
   let color = '';
   let priority = '';
   
-  // Decision logic based on export ratio
   if (exportRatio > 70) {
     recommendation = '🔋 BATTERY STORAGE RECOMMENDED';
     reason = `Your solar generates ${avgDailyGeneration} units/day but you export ${avgDailyExport} units/day (${exportRatio}% of generation). This shows excellent solar capacity but timing mismatch. Battery storage will shift daytime surplus to nighttime use, eliminating most grid imports.`;
@@ -5325,8 +5384,8 @@ function generateSolarAnalysis() {
   const insights = [];
   
   if (priority === 'battery') {
-    const batteryCapacity = Math.round(avgDailyExport * 0.8);
-    const potentialSaving = Math.round(avgDailyImport * 7);
+    const batteryCapacity = Math.round(parseFloat(avgDailyExport) * 0.8);
+    const potentialSaving = Math.round(parseFloat(avgDailyImport) * 7);
     insights.push(`🔋 <strong>Battery Impact:</strong> A ${batteryCapacity} kWh battery could store your daytime surplus (${avgDailyExport} units/day) for nighttime use, potentially saving ₹${potentialSaving}/day.`);
     
     if (selfConsumptionRatio < 30) {
@@ -5335,7 +5394,7 @@ function generateSolarAnalysis() {
   }
   
   if (priority === 'panels') {
-    const additionalCapacity = Math.round(avgDailyImport * 0.8);
+    const additionalCapacity = Math.round(parseFloat(avgDailyImport) * 0.8);
     const panelsNeeded = Math.ceil(additionalCapacity / 4);
     const potentialSaving = Math.round(additionalCapacity * 7);
     insights.push(`☀️ <strong>Capacity Gap:</strong> Adding ${additionalCapacity} units/day capacity (~${panelsNeeded} panels) could reduce grid imports by 80%, saving approximately ₹${potentialSaving}/day.`);
@@ -5350,12 +5409,16 @@ function generateSolarAnalysis() {
     const gridReduction = ((totalGross - netImport) / totalGross * 100).toFixed(0);
     insights.push(`📊 <strong>Net Position:</strong> After solar offsetting, you import only ${avgNetImport} units/day net (${gridReduction}% reduction from ${avgDailyConsumption} units/day total consumption). ${priority === 'battery' ? 'Battery could eliminate most of this.' : priority === 'panels' ? 'Additional panels could reduce this further.' : 'This is excellent!'}`);
   } else {
-    insights.push(`📊 <strong>Net Position:</strong> You're a net energy contributor! Sending ${Math.abs(avgNetImport)} units/day to grid.`);
+    insights.push(`📊 <strong>Net Position:</strong> You're a net energy contributor! Sending ${Math.abs(parseFloat(avgNetImport))} units/day to grid.`);
   }
   
   if (selfConsumptionRatio > 70) {
     insights.push(`✨ <strong>Excellent Usage:</strong> You're consuming ${selfConsumptionRatio}% of solar directly - this is outstanding timing!`);
   }
+  
+  // Generate first and last bill period strings
+  const firstBillPeriod = formatBillPeriod(bills[0]);
+  const lastBillPeriod = formatBillPeriod(bills[bills.length - 1]);
   
   // Generate HTML report
   const analysisHTML = `
@@ -5367,7 +5430,7 @@ function generateSolarAnalysis() {
       
       <div style="background: #f0f9ff; padding: 0.75rem; border-radius: 6px; margin-bottom: 1rem; font-size: 0.9rem;">
         <strong>Period:</strong> ${totalDays} days (${bills.length} bills) &nbsp;|&nbsp; 
-        <strong>Range:</strong> ${formatBillPeriod(bills[0])} to ${formatBillPeriod(bills[bills.length - 1])}
+        <strong>Range:</strong> ${firstBillPeriod} to ${lastBillPeriod}
       </div>
       
       <div style="background: ${color}22; border-left: 4px solid ${color}; padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
@@ -5401,7 +5464,7 @@ function generateSolarAnalysis() {
           </tr>
           <tr style="background: ${netImport > 0 ? '#fef3c7' : '#dcfce7'}; border-radius: 4px;">
             <td style="padding: 0.5rem; font-weight: 700;">${netImport > 0 ? '⚖️ Net Grid Import' : '✅ Net Grid Export'}</td>
-            <td colspan="2" style="text-align: right; padding: 0.5rem; font-weight: 700; color: ${netImport > 0 ? '#f59e0b' : '#10b981'};">${Math.abs(avgNetImport)} units/day</td>
+            <td colspan="2" style="text-align: right; padding: 0.5rem; font-weight: 700; color: ${netImport > 0 ? '#f59e0b' : '#10b981'};">${Math.abs(parseFloat(avgNetImport))} units/day</td>
           </tr>
         </table>
       </div>
@@ -5423,10 +5486,10 @@ function generateSolarAnalysis() {
         <div style="background: white; padding: 0.75rem; border-radius: 6px; border-left: 3px solid #3b82f6;">
           <strong style="color: #1e40af;">💾 Install Battery Storage System</strong><br>
           <div style="font-size: 0.85rem; margin-top: 0.5rem; color: #475569;">
-            • Capacity: <strong>${Math.round(avgDailyExport * 0.8)} kWh</strong><br>
+            • Capacity: <strong>${Math.round(parseFloat(avgDailyExport) * 0.8)} kWh</strong><br>
             • Benefit: Store ${avgDailyExport} units/day surplus, use at night<br>
-            • Saving: ~₹${Math.round(avgDailyImport * 7)}/day from reduced imports<br>
-            • Payback: ${Math.round(Math.round(avgDailyExport * 0.8) * 12000 / (avgDailyImport * 7 * 365))} years (approx)
+            • Saving: ~₹${Math.round(parseFloat(avgDailyImport) * 7)}/day from reduced imports<br>
+            • Payback: ${Math.round(Math.round(parseFloat(avgDailyExport) * 0.8) * 12000 / (parseFloat(avgDailyImport) * 7 * 365))} years (approx)
           </div>
         </div>
         ` : ''}
@@ -5435,9 +5498,9 @@ function generateSolarAnalysis() {
         <div style="background: white; padding: 0.75rem; border-radius: 6px; border-left: 3px solid #f59e0b;">
           <strong style="color: #92400e;">☀️ Expand Solar Capacity</strong><br>
           <div style="font-size: 0.85rem; margin-top: 0.5rem; color: #475569;">
-            • Additional capacity: <strong>${Math.round(avgDailyImport * 0.8)} units/day</strong><br>
-            • Panels needed: ~${Math.ceil(avgDailyImport * 0.8 / 4)} panels (@ 4 units/panel/day)<br>
-            • Saving: ~₹${Math.round(avgDailyImport * 0.8 * 7)}/day from reduced imports<br>
+            • Additional capacity: <strong>${Math.round(parseFloat(avgDailyImport) * 0.8)} units/day</strong><br>
+            • Panels needed: ~${Math.ceil(parseFloat(avgDailyImport) * 0.8 / 4)} panels (@ 4 units/panel/day)<br>
+            • Saving: ~₹${Math.round(parseFloat(avgDailyImport) * 0.8 * 7)}/day from reduced imports<br>
             • ROI: Check with installer based on current rates
           </div>
         </div>
