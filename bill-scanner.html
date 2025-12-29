@@ -277,10 +277,10 @@ async function cropBillImage(file) {
         const originalHeight = img.height;
         
         // CROP SETTINGS - Based on UHBVN bill layout
-        const cropTopPercent = 0.10;      // Remove 10% from top (header)
-        const cropBottomPercent = 0.50;   // Remove 50% from bottom (footer)
-        const cropLeftPercent = 0.02;     // Remove 2% from left
-        const cropRightPercent = 0.02;    // Remove 2% from right
+       const cropTopPercent = 0.10;      // Increase from 0.08
+const cropBottomPercent = 0.45;   // Increase from 0.40
+const cropLeftPercent = 0.03;     // Increase from 0.02
+const cropRightPercent = 0.03;    // Increase from 0.02
         
         const cropTop = Math.floor(originalHeight * cropTopPercent);
         const cropBottom = Math.floor(originalHeight * cropBottomPercent);
