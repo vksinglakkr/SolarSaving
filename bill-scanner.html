@@ -286,6 +286,23 @@ async function cropBillImage(file) {
         const cropBottom = Math.floor(originalHeight * cropBottomPercent);
         const cropLeft = Math.floor(originalWidth * cropLeftPercent);
         const cropRight = Math.floor(originalWidth * cropRightPercent);
+        // ADD THESE LOGS
+console.log('=== CROP DEBUG ===');
+console.log('Original dimensions:', originalWidth, 'x', originalHeight);
+console.log('Crop percentages:', {
+  top: cropTopPercent,
+  bottom: cropBottomPercent,
+  left: cropLeftPercent,
+  right: cropRightPercent
+});
+console.log('Crop pixels:', {
+  top: cropTop,
+  bottom: cropBottom,
+  left: cropLeft,
+  right: cropRight
+});
+console.log('New dimensions:', newWidth, 'x', newHeight);
+console.log('==================');
         
         const newWidth = originalWidth - cropLeft - cropRight;
         const newHeight = originalHeight - cropTop - cropBottom;
