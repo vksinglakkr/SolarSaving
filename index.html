@@ -5240,7 +5240,14 @@ function generateSolarAnalysis() {
   console.log('=== BILL DATA DEBUG ===');
   console.log('Number of bills:', bills.length);
   console.log('Bills:', bills);
-  
+  // ===== DIAGNOSTIC CODE - SHOWS ALL FIELD NAMES =====
+  console.log('=== DIAGNOSTIC: SHOWING FIRST BILL STRUCTURE ===');
+  console.log('All fields in first bill:');
+  const firstBill = bills[0];
+  for (let key in firstBill) {
+    console.log(`  "${key}": ${firstBill[key]}`);
+  }
+  console.log('===========================================');
   // Calculate total units
   const totalGross = bills.reduce((sum, b) => sum + parseFloat(b['Gross Units'] || 0), 0);
   const totalImport = bills.reduce((sum, b) => sum + parseFloat(b['Import Units'] || 0), 0);
