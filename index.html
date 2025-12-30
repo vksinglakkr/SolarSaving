@@ -3965,14 +3965,27 @@ const isEditing = window.isEditingBill;
         action: () => { 
           closeModal(); 
           if (isEditing) {
-            // Reset edit state and go to dashboard
+            // Reset edit state
             window.isEditingBill = false;
             window.editingBillIndex = null;
+            
+            // Hide cancel button
             const cancelBtn = document.getElementById('cancelEditBtn');
             if (cancelBtn) cancelBtn.style.display = 'none';
+            
+            // Reset action button
+            const actionBtn = document.getElementById('actionBtn');
+            if (actionBtn) {
+              actionBtn.disabled = false;
+              actionBtn.style.opacity = '1';
+              actionBtn.style.cursor = 'pointer';
+              actionBtn.textContent = 'Calculate Solar Benefit';
+            }
+            
+            // Go to dashboard
             selectIntent('dashboard');
           }
-        } 
+        }
       }
     ]
   );
