@@ -5621,9 +5621,9 @@ function generateSolarAnalysis() {
         action: () => printModalWithContent() 
       },
       { 
-        text: '📱 WhatsApp', 
-        type: 'success', 
-        action: () => shareAnalysisViaWhatsApp() 
+           text: '📱 WhatsApp', 
+           type: 'success', 
+           action: () => shareAnalysisViaWhatsApp(totalDays, savedBills, avgDailyConsumption, avgDailySolar, avgDailyImport, avgDailyExport, avgNetImport, totalBillAmount, totalFixedCharges) 
       },
       { 
         text: '✕ Close', 
@@ -5718,7 +5718,7 @@ function printContent(title, content) {
     };
   }, 250);
 }
-function shareAnalysisViaWhatsApp() {
+function shareAnalysisViaWhatsApp(totalDays, savedBills, avgDailyConsumption, avgDailySolar, avgDailyImport, avgDailyExport, avgNetImport, totalBillAmount, totalFixedCharges) {
   // Get the modal content
   const modalElement = document.getElementById('customModal');
   
@@ -5737,61 +5737,66 @@ function shareAnalysisViaWhatsApp() {
   
   // Analysis Period
   message += '📅 *Analysis Period*\n';
-  message += `Period: ${totalDays} days (${savedBills.length} bills)\n`;
+  message += 'Period: ' + totalDays + ' days (' + savedBills.length + ' bills)\n';
   if (savedBills.length > 0) {
-    message += `From: ${savedBills[savedBills.length - 1].billFrom}\n`;
-    message += `To: ${savedBills[0].billTo}\n`;
+    message += 'From: ' + savedBills[savedBills.length - 1].billFrom + '\n';
+    message += 'To: ' + savedBills[0].billTo + '\n';
   }
   message += '\n';
   
   // Energy Summary
   message += '⚡ *Energy Summary*\n';
-  message += `Daily Consumption: ${avgDailyConsumption} units\n`;
-  message += `Daily Solar: ${avgDailySolar} units\n`;
-  message += `Daily Import: ${avgDailyImport} units\n`;
-  message += `Daily Export: ${avgDailyExport} units\n`;
-  message += `Net Grid: ${avgNetImport} units/day\n`;
+  message += 'Daily Consumption: ' + avgDailyConsumption + ' units\n';
+  message += 'Daily Solar: ' + avgDailySolar + ' units\n';
+  message += 'Daily Import: ' + avgDailyImport + ' units\n';
+  message += 'Daily Export: ' + avgDailyExport + ' units\n';
+  message += 'Net Grid: ' + avgNetImport + ' units/day\n';
   message += '\n';
   
   // Financial Summary
   message += '💰 *Bill Summary*\n';
-  message += `Daily Bill: ₹${Math.round(totalBillAmount / totalDays)}\n`;
-  message += `Daily Fixed: ₹${Math.round(totalFixedCharges / totalDays)}\n`;
-  message += `Daily Variable: ₹${Math.round((totalBillAmount - totalFixedCharges) / totalDays)}\n`;
+  message += 'Daily Bill: ₹' + Math.round(totalBillAmount / totalDays) + '\n';
+  message += 'Daily Fixed: ₹' + Math.round(totalFixedCharges / totalDays) + '\n';
+  message += 'Daily Variable: ₹' + Math.round((totalBillAmount - totalFixedCharges) / totalDays) + '\n';
   message += '\n';
   
-  // Recommendation (from the analysis)
+  // Recommendation (extract from modal)
   const contentElement = modalElement.querySelector('div[style*="max-height"]');
   if (contentElement) {
     const fullText = contentElement.innerText;
     
-    // Extract recommendation section
-    if (fullText.includes('BATTERY BENEFICIAL') || fullText.includes('Battery')) {
+    // Detect recommendation type and extract details
+    if (fullText.includes('BATTERY BENEFICIAL') || fullText.includes('BATTERY STORAGE RECOMMENDED')) {
       message += '🔋 *Recommendation: BATTERY STORAGE*\n';
       
-      // Extract battery details
-      const capacityMatch = fullText.match(/Battery Capacity[:\s]+(\d+)\s*kWh/i);
-      const savingMatch = fullText.match(/Battery.*?₹(\d+)\/day/i) || fullText.match(/Saving[:\s]+₹(\d+)/i);
-      const paybackMatch = fullText.match(/Payback[:\s]+(\d+)\s*years?/i);
+      // Extract battery details using regex
+      const capacityMatch = fullText.match(/(\d+)\s*kWh/i);
+      const savingMatch = fullText.match(/₹(\d+)\/day/i);
+      const paybackMatch = fullText.match(/(\d+)\s*years?/i);
       
-      if (capacityMatch) message += `Capacity: ${capacityMatch[1]} kWh\n`;
-      if (savingMatch) message += `Savings: ₹${savingMatch[1]}/day\n`;
-      if (paybackMatch) message += `Payback: ${paybackMatch[1]} years\n`;
+      if (capacityMatch) message += 'Capacity: ' + capacityMatch[1] + ' kWh\n';
+      if (savingMatch) message += 'Savings: ₹' + savingMatch[1] + '/day\n';
+      if (paybackMatch) message += 'Payback: ' + paybackMatch[1] + ' years\n';
       
-    } else if (fullText.includes('SYSTEM WORKING WELL') || fullText.includes('Optional')) {
+    } else if (fullText.includes('SYSTEM WORKING WELL') || fullText.includes('already') && fullText.includes('efficient')) {
       message += '✅ *System Working Well*\n';
-      const efficiencyMatch = fullText.match(/(\d+)%\s*efficient/i);
-      if (efficiencyMatch) {
-        message += `Grid Reduction: ${efficiencyMatch[1]}%\n`;
-      }
-      message += 'Battery not needed (already efficient)\n';
       
-    } else if (fullText.includes('INCREASE CAPACITY') || fullText.includes('Additional')) {
-      message += '☀️ *Increase Solar Capacity*\n';
-      const unitsMatch = fullText.match(/Add[:\s]+(\d+\.?\d*)\s*units/i);
-      if (unitsMatch) {
-        message += `Additional: ${unitsMatch[1]} units/day\n`;
+      const efficiencyMatch = fullText.match(/(\d+)%\s*(?:efficient|grid reduction)/i);
+      if (efficiencyMatch) {
+        message += 'Grid Reduction: ' + efficiencyMatch[1] + '%\n';
       }
+      message += 'Battery not needed\n';
+      
+    } else if (fullText.includes('INCREASE') || fullText.includes('ADD') || fullText.includes('Additional')) {
+      message += '☀️ *Increase Solar Capacity*\n';
+      
+      const unitsMatch = fullText.match(/(\d+\.?\d*)\s*units/i);
+      if (unitsMatch) {
+        message += 'Add: ' + unitsMatch[1] + ' units/day\n';
+      }
+    } else {
+      message += '💡 *Recommendation*\n';
+      message += 'Check portal for details\n';
     }
   }
   
@@ -5803,8 +5808,9 @@ function shareAnalysisViaWhatsApp() {
   message += '_Government of Haryana_\n\n';
   message += '🔗 vksinglakkr.github.io/SolarSaving';
   
-  // Log for debugging
-  console.log('WhatsApp message:', message);
+  console.log('=== WhatsApp Message ===');
+  console.log(message);
+  console.log('=======================');
   
   // Encode and open WhatsApp
   const encodedMessage = encodeURIComponent(message);
