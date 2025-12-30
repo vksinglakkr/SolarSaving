@@ -5646,6 +5646,9 @@ function shareAnalysisReport(recommendation, saving, capacity, payback, priority
     alert('Share feature not available.');
   }
 }
+// CORRECTED printModal() FUNCTION
+// Replace lines 5649-5731 with this
+
 function printModal() {
   const modalContent = document.querySelector('.modal-body');
   
@@ -5656,77 +5659,39 @@ function printModal() {
   
   const modalTitle = document.querySelector('.modal-title');
   const title = modalTitle ? modalTitle.textContent : 'Solar Analysis Report';
+  const timestamp = new Date().toLocaleString('en-IN');
   
   const printWindow = window.open('', '_blank');
   
-  const htmlContent = `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>` + title + `</title>
-  <style>
-    @page { size: A4; margin: 2cm; }
-    body { 
-      font-family: Arial, sans-serif; 
-      line-height: 1.6;
-      color: #333;
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    .print-header {
-      text-align: center;
-      margin-bottom: 30px;
-      border-bottom: 3px solid #1e40af;
-      padding-bottom: 15px;
-    }
-    .print-header h1 {
-      color: #1e40af;
-      margin: 0 0 10px 0;
-      font-size: 24px;
-    }
-    .print-header p {
-      color: #666;
-      margin: 5px 0;
-      font-size: 14px;
-    }
-    h4, h5, h6 {
-      color: #1e40af;
-      margin-top: 20px;
-      margin-bottom: 10px;
-    }
-    @media print {
-      body { margin: 0; padding: 20px; }
-      .no-print { display: none; }
-    }
-  </style>
-</head>
-<body>
-  <div class="print-header">
-    <h1>` + title + `</h1>
-    <p><strong>SolarSanchay</strong> - Government of Haryana</p>
-    <p>Generated: ` + new Date().toLocaleString('en-IN') + `</p>
-  </div>
+  // Build HTML using string concatenation (NO template literals!)
+  let html = '<!DOCTYPE html>';
+  html += '<html><head><meta charset="UTF-8">';
+  html += '<title>' + title + '</title>';
+  html += '<style>';
+  html += '@page { size: A4; margin: 2cm; }';
+  html += 'body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; }';
+  html += '.print-header { text-align: center; margin-bottom: 30px; border-bottom: 3px solid #1e40af; padding-bottom: 15px; }';
+  html += '.print-header h1 { color: #1e40af; margin: 0 0 10px 0; font-size: 24px; }';
+  html += '.print-header p { color: #666; margin: 5px 0; font-size: 14px; }';
+  html += 'h4, h5, h6 { color: #1e40af; margin-top: 20px; margin-bottom: 10px; }';
+  html += '@media print { body { margin: 0; padding: 20px; } }';
+  html += '</style></head><body>';
+  html += '<div class="print-header">';
+  html += '<h1>' + title + '</h1>';
+  html += '<p><strong>SolarSanchay</strong> - Government of Haryana</p>';
+  html += '<p>Generated: ' + timestamp + '</p>';
+  html += '</div>';
+  html += modalContent.innerHTML;
+  html += '<div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #e5e7eb; text-align: center; color: #666; font-size: 12px;">';
+  html += '<p><strong>SolarSanchay</strong> - Solar Savings Calculator</p>';
+  html += '<p>NIC, Kurukshetra | Government of Haryana</p>';
+  html += '</div>';
+  html += '<script>';
+  html += 'window.onload = function() { window.print(); window.onafterprint = function() { window.close(); }; };';
+  html += '</script>';
+  html += '</body></html>';
   
-  ` + modalContent.innerHTML + `
-  
-  <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #e5e7eb; text-align: center; color: #666; font-size: 12px;">
-    <p><strong>SolarSanchay</strong> - Solar Savings Calculator</p>
-    <p>NIC, Kurukshetra | Government of Haryana</p>
-  </div>
-  
-  <script>
-    window.onload = function() {
-      window.print();
-      window.onafterprint = function() {
-        window.close();
-      };
-    };
-  </script>
-</body>
-</html>`;
-  
-  printWindow.document.write(htmlContent);
+  printWindow.document.write(html);
   printWindow.document.close();
 }
 function shareAnalysisViaWhatsApp(recommendation, reason, selfConsumption, importRatio, exportRatio) {
