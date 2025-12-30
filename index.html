@@ -5646,9 +5646,6 @@ function shareAnalysisReport(recommendation, saving, capacity, payback, priority
     alert('Share feature not available.');
   }
 }
-// CORRECTED printModal() FUNCTION
-// Replace lines 5649-5731 with this
-
 function printModal() {
   const modalContent = document.querySelector('.modal-body');
   
@@ -5663,7 +5660,6 @@ function printModal() {
   
   const printWindow = window.open('', '_blank');
   
-  // Build HTML using string concatenation (NO template literals!)
   let html = '<!DOCTYPE html>';
   html += '<html><head><meta charset="UTF-8">';
   html += '<title>' + title + '</title>';
