@@ -2140,6 +2140,13 @@ div[style*="background: linear-gradient(135deg, #e0f2fe"] {
         onclick="calculate()">
   Calculate Solar Benefit
 </button>
+<!-- Cancel Edit Button -->
+<button id="cancelEditBtn"
+        class="btn btn-secondary w-100 mt-3"
+        style="display: none;"
+        onclick="cancelEdit()">
+  ❌ Cancel Edit
+</button>
 
 <div id="result" class="mt-4"></div>
 <div id="awardSummary" class="result-box d-none"
@@ -2883,6 +2890,50 @@ function editBill() {
   setTimeout(function() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, 600);
+}
+function cancelEdit() {
+  console.log('Cancelling edit...');
+  
+  // Clear editing state
+  window.isEditingBill = false;
+  window.editingBillIndex = null;
+  
+  // Reset button text
+  const actionBtn = document.getElementById('actionBtn');
+  if (actionBtn) {
+    actionBtn.textContent = 'Calculate Solar Benefit';
+  }
+  
+  // Hide cancel button
+  const cancelBtn = document.getElementById('cancelEditBtn');
+  if (cancelBtn) {
+    cancelBtn.style.display = 'none';
+  }
+  
+  // Clear form fields
+  const fieldsToReset = [
+    'billNumber', 'meter', 'accountNum',
+    'billFrom', 'billTo',
+    'gross', 'importU', 'exportU',
+    'fixed', 'totalBill', 'arrears'
+  ];
+  
+  fieldsToReset.forEach(fieldId => {
+    const field = document.getElementById(fieldId);
+    if (field) field.value = '';
+  });
+  
+  // Clear carry forward if visible
+  const carryForwardUnits = document.getElementById('carryForwardUnits');
+  if (carryForwardUnits) carryForwardUnits.value = '';
+  
+  const carryForwardSection = document.getElementById('carryForwardSection');
+  if (carryForwardSection) carryForwardSection.classList.add('d-none');
+  
+  // Go back to dashboard
+  selectIntent('dashboard');
+  
+  console.log('Edit cancelled, returning to dashboard');
 }
 // Delete button - removes selected bill
 function deleteBill() {
