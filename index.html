@@ -5649,10 +5649,34 @@ function shareAnalysisReport(recommendation, saving, capacity, payback, priority
 // BULLETPROOF printModal() - Replace entire function with this
 
 function printModal() {
-  const modalContent = document.querySelector('.modal-body');
+  console.log('=== PRINT MODAL DEBUG ===');
+  
+  // Try multiple selectors
+  let modalContent = document.querySelector('.modal-body');
+  console.log('Tried .modal-body:', modalContent);
   
   if (!modalContent) {
-    alert('No content to print');
+    modalContent = document.querySelector('.modal-content');
+    console.log('Tried .modal-content:', modalContent);
+  }
+  
+  if (!modalContent) {
+    modalContent = document.querySelector('[role="dialog"] .content');
+    console.log('Tried [role="dialog"] .content:', modalContent);
+  }
+  
+  if (!modalContent) {
+    // Try to find any visible modal
+    const modals = document.querySelectorAll('.modal, [role="dialog"]');
+    console.log('Found modals:', modals);
+    if (modals.length > 0) {
+      modalContent = modals[modals.length - 1];
+      console.log('Using last modal:', modalContent);
+    }
+  }
+  
+  if (!modalContent) {
+    alert('No content to print. Check console for details.');
     return;
   }
   
@@ -5660,6 +5684,9 @@ function printModal() {
   const title = modalTitle ? modalTitle.textContent : 'Solar Analysis Report';
   const timestamp = new Date().toLocaleString('en-IN');
   const content = modalContent.innerHTML;
+  
+  console.log('Title:', title);
+  console.log('Content length:', content.length);
   
   const printWindow = window.open('', '_blank');
   
@@ -5690,7 +5717,6 @@ function printModal() {
   
   printWindow.document.close();
   
-  // Print after a short delay
   setTimeout(function() {
     printWindow.print();
     printWindow.onafterprint = function() {
