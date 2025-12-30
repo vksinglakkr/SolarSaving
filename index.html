@@ -2852,30 +2852,37 @@ function editBill() {
   
   console.log('Editing bill:', bill['Bill Number']);
   
-  // Store editing state FIRST
+  // Store editing state FIRST (before selectIntent)
   window.isEditingBill = true;
   window.editingBillIndex = selectedBillIndex;
   
-  // Switch to form view using selectIntent
+  // Switch to form view
   selectIntent('save');
   
-  // Wait for form to be visible, then load data
+  // Wait for form to be visible, then load data and update buttons
   setTimeout(function() {
     loadBillForEditing(bill);
     
-    // Update button text
-    const calculateBtn = document.getElementById('calculateBtn');
-    if (calculateBtn) {
-      calculateBtn.textContent = '💾 Update Bill';
+    // Update button text AFTER selectIntent has run
+    const actionBtn = document.getElementById('actionBtn');
+    if (actionBtn) {
+      actionBtn.textContent = '💾 Update Bill';
+      actionBtn.classList.remove('d-none'); // Make sure it's visible
     }
     
-    console.log('Bill data loaded into form');
-  }, 300);
+    // Show cancel button
+    const cancelBtn = document.getElementById('cancelEditBtn');
+    if (cancelBtn) {
+      cancelBtn.style.display = 'block';
+    }
+    
+    console.log('Bill data loaded, buttons updated');
+  }, 500); // Increased timeout to 500ms
   
   // Scroll to top
   setTimeout(function() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, 400);
+  }, 600);
 }
 // Delete button - removes selected bill
 function deleteBill() {
@@ -3707,7 +3714,38 @@ async function calculate() {
           return;
         }
         
-        console.log("✅ Bill saved successfully");
+  console.log("✅ Bill saved successfully");
+        
+        // CHECK IF EDITING OR ADDING NEW
+        if (window.isEditingBill && window.editingBillIndex !== null) {
+          // UPDATE EXISTING BILL
+          console.log('Updating existing bill at index:', window.editingBillIndex);
+          
+          const bills = window.userBills || [];
+          bills[window.editingBillIndex] = webhookData;
+          window.userBills = bills;
+          
+          // Save to localStorage
+          saveBillsToStorage(bills);
+          
+          // Clear editing state
+          window.isEditingBill = false;
+          window.editingBillIndex = null;
+          
+          console.log('Bill updated successfully');
+        } else {
+          // ADD NEW BILL
+          console.log('Adding new bill');
+          
+          const bills = window.userBills || [];
+          bills.unshift(webhookData); // Add to beginning
+          window.userBills = bills;
+          
+          // Save to localStorage
+          saveBillsToStorage(bills);
+          
+          console.log('New bill added successfully');
+        }
         
       } else {
         throw new Error('Server returned error status: ' + response.status);
@@ -3891,13 +3929,29 @@ async function calculate() {
     saving: saving.toFixed(0)
   };
 
+const isEditing = window.isEditingBill;
+  
   showModal(
     '📊', 
-    entryMode === "one" ? "Quick Calculator Result" : "✅ Bill Saved Successfully!", 
+    isEditing ? "✅ Bill Updated Successfully!" : (entryMode === "one" ? "Quick Calculator Result" : "✅ Bill Saved Successfully!"), 
     modalContent, 
     [
       { text: 'Share on WhatsApp', type: 'success', action: () => { shareWhatsApp(window.lastCalculation); closeModal(); } },
-      { text: 'Close', type: 'secondary', action: closeModal }
+      { 
+        text: isEditing ? 'Back to Dashboard' : 'Close', 
+        type: 'secondary', 
+        action: () => { 
+          closeModal(); 
+          if (isEditing) {
+            // Reset edit state and go to dashboard
+            window.isEditingBill = false;
+            window.editingBillIndex = null;
+            const cancelBtn = document.getElementById('cancelEditBtn');
+            if (cancelBtn) cancelBtn.style.display = 'none';
+            selectIntent('dashboard');
+          }
+        } 
+      }
     ]
   );
 // ===== Award Summary Hook (UI only) =====
