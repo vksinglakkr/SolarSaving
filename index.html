@@ -2843,10 +2843,7 @@ function editBill() {
     return;
   }
   
-  // Load bill data into form
-  loadBillForEditing(bill);
-  
-  // Switch to form view
+  // Switch to form view FIRST
   const formCard = document.getElementById('formCard');
   const dashboardCard = document.getElementById('dashboardCard');
   
@@ -2863,10 +2860,15 @@ function editBill() {
   window.isEditingBill = true;
   window.editingBillIndex = selectedBillIndex;
   
+  // NOW Load bill data into form (after form is visible)
+  setTimeout(function() {
+    loadBillForEditing(bill);
+    console.log('Bill data loaded into form');
+  }, 100);
+  
   // Scroll to top
   window.scrollTo(0, 0);
 }
-
 // Delete button - removes selected bill
 function deleteBill() {
   if (selectedBillIndex === null || selectedBillIndex === undefined) {
