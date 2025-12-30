@@ -5786,56 +5786,6 @@ function printModal() {
   printWindow.document.close();
 }
 
-function getModalStyles() {
-  // Return CSS that matches your modal content styles
-  return `
-    h4, h5, h6 {
-      color: #1e40af;
-      margin-top: 20px;
-      margin-bottom: 10px;
-    }
-    
-    .analysis-card {
-      background: #f0f9ff;
-      border-left: 4px solid #3b82f6;
-      padding: 15px;
-      margin: 15px 0;
-      border-radius: 8px;
-    }
-    
-    .metric-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 8px 0;
-      border-bottom: 1px solid #e5e7eb;
-    }
-    
-    .metric-label {
-      color: #666;
-    }
-    
-    .metric-value {
-      font-weight: bold;
-      color: #1e40af;
-    }
-    
-    .highlight-box {
-      background: #dcfce7;
-      border-left: 4px solid #10b981;
-      padding: 15px;
-      margin: 15px 0;
-      border-radius: 8px;
-    }
-    
-    .highlight-box .value {
-      font-size: 20px;
-      font-weight: bold;
-      color: #10b981;
-    }
-    
-    /* Copy any other styles from your modal */
-  `;
-}
 function shareAnalysisViaWhatsApp(recommendation, reason, selfConsumption, importRatio, exportRatio) {
   const text = `
 *🔍 SolarSanchay - Capacity Analysis*
