@@ -4994,7 +4994,7 @@ showModal(
        { 
         text: '🖨️ Print', 
         type: 'primary', 
-        action: () => printModal() 
+        action: () => printModalWithContent()
       },
     { 
       text: '📄 Download PDF', 
@@ -5618,7 +5618,7 @@ function generateSolarAnalysis() {
      { 
         text: '🖨️ Print', 
         type: 'primary', 
-        action: () => printModal() 
+        action: () => printModalWithContent()
       },
       { 
         text: '✕ Close', 
@@ -5646,48 +5646,37 @@ function shareAnalysisReport(recommendation, saving, capacity, payback, priority
     alert('Share feature not available.');
   }
 }
-// BULLETPROOF printModal() - Replace entire function with this
-
-function printModal() {
-  console.log('=== PRINT MODAL DEBUG ===');
+function printModalWithContent() {
+  // Get the content RIGHT NOW while modal is visible
+  const modalElement = document.getElementById('customModal');
   
-  // Try multiple selectors
-  let modalContent = document.querySelector('.modal-body');
-  console.log('Tried .modal-body:', modalContent);
-  
-  if (!modalContent) {
-    modalContent = document.querySelector('.modal-content');
-    console.log('Tried .modal-content:', modalContent);
-  }
-  
-  if (!modalContent) {
-    modalContent = document.querySelector('[role="dialog"] .content');
-    console.log('Tried [role="dialog"] .content:', modalContent);
-  }
-  
-  if (!modalContent) {
-    // Try to find any visible modal
-    const modals = document.querySelectorAll('.modal, [role="dialog"]');
-    console.log('Found modals:', modals);
-    if (modals.length > 0) {
-      modalContent = modals[modals.length - 1];
-      console.log('Using last modal:', modalContent);
-    }
-  }
-  
-  if (!modalContent) {
-    alert('No content to print. Check console for details.');
+  if (!modalElement) {
+    alert('Modal not found');
     return;
   }
   
-  const modalTitle = document.querySelector('.modal-title');
-  const title = modalTitle ? modalTitle.textContent : 'Solar Analysis Report';
+  const titleElement = modalElement.querySelector('.modal-title');
+  const contentElement = modalElement.querySelector('div[style*="max-height"]') || 
+                         modalElement.querySelector('.modal-body') ||
+                         modalElement.querySelector('div > div > div:nth-child(2)');
+  
+  if (!contentElement) {
+    alert('Content not found. Modal structure: ' + modalElement.innerHTML.substring(0, 200));
+    return;
+  }
+  
+  const title = titleElement ? titleElement.textContent : 'Solar Analysis Report';
+  const content = contentElement.innerHTML;
+  
+  console.log('Got title:', title);
+  console.log('Got content length:', content.length);
+  
+  // Now print with this content
+  printContent(title, content);
+}
+
+function printContent(title, content) {
   const timestamp = new Date().toLocaleString('en-IN');
-  const content = modalContent.innerHTML;
-  
-  console.log('Title:', title);
-  console.log('Content length:', content.length);
-  
   const printWindow = window.open('', '_blank');
   
   printWindow.document.write('<!DOCTYPE html>');
