@@ -2843,31 +2843,32 @@ function editBill() {
     return;
   }
   
-  // Switch to form view FIRST
-  const formCard = document.getElementById('formCard');
-  const dashboardCard = document.getElementById('dashboardCard');
+  console.log('Editing bill:', bill['Bill Number']);
   
-  if (formCard) formCard.style.display = 'block';
-  if (dashboardCard) dashboardCard.style.display = 'none';
-  
-  // Update save button text
-  const calculateBtn = document.getElementById('calculateBtn');
-  if (calculateBtn) {
-    calculateBtn.textContent = '💾 Update Bill';
-  }
-  
-  // Store editing state
+  // Store editing state FIRST
   window.isEditingBill = true;
   window.editingBillIndex = selectedBillIndex;
   
-  // NOW Load bill data into form (after form is visible)
+  // Switch to form view using selectIntent
+  selectIntent('save');
+  
+  // Wait for form to be visible, then load data
   setTimeout(function() {
     loadBillForEditing(bill);
+    
+    // Update button text
+    const calculateBtn = document.getElementById('calculateBtn');
+    if (calculateBtn) {
+      calculateBtn.textContent = '💾 Update Bill';
+    }
+    
     console.log('Bill data loaded into form');
-  }, 100);
+  }, 300);
   
   // Scroll to top
-  window.scrollTo(0, 0);
+  setTimeout(function() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, 400);
 }
 // Delete button - removes selected bill
 function deleteBill() {
