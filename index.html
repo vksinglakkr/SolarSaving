@@ -5683,8 +5683,8 @@ function shareMultiBillViaWhatsApp(summary, bills) {
   message += 'Total Gross: ' + summary.totalGross.toLocaleString() + ' units\n';
   message += 'Total Import: ' + summary.totalImport.toLocaleString() + ' units\n';
   message += 'Total Export: ' + summary.totalExport.toLocaleString() + ' units\n';
-  message += 'Solar Generated: ' + summary.totalSolar.toLocaleString() + ' units\n';
-  message += 'Self Consumed: ' + summary.selfConsumed.toLocaleString() + ' units\n';
+  message += 'Solar Generated: ' + summary.totalSolarGenerated.toLocaleString() + ' units\n';
+  message += 'Self Consumed: ' + summary.selfConsumption.toLocaleString() + ' units\n';
   message += '\n';
   
   // Financial Summary
@@ -5693,7 +5693,7 @@ function shareMultiBillViaWhatsApp(summary, bills) {
   message += 'Without Solar: ₹' + summary.totalWithoutSolar.toLocaleString() + '\n';
   message += 'Total Savings: ₹' + summary.totalSavings.toLocaleString() + '\n';
   message += 'Avg Saving: ' + summary.avgSavingPercent + '%\n';
-  message += 'Daily Saving: ₹' + Math.round(summary.totalSavings / summary.totalDays) + '/day\n';
+  message += 'Daily Saving: ₹' + summary.perDaySaving + '/day\n';
   message += '\n';
   
   // Bill-wise Breakdown (first 3 bills)
@@ -5701,9 +5701,10 @@ function shareMultiBillViaWhatsApp(summary, bills) {
   const maxBills = Math.min(3, bills.length);
   for (let i = 0; i < maxBills; i++) {
     const bill = bills[i];
+    const billSaving = bill.billWithoutSolar - bill.totalBill;
     message += (i + 1) + '. Bill #' + bill.billNumber + '\n';
     message += '   Period: ' + bill.billFrom + ' to ' + bill.billTo + '\n';
-    message += '   Saving: ₹' + (bill.billWithoutSolar - bill.totalBill).toFixed(0) + '\n';
+    message += '   Saving: ₹' + Math.round(billSaving) + '\n';
   }
   if (bills.length > 3) {
     message += '   ... and ' + (bills.length - 3) + ' more bills\n';
@@ -5724,7 +5725,7 @@ function shareMultiBillViaWhatsApp(summary, bills) {
   const whatsappURL = 'https://wa.me/?text=' + encodedMessage;
   
   window.open(whatsappURL, '_blank');
-}   
+} 
 function printModalWithContent() {
   // Get the content RIGHT NOW while modal is visible
   const modalElement = document.getElementById('customModal');
