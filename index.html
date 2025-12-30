@@ -2936,96 +2936,73 @@ function selectSingleBill(index) {
 }
 
 // Load bill data into form for editing
-// Load bill data into form for editing
 function loadBillForEditing(bill) {
   console.log('=== LOADING BILL FOR EDITING ===');
-  console.log('Full bill object:', bill);
-  console.log('Bill properties:', Object.keys(bill));
+  console.log('Bill:', bill['Bill Number']);
   
-  // Identity fields
+  // Identity fields - THESE WORK
   const billNumber = document.getElementById('billNumber');
   const meter = document.getElementById('meter');
   const accountNum = document.getElementById('accountNum');
   
-  console.log('Bill Number field exists?', !!billNumber);
-  console.log('Bill Number value:', bill['Bill Number']);
+  if (billNumber) billNumber.value = bill['Bill Number'] || '';
+  if (meter) meter.value = bill['Meter Number'] || '';
+  if (accountNum) accountNum.value = bill['Account Number'] || '';
   
-  if (billNumber) {
-    billNumber.value = bill['Bill Number'] || bill.billNumber || '';
-    console.log('Set bill number to:', billNumber.value);
-  }
-  if (meter) {
-    meter.value = bill['Meter Number'] || bill.meterNumber || '';
-    console.log('Set meter to:', meter.value);
-  }
-  if (accountNum) {
-    accountNum.value = bill['Account Number'] || bill.accountNumber || '';
-    console.log('Set account to:', accountNum.value);
-  }
-  
-  // Date fields
+  // Date fields - THESE WORK
   const billFrom = document.getElementById('billFrom');
   const billTo = document.getElementById('billTo');
   
-  if (billFrom) {
-    billFrom.value = bill['Bill From Date'] || bill.billFromDate || '';
-    console.log('Set billFrom to:', billFrom.value);
-  }
-  if (billTo) {
-    billTo.value = bill['Bill To Date'] || bill.billToDate || '';
-    console.log('Set billTo to:', billTo.value);
-  }
+  if (billFrom) billFrom.value = bill['Bill From Date'] || '';
+  if (billTo) billTo.value = bill['Bill To Date'] || '';
   
-  // Units fields
-  const grossUnits = document.getElementById('grossUnits');
-  const importUnits = document.getElementById('importUnits');
-  const exportUnits = document.getElementById('exportUnits');
+  // Units fields - CORRECTED IDs
+  const gross = document.getElementById('gross');
+  const importU = document.getElementById('importU');
+  const exportU = document.getElementById('exportU');
   
-  console.log('Gross Units field exists?', !!grossUnits);
-  console.log('Gross Units value from bill:', bill['Gross Units']);
-  
-  if (grossUnits) {
-    grossUnits.value = bill['Gross Units'] || bill.grossUnits || '';
-    console.log('Set grossUnits to:', grossUnits.value);
+  if (gross) {
+    gross.value = bill['Gross Units'] || '';
+    console.log('Set gross to:', gross.value);
   }
-  if (importUnits) {
-    importUnits.value = bill['Import Units'] || bill.importUnits || '';
-    console.log('Set importUnits to:', importUnits.value);
+  if (importU) {
+    importU.value = bill['Import Units'] || '';
+    console.log('Set importU to:', importU.value);
   }
-  if (exportUnits) {
-    exportUnits.value = bill['Export Units'] || bill.exportUnits || '';
-    console.log('Set exportUnits to:', exportUnits.value);
+  if (exportU) {
+    exportU.value = bill['Export Units'] || '';
+    console.log('Set exportU to:', exportU.value);
   }
   
   // Carry forward
   const carryForwardUnits = document.getElementById('carryForwardUnits');
   const carryForwardSection = document.getElementById('carryForwardSection');
-  const openingCarry = bill['Opening Carry Forward'] || bill.openingCarryForward || 0;
+  const openingCarry = bill['Opening Carry Forward'] || 0;
   
   if (carryForwardUnits) carryForwardUnits.value = openingCarry;
   if (carryForwardSection && openingCarry > 0) {
     carryForwardSection.classList.remove('d-none');
   }
   
-  // Amount fields
-  const fixedCharges = document.getElementById('fixedCharges');
+  // Amount fields - CORRECTED IDs
+  const fixed = document.getElementById('fixed');
   const totalBill = document.getElementById('totalBill');
+  const arrears = document.getElementById('arrears');
   
-  console.log('Fixed Charges field exists?', !!fixedCharges);
-  console.log('Fixed Charges value from bill:', bill['Fixed Charges']);
-  
-  if (fixedCharges) {
-    fixedCharges.value = bill['Fixed Charges'] || bill.fixedCharges || '';
-    console.log('Set fixedCharges to:', fixedCharges.value);
+  if (fixed) {
+    fixed.value = bill['Fixed Charges'] || '';
+    console.log('Set fixed to:', fixed.value);
   }
   if (totalBill) {
-    totalBill.value = bill['Total Bill Amount'] || bill.totalBillAmount || '';
+    totalBill.value = bill['Total Bill Amount'] || '';
     console.log('Set totalBill to:', totalBill.value);
+  }
+  if (arrears) {
+    arrears.value = bill['Arrears'] || '';
   }
   
   console.log('=== BILL LOADING COMPLETE ===');
 }
-
 // ==========================================
 // UPDATED viewSelectedBill() Function
 // Replace in your chatgpt_updated.html
