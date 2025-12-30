@@ -2527,7 +2527,7 @@ if (userGuide) {                           // ADD THIS
     }
 
     // Mode-specific: Identity and Carry Forward
-    if (type === "save") {
+   if (type === "save") {
       if (identity) {
         identity.classList.remove("d-none");
         console.log('Identity section shown (save mode)');
@@ -2536,16 +2536,23 @@ if (userGuide) {                           // ADD THIS
         carrySec.classList.remove("d-none");
         console.log('Carry forward section shown');
       }
-      if (actionBtn) actionBtn.innerText = "💾 Save & Submit";
+      
+      // Only change button text if NOT editing
+      if (actionBtn && !window.isEditingBill) {
+        actionBtn.innerText = "💾 Save & Submit";
+      }
     } else {
       // type === "one"
       if (identity) identity.classList.add("d-none");
       if (carrySec) carrySec.classList.add("d-none");
       const openingCarry = document.getElementById("openingCarry");
       if (openingCarry) openingCarry.value = "";
-      if (actionBtn) actionBtn.innerText = "🔍 Calculate Saving";
+      
+      // Only change button text if NOT editing
+      if (actionBtn && !window.isEditingBill) {
+        actionBtn.innerText = "🔍 Calculate Saving";
+      }
     }
-
     // Show action button
     if (actionBtn) {
       actionBtn.classList.remove("d-none");
