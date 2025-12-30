@@ -5646,6 +5646,8 @@ function shareAnalysisReport(recommendation, saving, capacity, payback, priority
     alert('Share feature not available.');
   }
 }
+// BULLETPROOF printModal() - Replace entire function with this
+
 function printModal() {
   const modalContent = document.querySelector('.modal-body');
   
@@ -5657,38 +5659,44 @@ function printModal() {
   const modalTitle = document.querySelector('.modal-title');
   const title = modalTitle ? modalTitle.textContent : 'Solar Analysis Report';
   const timestamp = new Date().toLocaleString('en-IN');
+  const content = modalContent.innerHTML;
   
   const printWindow = window.open('', '_blank');
   
-  let html = '<!DOCTYPE html>';
-  html += '<html><head><meta charset="UTF-8">';
-  html += '<title>' + title + '</title>';
-  html += '<style>';
-  html += '@page { size: A4; margin: 2cm; }';
-  html += 'body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; }';
-  html += '.print-header { text-align: center; margin-bottom: 30px; border-bottom: 3px solid #1e40af; padding-bottom: 15px; }';
-  html += '.print-header h1 { color: #1e40af; margin: 0 0 10px 0; font-size: 24px; }';
-  html += '.print-header p { color: #666; margin: 5px 0; font-size: 14px; }';
-  html += 'h4, h5, h6 { color: #1e40af; margin-top: 20px; margin-bottom: 10px; }';
-  html += '@media print { body { margin: 0; padding: 20px; } }';
-  html += '</style></head><body>';
-  html += '<div class="print-header">';
-  html += '<h1>' + title + '</h1>';
-  html += '<p><strong>SolarSanchay</strong> - Government of Haryana</p>';
-  html += '<p>Generated: ' + timestamp + '</p>';
-  html += '</div>';
-  html += modalContent.innerHTML;
-  html += '<div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #e5e7eb; text-align: center; color: #666; font-size: 12px;">';
-  html += '<p><strong>SolarSanchay</strong> - Solar Savings Calculator</p>';
-  html += '<p>NIC, Kurukshetra | Government of Haryana</p>';
-  html += '</div>';
-  html += '<script>';
-  html += 'window.onload = function() { window.print(); window.onafterprint = function() { window.close(); }; };';
-  html += '</script>';
-  html += '</body></html>';
+  printWindow.document.write('<!DOCTYPE html>');
+  printWindow.document.write('<html><head>');
+  printWindow.document.write('<meta charset="UTF-8">');
+  printWindow.document.write('<title>' + title + '</title>');
+  printWindow.document.write('<style>');
+  printWindow.document.write('@page { size: A4; margin: 2cm; }');
+  printWindow.document.write('body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; }');
+  printWindow.document.write('.print-header { text-align: center; margin-bottom: 30px; border-bottom: 3px solid #1e40af; padding-bottom: 15px; }');
+  printWindow.document.write('.print-header h1 { color: #1e40af; margin: 0 0 10px 0; font-size: 24px; }');
+  printWindow.document.write('.print-header p { color: #666; margin: 5px 0; font-size: 14px; }');
+  printWindow.document.write('h4, h5, h6 { color: #1e40af; margin-top: 20px; margin-bottom: 10px; }');
+  printWindow.document.write('@media print { body { margin: 0; padding: 20px; } }');
+  printWindow.document.write('</style></head><body>');
+  printWindow.document.write('<div class="print-header">');
+  printWindow.document.write('<h1>' + title + '</h1>');
+  printWindow.document.write('<p><strong>SolarSanchay</strong> - Government of Haryana</p>');
+  printWindow.document.write('<p>Generated: ' + timestamp + '</p>');
+  printWindow.document.write('</div>');
+  printWindow.document.write(content);
+  printWindow.document.write('<div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #e5e7eb; text-align: center; color: #666; font-size: 12px;">');
+  printWindow.document.write('<p><strong>SolarSanchay</strong> - Solar Savings Calculator</p>');
+  printWindow.document.write('<p>NIC, Kurukshetra | Government of Haryana</p>');
+  printWindow.document.write('</div>');
+  printWindow.document.write('</body></html>');
   
-  printWindow.document.write(html);
   printWindow.document.close();
+  
+  // Print after a short delay
+  setTimeout(function() {
+    printWindow.print();
+    printWindow.onafterprint = function() {
+      printWindow.close();
+    };
+  }, 250);
 }
 function shareAnalysisViaWhatsApp(recommendation, reason, selfConsumption, importRatio, exportRatio) {
   const text = `
