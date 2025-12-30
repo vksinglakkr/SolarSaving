@@ -5672,9 +5672,18 @@ function shareMultiBillViaWhatsApp(summary, bills) {
   message += '📅 *Period Summary*\n';
   message += 'Total Days: ' + summary.totalDays + ' days\n';
   message += 'Bills Analyzed: ' + summary.count + ' bills\n';
+  
+  // Get first and last bill dates
   if (bills.length > 0) {
-    message += 'From: ' + bills[bills.length - 1].billFrom + '\n';
-    message += 'To: ' + bills[0].billTo + '\n';
+    const firstBill = bills[bills.length - 1];
+    const lastBill = bills[0];
+    const fromDate = firstBill['Bill From Date'];
+    const toDate = lastBill['Bill To Date'];
+    
+    if (fromDate && toDate) {
+      message += 'From: ' + new Date(fromDate).toLocaleDateString('en-GB') + '\n';
+      message += 'To: ' + new Date(toDate).toLocaleDateString('en-GB') + '\n';
+    }
   }
   message += '\n';
   
@@ -5701,11 +5710,24 @@ function shareMultiBillViaWhatsApp(summary, bills) {
   const maxBills = Math.min(3, bills.length);
   for (let i = 0; i < maxBills; i++) {
     const bill = bills[i];
-    const billSaving = bill.billWithoutSolar - bill.totalBill;
-    message += (i + 1) + '. Bill #' + bill.billNumber + '\n';
-    message += '   Period: ' + bill.billFrom + ' to ' + bill.billTo + '\n';
-    message += '   Saving: ₹' + Math.round(billSaving) + '\n';
+    const billNumber = bill['Bill Number'] || 'N/A';
+    const fromDate = bill['Bill From Date'];
+    const toDate = bill['Bill To Date'];
+    const billAmount = parseFloat(bill['Total Bill Amount'] || bill['Bill Amount'] || 0);
+    const withoutSolar = parseFloat(bill['Bill Without Solar'] || 0);
+    const saving = withoutSolar - billAmount;
+    
+    message += (i + 1) + '. Bill #' + billNumber + '\n';
+    
+    if (fromDate && toDate) {
+      const from = new Date(fromDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+      const to = new Date(toDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+      message += '   Period: ' + from + ' - ' + to + '\n';
+    }
+    
+    message += '   Saving: ₹' + Math.round(saving).toLocaleString() + '\n';
   }
+  
   if (bills.length > 3) {
     message += '   ... and ' + (bills.length - 3) + ' more bills\n';
   }
@@ -5725,7 +5747,7 @@ function shareMultiBillViaWhatsApp(summary, bills) {
   const whatsappURL = 'https://wa.me/?text=' + encodedMessage;
   
   window.open(whatsappURL, '_blank');
-} 
+}
 function printModalWithContent() {
   // Get the content RIGHT NOW while modal is visible
   const modalElement = document.getElementById('customModal');
