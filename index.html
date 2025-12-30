@@ -5647,7 +5647,6 @@ function shareAnalysisReport(recommendation, saving, capacity, payback, priority
   }
 }
 function printModal() {
-  // Get the modal content
   const modalContent = document.querySelector('.modal-body');
   
   if (!modalContent) {
@@ -5655,116 +5654,61 @@ function printModal() {
     return;
   }
   
-  // Get the modal title
   const modalTitle = document.querySelector('.modal-title');
   const title = modalTitle ? modalTitle.textContent : 'Solar Analysis Report';
   
-  // Create print window with the EXACT same content
   const printWindow = window.open('', '_blank');
   
-  printWindow.document.write(`
-<!DOCTYPE html>
+  const htmlContent = `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>${title}</title>
+  <title>` + title + `</title>
   <style>
-    @page { 
-      size: A4; 
-      margin: 2cm; 
-    }
-    
+    @page { size: A4; margin: 2cm; }
     body { 
       font-family: Arial, sans-serif; 
       line-height: 1.6;
       color: #333;
       max-width: 800px;
       margin: 0 auto;
+      padding: 20px;
     }
-    
     .print-header {
       text-align: center;
       margin-bottom: 30px;
       border-bottom: 3px solid #1e40af;
       padding-bottom: 15px;
     }
-    
     .print-header h1 {
       color: #1e40af;
       margin: 0 0 10px 0;
       font-size: 24px;
     }
-    
     .print-header p {
       color: #666;
       margin: 5px 0;
       font-size: 14px;
     }
-    
     h4, h5, h6 {
       color: #1e40af;
       margin-top: 20px;
       margin-bottom: 10px;
     }
-    
-    .analysis-card {
-      background: #f0f9ff;
-      border-left: 4px solid #3b82f6;
-      padding: 15px;
-      margin: 15px 0;
-      border-radius: 8px;
-    }
-    
-    .metric-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 8px 0;
-      border-bottom: 1px solid #e5e7eb;
-    }
-    
-    .metric-label {
-      color: #666;
-    }
-    
-    .metric-value {
-      font-weight: bold;
-      color: #1e40af;
-    }
-    
-    .highlight-box {
-      background: #dcfce7;
-      border-left: 4px solid #10b981;
-      padding: 15px;
-      margin: 15px 0;
-      border-radius: 8px;
-    }
-    
-    .highlight-box .value {
-      font-size: 20px;
-      font-weight: bold;
-      color: #10b981;
-    }
-    
     @media print {
-      body { margin: 0; }
+      body { margin: 0; padding: 20px; }
       .no-print { display: none; }
     }
   </style>
 </head>
 <body>
   <div class="print-header">
-    <h1>${title}</h1>
+    <h1>` + title + `</h1>
     <p><strong>SolarSanchay</strong> - Government of Haryana</p>
-    <p>Generated: ${new Date().toLocaleDateString('en-IN', { 
-      day: 'numeric', 
-      month: 'short', 
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })}</p>
+    <p>Generated: ` + new Date().toLocaleString('en-IN') + `</p>
   </div>
   
-  ${modalContent.innerHTML}
+  ` + modalContent.innerHTML + `
   
   <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #e5e7eb; text-align: center; color: #666; font-size: 12px;">
     <p><strong>SolarSanchay</strong> - Solar Savings Calculator</p>
@@ -5780,12 +5724,11 @@ function printModal() {
     };
   </script>
 </body>
-</html>
-  `);
+</html>`;
   
+  printWindow.document.write(htmlContent);
   printWindow.document.close();
 }
-
 function shareAnalysisViaWhatsApp(recommendation, reason, selfConsumption, importRatio, exportRatio) {
   const text = `
 *🔍 SolarSanchay - Capacity Analysis*
