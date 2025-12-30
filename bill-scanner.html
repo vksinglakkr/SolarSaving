@@ -448,8 +448,10 @@ function updateScanStatus(message, progress) {
 // DISPLAY RESULTS
 // ==========================================
 function displayResults() {
-  const container = document.getElementById('extractedFieldsContainer');
+  document.getElementById('uploadPreview').style.display = 'none';
+  document.getElementById('uploadPrompt').style.display = 'block';
   
+  const container = document.getElementById('extractedFieldsContainer');  
   if (Object.keys(extractedData).length === 0) {
     container.innerHTML = `
       <div style="color: #dc2626; text-align: center; padding: 1rem;">
