@@ -2369,6 +2369,7 @@ let entryMode = "one";
 let currentUser = null;
 // Initialize and synchronize userBills
 let userBills = [];
+let currentAnalysisData = null;
 
 // Create two-way binding with window.userBills
 Object.defineProperty(window, 'userBills', {
@@ -5609,7 +5610,17 @@ function generateSolarAnalysis() {
       
     </div>
   `;
-  
+  currentAnalysisData = {
+    totalDays: totalDays,
+    savedBills: savedBills,
+    avgDailyConsumption: avgDailyConsumption,
+    avgDailySolar: avgDailySolar,
+    avgDailyImport: avgDailyImport,
+    avgDailyExport: avgDailyExport,
+    avgNetImport: avgNetImport,
+    totalBillAmount: totalBillAmount,
+    totalFixedCharges: totalFixedCharges
+  };
   showModal(
     '🔍',
     'Solar Performance Analysis',
@@ -5623,7 +5634,7 @@ function generateSolarAnalysis() {
       { 
            text: '📱 WhatsApp', 
            type: 'success', 
-           action: () => shareAnalysisViaWhatsApp(totalDays, savedBills, avgDailyConsumption, avgDailySolar, avgDailyImport, avgDailyExport, avgNetImport, totalBillAmount, totalFixedCharges) 
+           action: () => shareAnalysisViaWhatsApp()      
       },
       { 
         text: '✕ Close', 
@@ -5718,7 +5729,13 @@ function printContent(title, content) {
     };
   }, 250);
 }
-function shareAnalysisViaWhatsApp(totalDays, savedBills, avgDailyConsumption, avgDailySolar, avgDailyImport, avgDailyExport, avgNetImport, totalBillAmount, totalFixedCharges) {
+function shareAnalysisViaWhatsApp() {
+  // Check if analysis data is available
+  if (!currentAnalysisData) {
+    alert('No analysis data available');
+    return;
+  }
+  
   // Get the modal content
   const modalElement = document.getElementById('customModal');
   
@@ -5730,6 +5747,9 @@ function shareAnalysisViaWhatsApp(totalDays, savedBills, avgDailyConsumption, av
   const titleElement = modalElement.querySelector('.modal-title');
   const title = titleElement ? titleElement.textContent.trim() : 'Solar Performance Analysis';
   
+  // Extract data from global variable
+  const data = currentAnalysisData;
+  
   // Build comprehensive WhatsApp message
   let message = '*' + title + '*\n\n';
   message += '*🌞 SolarSanchay Report*\n';
@@ -5737,27 +5757,27 @@ function shareAnalysisViaWhatsApp(totalDays, savedBills, avgDailyConsumption, av
   
   // Analysis Period
   message += '📅 *Analysis Period*\n';
-  message += 'Period: ' + totalDays + ' days (' + savedBills.length + ' bills)\n';
-  if (savedBills.length > 0) {
-    message += 'From: ' + savedBills[savedBills.length - 1].billFrom + '\n';
-    message += 'To: ' + savedBills[0].billTo + '\n';
+  message += 'Period: ' + data.totalDays + ' days (' + data.savedBills.length + ' bills)\n';
+  if (data.savedBills.length > 0) {
+    message += 'From: ' + data.savedBills[data.savedBills.length - 1].billFrom + '\n';
+    message += 'To: ' + data.savedBills[0].billTo + '\n';
   }
   message += '\n';
   
   // Energy Summary
   message += '⚡ *Energy Summary*\n';
-  message += 'Daily Consumption: ' + avgDailyConsumption + ' units\n';
-  message += 'Daily Solar: ' + avgDailySolar + ' units\n';
-  message += 'Daily Import: ' + avgDailyImport + ' units\n';
-  message += 'Daily Export: ' + avgDailyExport + ' units\n';
-  message += 'Net Grid: ' + avgNetImport + ' units/day\n';
+  message += 'Daily Consumption: ' + data.avgDailyConsumption + ' units\n';
+  message += 'Daily Solar: ' + data.avgDailySolar + ' units\n';
+  message += 'Daily Import: ' + data.avgDailyImport + ' units\n';
+  message += 'Daily Export: ' + data.avgDailyExport + ' units\n';
+  message += 'Net Grid: ' + data.avgNetImport + ' units/day\n';
   message += '\n';
   
   // Financial Summary
   message += '💰 *Bill Summary*\n';
-  message += 'Daily Bill: ₹' + Math.round(totalBillAmount / totalDays) + '\n';
-  message += 'Daily Fixed: ₹' + Math.round(totalFixedCharges / totalDays) + '\n';
-  message += 'Daily Variable: ₹' + Math.round((totalBillAmount - totalFixedCharges) / totalDays) + '\n';
+  message += 'Daily Bill: ₹' + Math.round(data.totalBillAmount / data.totalDays) + '\n';
+  message += 'Daily Fixed: ₹' + Math.round(data.totalFixedCharges / data.totalDays) + '\n';
+  message += 'Daily Variable: ₹' + Math.round((data.totalBillAmount - data.totalFixedCharges) / data.totalDays) + '\n';
   message += '\n';
   
   // Recommendation (extract from modal)
@@ -5765,11 +5785,9 @@ function shareAnalysisViaWhatsApp(totalDays, savedBills, avgDailyConsumption, av
   if (contentElement) {
     const fullText = contentElement.innerText;
     
-    // Detect recommendation type and extract details
     if (fullText.includes('BATTERY BENEFICIAL') || fullText.includes('BATTERY STORAGE RECOMMENDED')) {
       message += '🔋 *Recommendation: BATTERY STORAGE*\n';
       
-      // Extract battery details using regex
       const capacityMatch = fullText.match(/(\d+)\s*kWh/i);
       const savingMatch = fullText.match(/₹(\d+)\/day/i);
       const paybackMatch = fullText.match(/(\d+)\s*years?/i);
@@ -5778,7 +5796,7 @@ function shareAnalysisViaWhatsApp(totalDays, savedBills, avgDailyConsumption, av
       if (savingMatch) message += 'Savings: ₹' + savingMatch[1] + '/day\n';
       if (paybackMatch) message += 'Payback: ' + paybackMatch[1] + ' years\n';
       
-    } else if (fullText.includes('SYSTEM WORKING WELL') || fullText.includes('already') && fullText.includes('efficient')) {
+    } else if (fullText.includes('SYSTEM WORKING WELL') || (fullText.includes('already') && fullText.includes('efficient'))) {
       message += '✅ *System Working Well*\n';
       
       const efficiencyMatch = fullText.match(/(\d+)%\s*(?:efficient|grid reduction)/i);
@@ -5810,7 +5828,6 @@ function shareAnalysisViaWhatsApp(totalDays, savedBills, avgDailyConsumption, av
   
   console.log('=== WhatsApp Message ===');
   console.log(message);
-  console.log('=======================');
   
   // Encode and open WhatsApp
   const encodedMessage = encodeURIComponent(message);
