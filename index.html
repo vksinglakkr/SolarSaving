@@ -1661,10 +1661,20 @@ div[style*="background: linear-gradient(135deg, #e0f2fe"] {
 
 <!-- DASHBOARD SECTION -->
 <div class="d-none" id="dashboardSection">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h6 class="mb-0">📊 My Dashboard</h6>
-    <div id="userInfo" class="text-muted small"></div>
+ <div class="section-header mb-4">
+  <div class="section-title">
+    <div class="section-icon section-icon-identity">
+      📊
+    </div>
+    <div class="section-title-text">
+      My Dashboard
+      <small class="section-subtitle">Manage and track your solar bills</small>
+    </div>
   </div>
+  
+  <div id="userInfo" class="section-badge bg-light border text-primary small">
+    </div>
+</div>
   <!-- Mode Selection -->
 <div class="mb-3 d-flex gap-2">
   <button id="singleModeBtn" class="btn btn-primary" onclick="switchMode('single')">
