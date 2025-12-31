@@ -4062,7 +4062,7 @@ function exitAfterSuccessfulEdit() {
   resetDashboardActions();
 
   // 🔥 CRITICAL LINE: refresh dashboard list with updated data
-  renderBillCards(bills);
+ renderBillCards(window.userBills);
 
   // show dashboard
   document.getElementById("dashboardSection")?.classList.remove("d-none");
