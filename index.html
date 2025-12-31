@@ -2721,7 +2721,8 @@ if (fromDate && toDate) {
   const billAmount = parseFloat(bill['Total Bill Amount'] || 0);
   
 return `
-  <div class="bill-card" onclick="handleBillCardClick(${index})">
+  <div class="bill-card" onclick="handleBillCardClick(event, ${index})">
+
     <div class="d-flex align-items-center gap-3">
       
       <!-- Single Selection Radio (default visible) -->
@@ -2923,12 +2924,27 @@ function deleteBill() {
   }
 }
 // Handle bill card click
-function handleBillCardClick(index) {
+function handleBillCardClick(event, index) {
+
+  // ❌ Ignore synthetic / programmatic clicks
+  if (!event.isTrusted) {
+    console.log("Ignored non-user card click");
+    return;
+  }
+
+  // ❌ Ignore clicks while exiting edit mode
+  if (window.isEditMode === true) {
+    console.log("Ignored card click during edit exit");
+    return;
+  }
+
   if (currentSelectionMode === 'single') {
+    console.log("User clicked bill card:", index);
     selectSingleBill(index);
   }
   // In summary mode, let checkbox handle it
 }
+
 
 // Select single bill (radio button)
 function selectSingleBill(index) {
