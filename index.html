@@ -3781,7 +3781,7 @@ console.log("Sending to webhook:", webhookData);
 
       console.log("Response status:", response.status);
 
-      if (response.ok) {
+if (response.ok) {
         const data = await response.json().catch(() => ({ status: 'success' }));
         console.log("Response data:", data);
 
@@ -3790,34 +3790,33 @@ console.log("Sending to webhook:", webhookData);
           return;
         }
         
-  console.log("✅ Bill saved successfully");
-  if (window.isEditMode === true) {
-  exitAfterSuccessfulEdit();
-  return;
-}
+        console.log("✅ Bill saved successfully");
         
         // CHECK IF EDITING OR ADDING NEW
         if (window.isEditingBill && window.editingBillIndex !== null) {
           // UPDATE EXISTING BILL
           console.log('Updating existing bill at index:', window.editingBillIndex);
           
-          const bills = window.userBills || [];
-          bills[window.editingBillIndex] = webhookData;
-          window.userBills = bills;
-          
-          // Save to localStorage
-          saveBillsToStorage(bills);
+          // ✅ FIX: Refresh bills from server after update
+          await authenticateUserSilent();
           
           // Clear editing state
           window.isEditingBill = false;
           window.editingBillIndex = null;
           
-          console.log('Bill updated successfully');
-               if (isEditMode === true || editingIndex !== null) {
-                    exitAfterSuccessfulEdit();
-                    return;
-               }        
-        } else {   
+          console.log('✅ Bill updated and dashboard refreshed');
+          
+          // Show success message
+          showSuccessModal('✅ Bill updated successfully!');
+          
+          // Return to dashboard after 1 second
+          setTimeout(() => {
+            closeModal();
+            selectIntent('dashboard');
+          }, 1000);
+          
+          return;
+        } else {
           // ADD NEW BILL
           console.log('Adding new bill');
           
