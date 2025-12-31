@@ -4147,7 +4147,14 @@ if (actionBtn) {
 }
 function exitAfterSuccessfulEdit() {
   console.log("↩ Exiting edit mode");
+ const singleActions = document.getElementById('singleModeActions');
+   const summaryActions = document.getElementById('summaryModeActions');
 
+   if (singleActions) singleActions.style.display = 'flex';   // ← SHOW single
+   if (summaryActions) summaryActions.style.display = 'none'; // ← HIDE summary
+   document.getElementById('viewBtn').disabled = true;
+document.getElementById('editBtn').disabled = true;
+document.getElementById('deleteBtn').disabled = true;
   window.ignoreNextBillSelection = true; // 🔥 IMPORTANT
 
   window.isEditMode = false;
@@ -4164,14 +4171,7 @@ function exitAfterSuccessfulEdit() {
   renderBillCards(userBills);
 
   document.getElementById("dashboardSection")?.classList.remove("d-none");
-   const singleActions = document.getElementById('singleModeActions');
-   const summaryActions = document.getElementById('summaryModeActions');
-
-   if (singleActions) singleActions.style.display = 'flex';   // ← SHOW single
-   if (summaryActions) summaryActions.style.display = 'none'; // ← HIDE summary
-   document.getElementById('viewBtn').disabled = true;
-document.getElementById('editBtn').disabled = true;
-document.getElementById('deleteBtn').disabled = true;
+  
 }
 
 
