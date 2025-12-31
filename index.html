@@ -2898,8 +2898,9 @@ function editBill() {
 }
 function cancelEdit() {
   console.log("❌ Edit cancelled. Returning to dashboard.");
-
-  // clear edit state
+   const billHelpers = document.getElementById("billHelpers");  
+  if (billHelpers) billHelpers.classList.add("d-none");   
+   // clear edit state
   isEditMode = false;
   editingIndex = null;
 
