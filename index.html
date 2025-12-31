@@ -2726,12 +2726,12 @@ return `
       
       <!-- Single Selection Radio (default visible) -->
       <input type="radio" 
-             name="billSelection" 
-             id="single_${index}"
-             class="single-selector"
-             value="${index}" 
-             style="width: 20px; height: 20px; cursor: pointer;"
-             onchange="selectSingleBill(${index})">
+       name="billSelection" 
+       id="single_${index}"
+       class="single-selector"
+       value="${index}" 
+       style="width: 20px; height: 20px; cursor: pointer;"
+       onclick="selectSingleBill(${index})">
       
       <!-- Multi Selection Checkbox (hidden by default) -->
       <input type="checkbox" 
@@ -4050,6 +4050,7 @@ if (actionBtn) {
 function exitAfterSuccessfulEdit() {
   console.log("↩ Exiting edit mode");
 
+  // 🔥 RESET EDIT STATE FIRST (CRITICAL)
   window.isEditMode = false;
   editingIndex = null;
 
@@ -4061,10 +4062,9 @@ function exitAfterSuccessfulEdit() {
   exitBillEntryMode();
   resetDashboardActions();
 
-  // 🔥 CRITICAL LINE: refresh dashboard list with updated data
- renderBillCards(window.userBills);
+  // 🔥 RENDER AFTER RESET
+  renderBillCards(userBills);
 
-  // show dashboard
   document.getElementById("dashboardSection")?.classList.remove("d-none");
 }
 
