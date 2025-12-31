@@ -3804,7 +3804,15 @@ if (response.ok) {
           window.isEditingBill = false;
           window.editingBillIndex = null;
           
-          console.log('✅ Bill updated and dashboard refreshed');
+console.log('✅ Bill updated and dashboard refreshed');
+          
+          // Clear editing state
+          window.isEditingBill = false;
+          window.editingBillIndex = null;
+          
+          // Hide cancel button
+          const cancelBtn = document.getElementById('cancelEditBtn');
+          if (cancelBtn) cancelBtn.style.display = 'none';
           
           // Show success message
           showSuccessModal('✅ Bill updated successfully!');
@@ -3812,7 +3820,30 @@ if (response.ok) {
           // Return to dashboard after 1 second
           setTimeout(() => {
             closeModal();
-            selectIntent('dashboard');
+            
+            // ✅ FIX: Go directly to dashboard without re-authentication
+            // Hide form sections
+            document.getElementById('consumptionSection')?.classList.add('d-none');
+            document.getElementById('identitySection')?.classList.add('d-none');
+            document.getElementById('billPeriodSection')?.classList.add('d-none');
+            document.getElementById('carryForwardSection')?.classList.add('d-none');
+            document.getElementById('actionBtn')?.classList.add('d-none');
+            document.getElementById('intentSummary')?.classList.add('d-none');
+            document.getElementById('intentSection')?.classList.add('d-none');
+            document.getElementById('authSection')?.classList.add('d-none');
+            document.getElementById('awardSummary')?.classList.add('d-none');
+            
+            // Show dashboard
+            document.getElementById('dashboardSection')?.classList.remove('d-none');
+            
+            // Refresh bill list display
+            displayBillsList();
+            
+            // Show home button
+            showHomeButton();
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
           }, 1000);
           
           return;
