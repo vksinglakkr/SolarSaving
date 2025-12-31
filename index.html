@@ -2340,6 +2340,7 @@ let currentUser = null;
 // Initialize and synchronize userBills
 let userBills = [];
 let currentAnalysisData = null;
+window.isEditMode = false;
 
 // Create two-way binding with window.userBills
 Object.defineProperty(window, 'userBills', {
@@ -2811,6 +2812,7 @@ function editBill() {
     alert('Please select a bill first.');
     return;
   }
+window.isEditMode = true;
   
   const bills = window.userBills || [];
   const bill = bills[selectedBillIndex];
@@ -3719,6 +3721,10 @@ console.log("Sending to webhook:", webhookData);
         }
         
   console.log("✅ Bill saved successfully");
+  if (window.isEditMode === true) {
+  exitAfterSuccessfulEdit();
+  return;
+}
         
         // CHECK IF EDITING OR ADDING NEW
         if (window.isEditingBill && window.editingBillIndex !== null) {
