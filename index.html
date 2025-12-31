@@ -2835,12 +2835,14 @@ window.isEditMode = true;
   setTimeout(function() {
     loadBillForEditing(bill);
     
-    // Update button text AFTER selectIntent has run
-    const actionBtn = document.getElementById('actionBtn');
-    if (actionBtn) {
-      actionBtn.textContent = '💾 Update Bill';
-      actionBtn.classList.remove('d-none'); // Make sure it's visible
-    }
+  const actionBtn = document.getElementById('actionBtn');
+if (actionBtn) {
+  actionBtn.textContent = '💾 Update Bill';
+  actionBtn.classList.remove('d-none');   // ensure visible
+  actionBtn.disabled = false;             // 🔥 IMPORTANT
+  actionBtn.style.opacity = '1';          // restore normal look
+  actionBtn.style.cursor = 'pointer';     // UX polish
+}
     
     // Show cancel button
     const cancelBtn = document.getElementById('cancelEditBtn');
