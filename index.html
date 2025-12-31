@@ -4155,6 +4155,7 @@ function exitAfterSuccessfulEdit() {
   if (summaryActions) summaryActions.style.display = 'none';
   
   // ✅ CRITICAL FIX: Disable all action buttons (but keep visible)
+    selectedBillIndex = null;
   const viewBtn = document.getElementById('viewBtn');
   const editBtn = document.getElementById('editBtn');
   const deleteBtn = document.getElementById('deleteBtn');
