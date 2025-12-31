@@ -2861,9 +2861,12 @@ function cancelEdit() {
   window.isEditingBill = false;
   window.editingBillIndex = null;
   
-  // Reset button text
+  // Reset and re-enable button
   const actionBtn = document.getElementById('actionBtn');
   if (actionBtn) {
+    actionBtn.disabled = false;
+    actionBtn.style.opacity = '1';
+    actionBtn.style.cursor = 'pointer';
     actionBtn.textContent = 'Calculate Solar Benefit';
   }
   
@@ -2878,7 +2881,7 @@ function cancelEdit() {
     'billNumber', 'meter', 'accountNum',
     'billFrom', 'billTo',
     'gross', 'importU', 'exportU',
-    'fixed', 'totalBill', 'arrears'
+    'fixed', 'totalBill', 'arrears', 'openingCarry'
   ];
   
   fieldsToReset.forEach(fieldId => {
@@ -2886,17 +2889,19 @@ function cancelEdit() {
     if (field) field.value = '';
   });
   
-  // Clear carry forward if visible
-  const carryForwardUnits = document.getElementById('carryForwardUnits');
-  if (carryForwardUnits) carryForwardUnits.value = '';
-  
+  // Hide carry forward section
   const carryForwardSection = document.getElementById('carryForwardSection');
   if (carryForwardSection) carryForwardSection.classList.add('d-none');
   
-  // Go back to dashboard
+  // Return to dashboard immediately
   selectIntent('dashboard');
   
-  console.log('Edit cancelled, returning to dashboard');
+  // Scroll to top
+  setTimeout(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, 100);
+  
+  console.log('✅ Edit cancelled, returned to dashboard');
 }
 // Delete button - removes selected bill
 function deleteBill() {
@@ -3953,12 +3958,11 @@ console.log("Sending to webhook:", webhookData);
 
 const isEditing = window.isEditingBill;
   
-// Check if editing - skip modal and go straight to dashboard
+// Check if editing - save and return to dashboard immediately
   if (isEditing) {
-    // Show success message
-    alert('✅ Bill Updated Successfully!');
+    console.log('✅ Bill updated successfully');
     
-    // Reset edit state
+    // Clear editing flags
     window.isEditingBill = false;
     window.editingBillIndex = null;
     
@@ -3966,24 +3970,22 @@ const isEditing = window.isEditingBill;
     const cancelBtn = document.getElementById('cancelEditBtn');
     if (cancelBtn) cancelBtn.style.display = 'none';
     
-    // Reset action button
-    const actionBtn = document.getElementById('actionBtn');
+    // Reset action button completely
     if (actionBtn) {
       actionBtn.disabled = false;
       actionBtn.style.opacity = '1';
       actionBtn.style.cursor = 'pointer';
-      actionBtn.textContent = 'Calculate Solar Benefit';
+      actionBtn.innerText = 'Calculate Solar Benefit';
     }
     
-    // Go back to dashboard
-    selectIntent('dashboard');
+    // Return to dashboard immediately
+    setTimeout(() => {
+      selectIntent('dashboard');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 100);
     
-    // Scroll to top
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    
-    return; // Exit function - don't show modal
+    return; // Exit - don't show modal or award summary
   }
-  
   // For new bills - show modal as usual
   showModal(
     '📊', 
