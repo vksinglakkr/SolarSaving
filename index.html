@@ -2819,11 +2819,6 @@ window.isEditMode = true;
   const bills = window.userBills || [];
   const bill = bills[selectedBillIndex];
   
-  if (!bill) {
-    alert('Bill not found.');
-    return;
-  }
-  
   console.log('Editing bill:', bill['Bill Number']);
   
   // Store editing state FIRST (before selectIntent)
