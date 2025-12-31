@@ -2831,7 +2831,6 @@ function editBill() {
   
   window.isEditMode = true;
   
-  // ✅ CRITICAL FIX: Ensure bills are loaded
   const bills = window.userBills || [];
   
   console.log('=== EDIT BILL DEBUG ===');
@@ -2865,27 +2864,23 @@ function editBill() {
   setTimeout(function() {
     loadBillForEditing(bill);
     
-  const actionBtn = document.getElementById('actionBtn');
-if (actionBtn) {
-  actionBtn.textContent = '💾 Update Bill';
-  actionBtn.classList.remove('d-none');   // ensure visible
-  actionBtn.disabled = false;             // 🔥 IMPORTANT
-  actionBtn.style.opacity = '1';          // restore normal look
-  actionBtn.style.cursor = 'pointer';     // UX polish
-}
+    const actionBtn = document.getElementById('actionBtn');
+    if (actionBtn) {
+      actionBtn.textContent = '💾 Update Bill';
+      actionBtn.classList.remove('d-none');
+      actionBtn.disabled = false;
+      actionBtn.style.opacity = '1';
+      actionBtn.style.cursor = 'pointer';
+    }
     
     // Show cancel button
     const cancelBtn = document.getElementById('cancelEditBtn');
     if (cancelBtn) {
       cancelBtn.style.display = 'block';
     }
-     // ✅ CRITICAL FIX: Hide dashboard action buttons during edit
-    const singleActions = document.getElementById('singleModeActions');
-    if (singleActions) {
-      singleActions.style.display = 'none';
-    }
+    
     console.log('Bill data loaded, buttons updated');
-  }, 500); // Increased timeout to 500ms
+  }, 500);
   
   // Scroll to top
   setTimeout(function() {
@@ -4152,14 +4147,14 @@ if (actionBtn) {
 function exitAfterSuccessfulEdit() {
   console.log("↩ Exiting edit mode");
   
-  // ✅ SHOW single mode actions, HIDE summary mode actions
+  // ✅ SHOW single mode actions (keep them visible)
   const singleActions = document.getElementById('singleModeActions');
   const summaryActions = document.getElementById('summaryModeActions');
 
-  if (singleActions) singleActions.style.display = 'flex';
+  if (singleActions) singleActions.style.display = 'flex';   // Keep visible
   if (summaryActions) summaryActions.style.display = 'none';
   
-  // ✅ CRITICAL FIX: Disable all action buttons
+  // ✅ CRITICAL FIX: Disable all action buttons (but keep visible)
   const viewBtn = document.getElementById('viewBtn');
   const editBtn = document.getElementById('editBtn');
   const deleteBtn = document.getElementById('deleteBtn');
@@ -4192,7 +4187,7 @@ function exitAfterSuccessfulEdit() {
   // Show dashboard
   document.getElementById("dashboardSection")?.classList.remove("d-none");
   
-  console.log("✅ All buttons disabled, no bill selected");
+  console.log("✅ All buttons disabled (but visible), no bill selected");
 }
 
 
