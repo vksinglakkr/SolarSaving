@@ -4164,6 +4164,11 @@ function exitAfterSuccessfulEdit() {
   renderBillCards(userBills);
 
   document.getElementById("dashboardSection")?.classList.remove("d-none");
+   const singleActions = document.getElementById('singleModeActions');
+   const summaryActions = document.getElementById('summaryModeActions');
+
+   if (singleActions) singleActions.style.display = 'flex';   // ← SHOW single
+   if (summaryActions) summaryActions.style.display = 'none'; // ← HIDE summary
 }
 
 
