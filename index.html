@@ -3975,38 +3975,63 @@ const isEditing = window.isEditingBill;
   );
 // ===== Award Summary Hook (UI only) =====
 // ===== Award Summary Hook (UI only) =====
-const awardSavingEl = document.getElementById("awardSaving");
-const awardUnitsEl = document.getElementById("awardUnits");
-const awardPercentEl = document.getElementById("awardPercent");
-const awardPayableEl = document.getElementById("awardPayable");
-const awardWithoutSolarEl = document.getElementById("awardWithoutSolar");
 
-if (awardSavingEl) awardSavingEl.innerText = saving.toFixed(0);
-if (awardUnitsEl) awardUnitsEl.innerText = e || 0;
-if (awardPercentEl) awardPercentEl.innerText = without > 0 ? ((saving / without) * 100).toFixed(1) : 0;
-if (awardPayableEl) awardPayableEl.innerText = t || 0;
-if (awardWithoutSolarEl) awardWithoutSolarEl.innerText = without.toFixed(0);
+// 🔁 EDIT MODE: behave like Cancel and return to dashboard
+if (window.isEditingBill) {
+  console.log("✅ Edit mode calculation complete. Returning to dashboard.");
 
-const awardSummary = document.getElementById("awardSummary");
-if (awardSummary) awardSummary.classList.remove("d-none");
+  // reset edit flags
+  window.isEditingBill = false;
+  window.editingIndex = null;
 
-// Update button state based on mode
-if (actionBtn) {
-  const isEditing = window.isEditingBill;
-  
-  if (isEditing) {
-    // For editing: Re-enable button and reset text
-    actionBtn.disabled = false;
-    actionBtn.style.opacity = '1';
-    actionBtn.style.cursor = 'pointer';
-    actionBtn.innerText = 'Calculate Solar Benefit';
-  } else {
-    // For new bills: Disable and mark as saved
+  // clear form fields
+  clearBillForm();
+
+  // clear radio + card selection
+  clearBillSelection();
+
+  // hide award summary explicitly
+  const awardSummary = document.getElementById("awardSummary");
+  if (awardSummary) awardSummary.classList.add("d-none");
+
+  // exit entry UI
+  exitBillEntryMode();
+
+  // reset dashboard buttons
+  resetDashboardActions();
+
+  // show dashboard
+  document.getElementById("dashboardSection")?.classList.remove("d-none");
+
+} else {
+  // 🟢 NORMAL MODE (New / Quick Check): show award summary
+
+  const awardSavingEl = document.getElementById("awardSaving");
+  const awardUnitsEl = document.getElementById("awardUnits");
+  const awardPercentEl = document.getElementById("awardPercent");
+  const awardPayableEl = document.getElementById("awardPayable");
+  const awardWithoutSolarEl = document.getElementById("awardWithoutSolar");
+
+  if (awardSavingEl) awardSavingEl.innerText = saving.toFixed(0);
+  if (awardUnitsEl) awardUnitsEl.innerText = e || 0;
+  if (awardPercentEl) {
+    awardPercentEl.innerText =
+      without > 0 ? ((saving / without) * 100).toFixed(1) : 0;
+  }
+  if (awardPayableEl) awardPayableEl.innerText = t || 0;
+  if (awardWithoutSolarEl) awardWithoutSolarEl.innerText = without.toFixed(0);
+
+  const awardSummary = document.getElementById("awardSummary");
+  if (awardSummary) awardSummary.classList.remove("d-none");
+
+  // Update button state for new entries
+  if (actionBtn) {
     actionBtn.disabled = true;
-    actionBtn.style.opacity = '0.5';
-    actionBtn.innerText = entryMode === 'save' ? '✅ Saved' : '✅ Calculated';
+    actionBtn.style.opacity = "0.5";
+    actionBtn.innerText = entryMode === "save" ? "✅ Saved" : "✅ Calculated";
   }
 }
+
 }
 
 function shareWhatsApp(data){
