@@ -2658,10 +2658,12 @@ function showDashboard() {
 function displayBillsList() {
    // --- ADD THESE THREE LINES AT THE START ---
     selectedBillIndex = null; 
+   const billHelpers = document.getElementById("billHelpers");   
     document.getElementById('editBtn').disabled = true;
     // If you have view/delete buttons, disable them too:
     if(document.getElementById('viewBtn')) document.getElementById('viewBtn').disabled = true;
     if(document.getElementById('deleteBtn')) document.getElementById('deleteBtn').disabled = true;
+      if (billHelpers) billHelpers.classList.add("d-none");     
     // ------------------------------------------
   const billsList = document.getElementById('billsList');
   
