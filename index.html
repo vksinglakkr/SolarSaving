@@ -3995,20 +3995,39 @@ const isEditing = window.isEditingBill;
     ]
   );
 // ===== Award Summary Hook (UI only) =====
-document.getElementById("awardSaving").innerText = solarSaving || 0;
-document.getElementById("awardUnits").innerText = exportU || 0;
-document.getElementById("awardPercent").innerText =
-  withoutSolarBill > 0 ? ((solarSaving / withoutSolarBill) * 100).toFixed(1) : 0;
-document.getElementById("awardPayable").innerText = totalBill || 0;
-document.getElementById("awardWithoutSolar").innerText = withoutSolarBill || 0;
+// ===== Award Summary Hook (UI only) =====
+const awardSavingEl = document.getElementById("awardSaving");
+const awardUnitsEl = document.getElementById("awardUnits");
+const awardPercentEl = document.getElementById("awardPercent");
+const awardPayableEl = document.getElementById("awardPayable");
+const awardWithoutSolarEl = document.getElementById("awardWithoutSolar");
 
-document.getElementById("awardSummary").classList.remove("d-none");
+if (awardSavingEl) awardSavingEl.innerText = saving.toFixed(0);
+if (awardUnitsEl) awardUnitsEl.innerText = e || 0;
+if (awardPercentEl) awardPercentEl.innerText = without > 0 ? ((saving / without) * 100).toFixed(1) : 0;
+if (awardPayableEl) awardPayableEl.innerText = t || 0;
+if (awardWithoutSolarEl) awardWithoutSolarEl.innerText = without.toFixed(0);
 
+const awardSummary = document.getElementById("awardSummary");
+if (awardSummary) awardSummary.classList.remove("d-none");
+
+// Update button state based on mode
 if (actionBtn) {
+  const isEditing = window.isEditingBill;
+  
+  if (isEditing) {
+    // For editing: Re-enable button and reset text
+    actionBtn.disabled = false;
+    actionBtn.style.opacity = '1';
+    actionBtn.style.cursor = 'pointer';
+    actionBtn.innerText = 'Calculate Solar Benefit';
+  } else {
+    // For new bills: Disable and mark as saved
     actionBtn.disabled = true;
     actionBtn.style.opacity = '0.5';
     actionBtn.innerText = entryMode === 'save' ? '✅ Saved' : '✅ Calculated';
   }
+}
 }
 
 function shareWhatsApp(data){
