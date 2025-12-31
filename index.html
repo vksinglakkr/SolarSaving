@@ -2861,8 +2861,11 @@ function cancelEdit() {
   isEditMode = false;
   editingIndex = null;
 
-  // clear all form fields INCLUDING openingCarry
+  // clear all form fields
   clearBillForm();
+
+  // clear radio / checkbox selection  ✅ FIX
+  clearBillSelection();
 
   // hide award summary
   document.getElementById("awardSummary")?.classList.add("d-none");
@@ -5342,6 +5345,17 @@ function formatBillPeriod(bill) {
   } catch (e) {
     return 'N/A';
   }
+}
+function clearBillSelection() {
+  const radios = document.querySelectorAll(
+    '#billsList input[type="radio"], #billsList input[type="checkbox"]'
+  );
+
+  radios.forEach(radio => {
+    radio.checked = false;
+  });
+
+  console.log("🔘 Bill selection cleared");
 }
 
 function generateSolarAnalysis() {
