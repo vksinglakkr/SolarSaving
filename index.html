@@ -2574,7 +2574,14 @@ async function authenticateUser() {
     
     if (data.status === 'success' && data.authenticated) {
       currentUser = { meter, account };
-      userBills = Array.isArray(data.bills) ? data.bills : [];
+      
+      // ✅ CRITICAL FIX: Properly store bills in window.userBills
+      const bills = Array.isArray(data.bills) ? data.bills : [];
+      userBills = bills;
+      window.userBills = bills;
+      
+      console.log('✅ Bills stored:', bills.length, 'bills');
+      console.log('First bill:', bills[0]?.['Bill Number']);
       
       showSuccessModal(`✅ Login Successful!<br><br>Found ${data.billCount} bill(s).`);
       
