@@ -11,11 +11,10 @@
 /* ========================================
    GLOBAL STYLES
    ======================================== */
-body { 
-  background: #f4f6fb; 
-  margin: 0;
-  padding: 0;
-}
+body {
+     background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
+     background-attachment: fixed;
+   }
 
 /* ========================================
    STANDARD CONTAINER FOR ALL SECTIONS
@@ -1433,7 +1432,7 @@ div[style*="background: linear-gradient(135deg, #e0f2fe"] {
   <div class="container">  
 <!-- HEADER -->
 <!-- CLEAN PROFESSIONAL HEADER -->
-<div class="header" style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); border-bottom: 3px solid #fbbf24; padding: 1.5rem 0;">
+<div class="header" style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); border-bottom: 1px solid rgba(255, 255, 255, 0.2); padding: 1.5rem 0;">
   <div class="container">
     <div class="d-flex align-items-center justify-content-between">
       
@@ -1444,9 +1443,8 @@ div[style*="background: linear-gradient(135deg, #e0f2fe"] {
           <h1 style="color: #ffffff; font-size: 2.2rem; font-weight: 800; margin: 0; text-shadow: 0 2px 8px rgba(0,0,0,0.2);">
             SolarSanchay
           </h1>
-       <small class="d-none d-md-block">From Units to ₹ Savings – Making Solar Benefits Visible</small>
-    <small class="d-block d-md-none">Solar Savings Calculator</small>
-              </div>
+<small class="d-none d-md-block" style="color: #ffffff; opacity: 0.95; font-weight: 500; text-shadow: 0 1px 3px rgba(0,0,0,0.2);">From Units to ₹ Savings – Making Solar Benefits Visible</small>
+    <small class="d-block d-md-none" style="color: #ffffff; opacity: 0.95; font-weight: 500;">Solar Savings Calculator</small>              </div>
       </div>
       
       <!-- Right: Haryana Logo -->
@@ -1642,52 +1640,14 @@ div[style*="background: linear-gradient(135deg, #e0f2fe"] {
     </iframe>
   </div>
 </div>
-<!-- ANNUAL STATISTICS CARD -->
-<div class="card mb-3" id="annualStatsCard" style="display: none;">
-  <div class="card-header">
-    <h6 style="margin: 0;">
-      📊 वार्षिक सांख्यिकी / Annual Statistics (Current FY)
-    </h6>
-  </div>
-  <div class="card-body">
-    <div class="row text-center">
-      <div class="col-6 col-md-3 mb-2">
-        <small class="text-muted">Total Consumption</small>
-        <h5 id="statTotalConsumption">—</h5>
-        <small>units</small>
-      </div>
-      
-      <div class="col-6 col-md-3 mb-2">
-        <small class="text-muted">Total Generation</small>
-        <h5 id="statTotalGeneration">—</h5>
-        <small>units</small>
-      </div>
-      
-      <div class="col-6 col-md-3 mb-2">
-        <small class="text-muted">Generation Ratio</small>
-        <h5 id="statRatio">—</h5>
-        <small>%</small>
-      </div>
-      
-      <div class="col-6 col-md-3 mb-2">
-        <small class="text-muted">90% Reference</small>
-        <h5 id="stat90Limit">—</h5>
-        <small>units</small>
-      </div>
-    </div>
-    
-    <!-- Warning area -->
-    <div id="limitWarningBox" style="margin-top: 1rem;"></div>
-  </div>
-</div>
+
   <!-- Decorative left accent -->
   <div class="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-emerald-500 to-blue-500"></div>
 
  <!-- INTENT SUMMARY -->
 <div id="intentSummary" class="alert alert-info d-none">
   <span id="intentText"></span>
-  <button class="btn btn-sm btn-link" onclick="resetIntent()"></button>
-</div>
+ </div>
 <!-- AUTHENTICATION SECTION (for Dashboard) -->
 <div class="card p-3 mb-3 d-none" id="authSection">
   <h6>🔐 Login to Dashboard</h6>
@@ -1701,10 +1661,20 @@ div[style*="background: linear-gradient(135deg, #e0f2fe"] {
 
 <!-- DASHBOARD SECTION -->
 <div class="d-none" id="dashboardSection">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h6 class="mb-0">📊 My Dashboard</h6>
-    <div id="userInfo" class="text-muted small"></div>
+ <div class="section-header mb-4">
+  <div class="section-title">
+    <div class="section-icon section-icon-identity">
+      📊
+    </div>
+    <div class="section-title-text">
+      My Dashboard
+      <small class="section-subtitle">Manage and track your solar bills</small>
+    </div>
   </div>
+  
+  <div id="userInfo" class="section-badge bg-light border text-primary small">
+    </div>
+</div>
   <!-- Mode Selection -->
 <div class="mb-3 d-flex gap-2">
   <button id="singleModeBtn" class="btn btn-primary" onclick="switchMode('single')">
@@ -2143,6 +2113,13 @@ div[style*="background: linear-gradient(135deg, #e0f2fe"] {
         onclick="calculate()">
   Calculate Solar Benefit
 </button>
+<!-- Cancel Edit Button -->
+<button id="cancelEditBtn"
+        class="btn btn-secondary w-100 mt-3"
+        style="display: none;"
+        onclick="cancelEdit()">
+  ❌ Cancel Edit
+</button>
 
 <div id="result" class="mt-4"></div>
 <div id="awardSummary" class="result-box d-none"
@@ -2262,12 +2239,15 @@ div[style*="background: linear-gradient(135deg, #e0f2fe"] {
 </div>
 </div>
    <footer class="mt-1 py-3 text-center"
-        style="background:#f8f9fa;border-top:1px solid #dee2e6;">
+        style="background:#f8f9fa;border-top:1px solid #cbd5e1;">
 <!-- Quote Section - Full Width Simple -->
 <div class="container">
-  <div id="quotesSection" class="p-4" style="background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%); border-radius: 12px; border-left: 6px solid #0284c7; box-shadow: 0 2px 12px rgba(2, 132, 199, 0.1);">
-    
-    <!-- Quote -->
+  <div id="quotesSection" class="p-4" style=" background: linear-gradient(135deg, #FFFDF5 0%, #FFFFFF 100%);  
+   border-radius: 12px; border-left: 6px solid #16a34a; box-shadow: 0 4px 16px rgba(22, 163, 74, 0.15);">
+  
+  
+       
+     <!-- Quote -->
     <p class="text-center mb-3" style="font-size: 1.15rem; color: #1e3a8a; font-weight: 500; font-style: italic; line-height: 1.8;">
       सूर्य की रोशनी को बचत में बदलना — जब नागरिक स्पष्ट रूप से देख सकें कि सोलर क्या वापस देता है।
     </p>
@@ -2291,13 +2271,13 @@ div[style*="background: linear-gradient(135deg, #e0f2fe"] {
 <!-- DOCUMENT DOWNLOAD BANNER - FULLY RESPONSIVE -->
 <div class="container" style="margin: 1.5rem auto;" id="userGuideBanner">
   <div class="doc-banner-wrapper">
-    
-    <!-- Text Content -->
+
+       <!-- Text Content -->
     <div class="doc-banner-text">
       <h4 style="color: #1e40af; font-weight: 700; margin: 0 0 0.5rem 0; font-size: 1.1rem;">
         📚 Complete User Guide Available
       </h4>
-      <p style="color: #64748b; margin: 0; font-size: 0.9rem;">
+      <p style="color: #64748b; margin: 0; font-size: 1rem;">
         Learn about features, benefits, and how to use SolarSanchay
       </p>
     </div>
@@ -2317,7 +2297,7 @@ div[style*="background: linear-gradient(135deg, #e0f2fe"] {
 
 <div class="footer">
   Developed by <b>National Informatics Centre (NIC), Kurukshetra</b><br>
-  for <b>District Administration, Kurukshetra</b><br>
+  for District Administration, Kurukshetra<br>
   <span class="small">A scalable Digital India initiative for solar transparency</span>
 </div>
   Last Updated: <span id="lastModified"></span>
@@ -2369,6 +2349,9 @@ let entryMode = "one";
 let currentUser = null;
 // Initialize and synchronize userBills
 let userBills = [];
+let currentAnalysisData = null;
+window.isEditMode = false;
+window.ignoreNextBillSelection = false;
 
 // Create two-way binding with window.userBills
 Object.defineProperty(window, 'userBills', {
@@ -2526,7 +2509,7 @@ if (userGuide) {                           // ADD THIS
     }
 
     // Mode-specific: Identity and Carry Forward
-    if (type === "save") {
+   if (type === "save") {
       if (identity) {
         identity.classList.remove("d-none");
         console.log('Identity section shown (save mode)');
@@ -2535,16 +2518,23 @@ if (userGuide) {                           // ADD THIS
         carrySec.classList.remove("d-none");
         console.log('Carry forward section shown');
       }
-      if (actionBtn) actionBtn.innerText = "💾 Save & Submit";
+      
+      // Only change button text if NOT editing
+      if (actionBtn && !window.isEditingBill) {
+        actionBtn.innerText = "💾 Save & Submit";
+      }
     } else {
       // type === "one"
       if (identity) identity.classList.add("d-none");
       if (carrySec) carrySec.classList.add("d-none");
       const openingCarry = document.getElementById("openingCarry");
       if (openingCarry) openingCarry.value = "";
-      if (actionBtn) actionBtn.innerText = "🔍 Calculate Saving";
+      
+      // Only change button text if NOT editing
+      if (actionBtn && !window.isEditingBill) {
+        actionBtn.innerText = "🔍 Calculate Saving";
+      }
     }
-
     // Show action button
     if (actionBtn) {
       actionBtn.classList.remove("d-none");
@@ -2594,7 +2584,14 @@ async function authenticateUser() {
     
     if (data.status === 'success' && data.authenticated) {
       currentUser = { meter, account };
-      userBills = Array.isArray(data.bills) ? data.bills : [];
+      
+      // ✅ CRITICAL FIX: Properly store bills in window.userBills
+      const bills = Array.isArray(data.bills) ? data.bills : [];
+      userBills = bills;
+      window.userBills = bills;
+      
+      console.log('✅ Bills stored:', bills.length, 'bills');
+      console.log('First bill:', bills[0]?.['Bill Number']);
       
       showSuccessModal(`✅ Login Successful!<br><br>Found ${data.billCount} bill(s).`);
       
@@ -2638,9 +2635,16 @@ async function authenticateUserSilent() {
     let data = await response.json();
     if (Array.isArray(data)) data = data[0];
     
-    if (data.status === 'success' && data.authenticated) {
+if (data.status === 'success' && data.authenticated) {
       currentUser = { meter, account };
-      userBills = Array.isArray(data.bills) ? data.bills : [];
+      
+      // ✅ CRITICAL FIX: Properly store bills
+      const bills = Array.isArray(data.bills) ? data.bills : [];
+      userBills = bills;
+      window.userBills = bills;
+      
+      console.log('✅ Silent auth: Bills refreshed:', bills.length);
+      
       displayBillsList();
     } else {
       showErrorModal('Failed to refresh dashboard');
@@ -2662,6 +2666,15 @@ function showDashboard() {
 }
 
 function displayBillsList() {
+   // --- ADD THESE THREE LINES AT THE START ---
+    selectedBillIndex = null; 
+   const billHelpers = document.getElementById("billHelpers");   
+    document.getElementById('editBtn').disabled = true;
+    // If you have view/delete buttons, disable them too:
+    if(document.getElementById('viewBtn')) document.getElementById('viewBtn').disabled = true;
+    if(document.getElementById('deleteBtn')) document.getElementById('deleteBtn').disabled = true;
+      if (billHelpers) billHelpers.classList.add("d-none");     
+    // ------------------------------------------
   const billsList = document.getElementById('billsList');
   
   if (!userBills || userBills.length === 0) {
@@ -2742,17 +2755,18 @@ if (fromDate && toDate) {
   const billAmount = parseFloat(bill['Total Bill Amount'] || 0);
   
 return `
-  <div class="bill-card" onclick="handleBillCardClick(${index})">
+  <div class="bill-card" onclick="handleBillCardClick(event, ${index})">
+
     <div class="d-flex align-items-center gap-3">
       
       <!-- Single Selection Radio (default visible) -->
       <input type="radio" 
-             name="billSelection" 
-             id="single_${index}"
-             class="single-selector"
-             value="${index}" 
-             style="width: 20px; height: 20px; cursor: pointer;"
-             onchange="selectSingleBill(${index})">
+       name="billSelection" 
+       id="single_${index}"
+       class="single-selector"
+       value="${index}" 
+       style="width: 20px; height: 20px; cursor: pointer;"
+       onclick="selectSingleBill(${index})">
       
       <!-- Multi Selection Checkbox (hidden by default) -->
       <input type="checkbox" 
@@ -2834,36 +2848,92 @@ function editBill() {
     return;
   }
   
-  const bills = window.userBills || [];
-  const bill = bills[selectedBillIndex];
+  window.isEditMode = true;
   
-  if (!bill) {
-    alert('Bill not found.');
+  const bills = window.userBills || [];
+  
+  console.log('=== EDIT BILL DEBUG ===');
+  console.log('Selected index:', selectedBillIndex);
+  console.log('Total bills available:', bills.length);
+  console.log('Bills array:', bills);
+  
+  if (bills.length === 0) {
+    alert('❌ No bills loaded! Please refresh the page.');
     return;
   }
   
-  // Load bill data into form
-  loadBillForEditing(bill);
+  const bill = bills[selectedBillIndex];
   
-  // Switch to form view
-  const formCard = document.getElementById('formCard');
-  const dashboardCard = document.getElementById('dashboardCard');
-  
-  if (formCard) formCard.style.display = 'block';
-  if (dashboardCard) dashboardCard.style.display = 'none';
-  
-  // Update save button text
-  const calculateBtn = document.getElementById('calculateBtn');
-  if (calculateBtn) {
-    calculateBtn.textContent = '💾 Update Bill';
+  if (!bill) {
+    alert(`❌ Bill not found at index ${selectedBillIndex}. Total bills: ${bills.length}`);
+    console.error('Bill not found. Index:', selectedBillIndex, 'Bills:', bills);
+    return;
   }
   
-  // Store editing state
+  console.log('Editing bill:', bill['Bill Number']);
+  
+  // Store editing state FIRST (before selectIntent)
   window.isEditingBill = true;
   window.editingBillIndex = selectedBillIndex;
   
+  // Switch to form view
+  selectIntent('save');
+  
+  // Wait for form to be visible, then load data and update buttons
+  setTimeout(function() {
+    loadBillForEditing(bill);
+    
+    const actionBtn = document.getElementById('actionBtn');
+    if (actionBtn) {
+      actionBtn.textContent = '💾 Update Bill';
+      actionBtn.classList.remove('d-none');
+      actionBtn.disabled = false;
+      actionBtn.style.opacity = '1';
+      actionBtn.style.cursor = 'pointer';
+    }
+    
+    // Show cancel button
+    const cancelBtn = document.getElementById('cancelEditBtn');
+    if (cancelBtn) {
+      cancelBtn.style.display = 'block';
+    }
+    
+    console.log('Bill data loaded, buttons updated');
+  }, 500);
+  
   // Scroll to top
-  window.scrollTo(0, 0);
+  setTimeout(function() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, 600);
+}
+function cancelEdit() {
+  console.log("❌ Edit cancelled. Returning to dashboard.");
+  const billHelpers = document.getElementById("billHelpers");  
+  if (billHelpers) billHelpers.classList.add("d-none");   
+  const intentSummary = document.getElementById("intentSummary");
+     intentSummary.classList.add("d-none");
+ 
+   // clear edit state
+  isEditMode = false;
+  editingIndex = null;
+
+  // clear all form fields
+  clearBillForm();
+
+  // clear radio / checkbox selection  ✅ FIX
+  clearBillSelection();
+
+  // hide award summary
+  document.getElementById("awardSummary")?.classList.add("d-none");
+
+  // exit entry mode
+  exitBillEntryMode();
+
+  // reset dashboard buttons
+  resetDashboardActions();
+
+  // show dashboard
+  document.getElementById("dashboardSection").classList.remove("d-none");
 }
 
 // Delete button - removes selected bill
@@ -2904,22 +2974,58 @@ function deleteBill() {
     alert('Bill deleted successfully!');
   }
 }
-// Handle bill card click
-function handleBillCardClick(index) {
-  if (currentSelectionMode === 'single') {
-    selectSingleBill(index);
+function handleBillCardClick(event, index) {
+  console.log('=== BILL CARD CLICKED ===');
+  console.log('Index:', index);
+  console.log('Current mode:', currentSelectionMode);
+  console.log('Ignore flag:', window.ignoreNextBillSelection);
+
+  // 🔥 Ignore auto-selection after dashboard restore
+  if (window.ignoreNextBillSelection === true) {
+    console.log("Ignored auto bill selection:", index);
+    window.ignoreNextBillSelection = false; // reset after first ignore
+    return;
   }
-  // In summary mode, let checkbox handle it
+
+  if (currentSelectionMode === 'single') {
+    console.log("User clicked bill card - selecting:", index);
+    selectSingleBill(index);
+  } else {
+    console.log('Not in single mode - mode is:', currentSelectionMode);
+  }
 }
 
+
+// Select single bill (radio button)
 // Select single bill (radio button)
 function selectSingleBill(index) {
+  console.log('=== SELECT SINGLE BILL ===');
+  console.log('Index:', index);
+  
   selectedBillIndex = index;
   
   // Enable action buttons
-  document.getElementById('viewBtn').disabled = false;
-  document.getElementById('editBtn').disabled = false;
-  document.getElementById('deleteBtn').disabled = false;
+  const viewBtn = document.getElementById('viewBtn');
+  const editBtn = document.getElementById('editBtn');
+  const deleteBtn = document.getElementById('deleteBtn');
+  
+  if (viewBtn) {
+    viewBtn.disabled = false;
+    console.log('✅ View button enabled');
+  }
+  if (editBtn) {
+    editBtn.disabled = false;
+    console.log('✅ Edit button enabled');
+  }
+  if (deleteBtn) {
+    deleteBtn.disabled = false;
+    console.log('✅ Delete button enabled');
+  }
+  
+  // Update radio button selection
+  document.querySelectorAll('.single-selector').forEach((radio, i) => {
+    radio.checked = (i === index);
+  });
   
   // Update visual selection
   document.querySelectorAll('.bill-card').forEach((card, i) => {
@@ -2929,55 +3035,78 @@ function selectSingleBill(index) {
       card.classList.remove('selected');
     }
   });
+  
+  console.log('✅ Bill selected:', index);
 }
 
 // Load bill data into form for editing
 function loadBillForEditing(bill) {
-  // Identity fields
+  console.log('=== LOADING BILL FOR EDITING ===');
+  console.log('Bill:', bill['Bill Number']);
+  
+  // Identity fields - THESE WORK
   const billNumber = document.getElementById('billNumber');
   const meter = document.getElementById('meter');
   const accountNum = document.getElementById('accountNum');
   
-  if (billNumber) billNumber.value = bill['Bill Number'] || bill.billNumber || '';
-  if (meter) meter.value = bill['Meter Number'] || bill.meterNumber || '';
-  if (accountNum) accountNum.value = bill['Account Number'] || bill.accountNumber || '';
+  if (billNumber) billNumber.value = bill['Bill Number'] || '';
+  if (meter) meter.value = bill['Meter Number'] || '';
+  if (accountNum) accountNum.value = bill['Account Number'] || '';
   
-  // Date fields
+  // Date fields - THESE WORK
   const billFrom = document.getElementById('billFrom');
   const billTo = document.getElementById('billTo');
   
-  if (billFrom) billFrom.value = bill['Bill From Date'] || bill.billFromDate || '';
-  if (billTo) billTo.value = bill['Bill To Date'] || bill.billToDate || '';
+  if (billFrom) billFrom.value = bill['Bill From Date'] || '';
+  if (billTo) billTo.value = bill['Bill To Date'] || '';
   
-  // Units fields
-  const grossUnits = document.getElementById('grossUnits');
-  const importUnits = document.getElementById('importUnits');
-  const exportUnits = document.getElementById('exportUnits');
+  // Units fields - CORRECTED IDs
+  const gross = document.getElementById('gross');
+  const importU = document.getElementById('importU');
+  const exportU = document.getElementById('exportU');
   
-  if (grossUnits) grossUnits.value = bill['Gross Units'] || bill.grossUnits || '';
-  if (importUnits) importUnits.value = bill['Import Units'] || bill.importUnits || '';
-  if (exportUnits) exportUnits.value = bill['Export Units'] || bill.exportUnits || '';
+  if (gross) {
+    gross.value = bill['Gross Units'] || '';
+    console.log('Set gross to:', gross.value);
+  }
+  if (importU) {
+    importU.value = bill['Import Units'] || '';
+    console.log('Set importU to:', importU.value);
+  }
+  if (exportU) {
+    exportU.value = bill['Export Units'] || '';
+    console.log('Set exportU to:', exportU.value);
+  }
   
   // Carry forward
   const carryForwardUnits = document.getElementById('carryForwardUnits');
   const carryForwardSection = document.getElementById('carryForwardSection');
-  const openingCarry = bill['Opening Carry Forward'] || bill.openingCarryForward || 0;
+  const openingCarry = bill['Opening Carry Forward'] || 0;
   
   if (carryForwardUnits) carryForwardUnits.value = openingCarry;
   if (carryForwardSection && openingCarry > 0) {
     carryForwardSection.classList.remove('d-none');
   }
   
-  // Amount fields
-  const fixedCharges = document.getElementById('fixedCharges');
+  // Amount fields - CORRECTED IDs
+  const fixed = document.getElementById('fixed');
   const totalBill = document.getElementById('totalBill');
+  const arrears = document.getElementById('arrears');
   
-  if (fixedCharges) fixedCharges.value = bill['Fixed Charges'] || bill.fixedCharges || '';
-  if (totalBill) totalBill.value = bill['Total Bill Amount'] || bill.totalBillAmount || '';
+  if (fixed) {
+    fixed.value = bill['Fixed Charges'] || '';
+    console.log('Set fixed to:', fixed.value);
+  }
+  if (totalBill) {
+    totalBill.value = bill['Total Bill Amount'] || '';
+    console.log('Set totalBill to:', totalBill.value);
+  }
+  if (arrears) {
+    arrears.value = bill['Arrears'] || '';
+  }
   
-  console.log('Bill loaded for editing:', bill['Bill Number'] || bill.billNumber);
+  console.log('=== BILL LOADING COMPLETE ===');
 }
-
 // ==========================================
 // UPDATED viewSelectedBill() Function
 // Replace in your chatgpt_updated.html
@@ -3653,10 +3782,18 @@ async function calculate() {
       }
     };
 
-    console.log("Sending to webhook:", webhookData);
+console.log("Sending to webhook:", webhookData);
+    
+    // Determine webhook URL based on edit mode
+    const isEditing = window.isEditingBill && window.editingBillIndex !== null;
+    const webhookUrl = isEditing 
+      ? 'https://n8n-workflow-test.duckdns.org/webhook/solar-update'
+      : 'https://n8n-workflow-test.duckdns.org/webhook/solar-saving';
+    
+    console.log("Using webhook:", webhookUrl, "| Editing:", isEditing);
 
     try {
-      const response = await fetch('https://n8n-workflow-test.duckdns.org/webhook/solar-saving', {
+      const response = await fetch(webhookUrl, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json'
@@ -3666,7 +3803,7 @@ async function calculate() {
 
       console.log("Response status:", response.status);
 
-      if (response.ok) {
+if (response.ok) {
         const data = await response.json().catch(() => ({ status: 'success' }));
         console.log("Response data:", data);
 
@@ -3676,6 +3813,75 @@ async function calculate() {
         }
         
         console.log("✅ Bill saved successfully");
+        
+        // CHECK IF EDITING OR ADDING NEW
+        if (window.isEditingBill && window.editingBillIndex !== null) {
+          // UPDATE EXISTING BILL
+          console.log('Updating existing bill at index:', window.editingBillIndex);
+          
+          // ✅ FIX: Refresh bills from server after update
+          await authenticateUserSilent();
+          
+          // Clear editing state
+          window.isEditingBill = false;
+          window.editingBillIndex = null;
+          
+console.log('✅ Bill updated and dashboard refreshed');
+          
+          // Clear editing state
+          window.isEditingBill = false;
+          window.editingBillIndex = null;
+          
+          // Hide cancel button
+          const cancelBtn = document.getElementById('cancelEditBtn');
+          if (cancelBtn) cancelBtn.style.display = 'none';
+          
+          // Show success message
+          showSuccessModal('✅ Bill updated successfully!');
+          
+          // Return to dashboard after 1 second
+          setTimeout(() => {
+            closeModal();
+            
+            // ✅ FIX: Go directly to dashboard without re-authentication
+            // Hide form sections
+            document.getElementById('consumptionSection')?.classList.add('d-none');
+            document.getElementById('identitySection')?.classList.add('d-none');
+            document.getElementById('billPeriodSection')?.classList.add('d-none');
+            document.getElementById('carryForwardSection')?.classList.add('d-none');
+            document.getElementById('actionBtn')?.classList.add('d-none');
+            document.getElementById('intentSummary')?.classList.add('d-none');
+            document.getElementById('intentSection')?.classList.add('d-none');
+            document.getElementById('authSection')?.classList.add('d-none');
+            document.getElementById('awardSummary')?.classList.add('d-none');
+            
+            // Show dashboard
+            document.getElementById('dashboardSection')?.classList.remove('d-none');
+            
+            // Refresh bill list display
+            displayBillsList();
+            
+            // Show home button
+            showHomeButton();
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }, 1000);
+          
+          return;
+        } else {
+          // ADD NEW BILL
+          console.log('Adding new bill');
+          
+          const bills = window.userBills || [];
+          bills.unshift(webhookData); // Add to beginning
+          window.userBills = bills;
+          
+          // Save to localStorage
+          saveBillsToStorage(bills);
+          
+          console.log('New bill added successfully');
+        }
         
       } else {
         throw new Error('Server returned error status: ' + response.status);
@@ -3859,6 +4065,37 @@ async function calculate() {
     saving: saving.toFixed(0)
   };
 
+const isEditing = window.isEditingBill;
+  
+// Check if editing - save and return to dashboard immediately
+  if (isEditing) {
+    console.log('✅ Bill updated successfully');
+    
+    // Clear editing flags
+    window.isEditingBill = false;
+    window.editingBillIndex = null;
+    
+    // Hide cancel button
+    const cancelBtn = document.getElementById('cancelEditBtn');
+    if (cancelBtn) cancelBtn.style.display = 'none';
+    
+    // Reset action button completely
+    if (actionBtn) {
+      actionBtn.disabled = false;
+      actionBtn.style.opacity = '1';
+      actionBtn.style.cursor = 'pointer';
+      actionBtn.innerText = 'Calculate Solar Benefit';
+    }
+    
+    // Return to dashboard immediately
+    setTimeout(() => {
+      selectIntent('dashboard');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 100);
+    
+    return; // Exit - don't show modal or award summary
+  }
+  // For new bills - show modal as usual
   showModal(
     '📊', 
     entryMode === "one" ? "Quick Calculator Result" : "✅ Bill Saved Successfully!", 
@@ -3869,21 +4106,115 @@ async function calculate() {
     ]
   );
 // ===== Award Summary Hook (UI only) =====
-document.getElementById("awardSaving").innerText = solarSaving || 0;
-document.getElementById("awardUnits").innerText = exportU || 0;
-document.getElementById("awardPercent").innerText =
-  withoutSolarBill > 0 ? ((solarSaving / withoutSolarBill) * 100).toFixed(1) : 0;
-document.getElementById("awardPayable").innerText = totalBill || 0;
-document.getElementById("awardWithoutSolar").innerText = withoutSolarBill || 0;
+// ===== Award Summary Hook (UI only) =====
 
-document.getElementById("awardSummary").classList.remove("d-none");
+// 🔁 EDIT MODE: detect via editingIndex (source of truth)
+if (editingIndex !== null && editingIndex !== undefined) {
+  console.log("✅ Edit-mode save detected. Returning to dashboard.");
 
-if (actionBtn) {
-    actionBtn.disabled = true;
-    actionBtn.style.opacity = '0.5';
-    actionBtn.innerText = entryMode === 'save' ? '✅ Saved' : '✅ Calculated';
-  }
+  // reset edit state
+  isEditMode = false;
+  editingIndex = null;
+
+  // clear form
+  clearBillForm();
+
+  // clear radio + card selection
+  clearBillSelection();
+
+  // hide award summary
+  const awardSummary = document.getElementById("awardSummary");
+  if (awardSummary) awardSummary.classList.add("d-none");
+
+  // exit entry UI
+  exitBillEntryMode();
+
+  // reset dashboard buttons
+  resetDashboardActions();
+
+  // show dashboard
+  document.getElementById("dashboardSection")?.classList.remove("d-none");
+
+  return; // ⛔ STOP here – do NOT render summary
 }
+
+/* =====================================================
+   🟢 NON-EDIT MODE (New / Quick Calculation)
+   ===================================================== */
+
+const awardSavingEl = document.getElementById("awardSaving");
+const awardUnitsEl = document.getElementById("awardUnits");
+const awardPercentEl = document.getElementById("awardPercent");
+const awardPayableEl = document.getElementById("awardPayable");
+const awardWithoutSolarEl = document.getElementById("awardWithoutSolar");
+
+if (awardSavingEl) awardSavingEl.innerText = saving.toFixed(0);
+if (awardUnitsEl) awardUnitsEl.innerText = e || 0;
+if (awardPercentEl)
+  awardPercentEl.innerText =
+    without > 0 ? ((saving / without) * 100).toFixed(1) : 0;
+if (awardPayableEl) awardPayableEl.innerText = t || 0;
+if (awardWithoutSolarEl) awardWithoutSolarEl.innerText = without.toFixed(0);
+
+const awardSummary = document.getElementById("awardSummary");
+if (awardSummary) awardSummary.classList.remove("d-none");
+
+// Update button state
+if (actionBtn) {
+  actionBtn.disabled = true;
+  actionBtn.style.opacity = "0.5";
+  actionBtn.innerText = entryMode === "save" ? "✅ Saved" : "✅ Calculated";
+}
+
+}
+function exitAfterSuccessfulEdit() {
+  console.log("↩ Exiting edit mode");
+  
+  // ✅ SHOW single mode actions (keep them visible)
+  const singleActions = document.getElementById('singleModeActions');
+  const summaryActions = document.getElementById('summaryModeActions');
+
+  if (singleActions) singleActions.style.display = 'flex';   // Keep visible
+  if (summaryActions) summaryActions.style.display = 'none';
+  
+  // ✅ CRITICAL FIX: Disable all action buttons (but keep visible)
+    selectedBillIndex = null;
+  const viewBtn = document.getElementById('viewBtn');
+  const editBtn = document.getElementById('editBtn');
+  const deleteBtn = document.getElementById('deleteBtn');
+  
+  if (viewBtn) viewBtn.disabled = true;
+  if (editBtn) editBtn.disabled = true;
+  if (deleteBtn) deleteBtn.disabled = true;
+  
+  // ✅ Reset selected bill index
+  selectedBillIndex = null;
+  
+  // Clear edit state
+  window.isEditMode = false;
+  window.editingBillIndex = null;
+  editingIndex = null;
+
+  // Clear form and selections
+  clearBillForm();
+  clearBillSelection();
+
+  // Hide award summary
+  document.getElementById("awardSummary")?.classList.add("d-none");
+
+  // Exit bill entry UI
+  exitBillEntryMode();
+
+  // Render bills (this will redraw all cards)
+  renderBillCards(window.userBills || []);
+
+  // Show dashboard
+  document.getElementById("dashboardSection")?.classList.remove("d-none");
+  
+  console.log("✅ All buttons disabled (but visible), no bill selected");
+}
+
+
 
 function shareWhatsApp(data){
   const msg = encodeURIComponent(
@@ -4836,11 +5167,7 @@ function displaySummaryModal(summary, bills) {
           </div>
         `).join('')}
         
-        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0; margin-top: 0.5rem;">
-          <span style="color: #78350f;">Avg Days/Bill:</span>
-          <span style="font-weight: 700; color: #92400e;">${summary.avgDaysPerBill} days</span>
-        </div>
-      </div>
+       </div>
       
       <!-- Units Summary -->
       <div style="background: linear-gradient(135deg, #e0e7ff, #c7d2fe); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid #6366f1;">
@@ -4991,15 +5318,15 @@ showModal(
   'Multi-Bill Summary',
   modalHTML,
   [
+       { 
+        text: '🖨️ Print', 
+        type: 'primary', 
+        action: () => printModalWithContent()
+      },
     { 
-      text: '📱 Share WhatsApp', 
+      text: '📱 WhatsApp', 
       type: 'success', 
-      action: () => shareViaWhatsApp(summary, bills) 
-    },
-    { 
-      text: '📄 Download PDF', 
-      type: 'primary', 
-      action: () => downloadAsPDF(summary, bills) 
+      action: () => shareMultiBillViaWhatsApp(summary, bills) 
     },
     { text: '🔍 Analysis', type: 'info', action: () => { closeModal(); generateSolarAnalysis(); } },
     { 
@@ -5226,6 +5553,24 @@ function formatBillPeriod(bill) {
     return 'N/A';
   }
 }
+function clearBillSelection() {
+  // Clear radio / checkbox selection
+  const radios = document.querySelectorAll(
+    '#billsList input[type="radio"], #billsList input[type="checkbox"]'
+  );
+
+  radios.forEach(radio => {
+    radio.checked = false;
+  });
+
+  // Clear visual selection (blue highlighted cards)
+  document
+    .querySelectorAll("#billsList .bill-card.selected")
+    .forEach(card => card.classList.remove("selected"));
+
+  console.log("🔘 Bill radio + card selection cleared");
+}
+
 
 function generateSolarAnalysis() {
   const bills = window.userBills || [];
@@ -5235,184 +5580,251 @@ function generateSolarAnalysis() {
     return;
   }
   
-  // Calculate metrics
+  // ==========================================
+  // 1. CALCULATE TOTALS
+  // ==========================================
   const totalGross = bills.reduce((sum, b) => sum + parseFloat(b['Gross Units'] || 0), 0);
   const totalImport = bills.reduce((sum, b) => sum + parseFloat(b['Import Units'] || 0), 0);
   const totalExport = bills.reduce((sum, b) => sum + parseFloat(b['Export Units'] || 0), 0);
-  const totalDays = bills.reduce((sum, b) => sum + parseInt(b['Days in Bill Period'] || 30), 0);
+  const totalBillAmount = bills.reduce((sum, b) => sum + parseFloat(b['Total Bill Amount'] || 0), 0);
+  const totalFixedCharges = bills.reduce((sum, b) => sum + parseFloat(b['Fixed Charges'] || 0), 0);
   
-  // Solar generation
+  // Calculate total days
+  let totalDays = 0;
+  bills.forEach((bill) => {
+    totalDays += parseInt(bill['Billing Days']) || 0;
+  });
+  
+  // Fallback day calculation
+  if (totalDays === 0) {
+    bills.forEach((bill) => {
+      const fromDate = new Date(bill['Bill From Date']);
+      const toDate = new Date(bill['Bill To Date']);
+      if (!isNaN(fromDate) && !isNaN(toDate)) {
+        totalDays += Math.ceil((toDate - fromDate) / (1000 * 60 * 60 * 24)) + 1;
+      }
+    });
+  }
+  if (totalDays === 0) totalDays = bills.length * 60; // Ultimate fallback
+  
+  // ==========================================
+  // 2. SOLAR METRICS
+  // ==========================================
   const solarGenerated = totalGross - totalImport + totalExport;
   const selfConsumption = totalGross - totalImport;
+  const netImport = totalImport - totalExport; // Positive = Pay Grid, Negative = Surplus
   
-  // Calculate ratios
-  const selfConsumptionRatio = (selfConsumption / solarGenerated * 100).toFixed(1);
-  const exportRatio = (totalExport / solarGenerated * 100).toFixed(1);
-  const importRatio = (totalImport / totalGross * 100).toFixed(1);
+  // Ratios
+  const selfConsumptionRatio = (solarGenerated > 0) ? (selfConsumption / solarGenerated * 100).toFixed(0) : 0;
+  const exportRatio = (solarGenerated > 0) ? (totalExport / solarGenerated * 100).toFixed(0) : 0;
+  const gridDependency = (totalGross > 0) ? (totalImport / totalGross * 100).toFixed(0) : 0;
   
-  // Daily averages
+  // Daily Averages (FIXED: Added missing definitions)
   const avgDailyGeneration = (solarGenerated / totalDays).toFixed(1);
   const avgDailyConsumption = (totalGross / totalDays).toFixed(1);
-  const avgDailyImport = (totalImport / totalDays).toFixed(1);
-  const avgDailyExport = (totalExport / totalDays).toFixed(1);
+  const avgDailyImport = (totalImport / totalDays).toFixed(1); // ✅ Restored
+  const avgDailyExport = (totalExport / totalDays).toFixed(1); // ✅ Restored
+  const avgNetImport = (netImport / totalDays).toFixed(1);
   
-  // Recommendations
-  let recommendation = '';
-  let reason = '';
-  let color = '';
-  
-  if (importRatio > 60) {
-    recommendation = '⬆️ INCREASE Solar Capacity';
-    reason = `You are importing ${importRatio}% of your consumption from grid. Increasing solar capacity will reduce your bills further.`;
-    color = '#ef4444';
-  } else if (exportRatio > 40) {
-    recommendation = '⬇️ DECREASE Solar Capacity';
-    reason = `You are exporting ${exportRatio}% of your solar generation. Your system is oversized for your consumption pattern.`;
-    color = '#f59e0b';
-  } else if (selfConsumptionRatio > 70) {
-    recommendation = '✅ OPTIMAL Solar Capacity';
-    reason = `Your system is well-sized. You're consuming ${selfConsumptionRatio}% of solar generation and importing only ${importRatio}% from grid.`;
-    color = '#10b981';
-  } else {
-    recommendation = '⚖️ BALANCED but Can Optimize';
-    reason = `Consider minor adjustments based on seasonal consumption patterns.`;
-    color = '#3b82f6';
+  // Financials
+  const dailyVariable = (totalBillAmount - totalFixedCharges) / totalDays;
+  const dailyFixed = totalFixedCharges / totalDays;
+
+  // ==========================================
+  // 3. DETERMINE STATUS & RECOMMENDATION (NO BATTERY)
+  // ==========================================
+  let statusTitle = '';
+  let statusMsg = '';
+  let statusColor = '';
+  let priority = ''; // 'optimize', 'expand', 'perfect'
+
+  // LOGIC 1: High Export (Generating much more than using during day)
+  if (exportRatio > 60) {
+    statusTitle = '☀️ POWERHOUSE GENERATOR';
+    statusMsg = `Your system is a beast! You are sending ${exportRatio}% of your power back to the grid. You are a "Net Exporter" effectively running your home for free most days.`;
+    statusColor = '#10b981'; // Green
+    priority = 'optimize';
+  } 
+  // LOGIC 2: High Import (System too small)
+  else if (parseFloat(avgNetImport) > 2) {
+    statusTitle = '📈 ROOM FOR SAVINGS';
+    statusMsg = `You are still buying about ${Math.abs(avgNetImport)} units/day from the grid. Your consumption is higher than your generation.`;
+    statusColor = '#f59e0b'; // Orange
+    priority = 'expand';
+  } 
+  // LOGIC 3: Balanced
+  else {
+    statusTitle = '✨ PERFECT BALANCE';
+    statusMsg = `You are in the "Goldilocks Zone." Your generation perfectly matches your consumption needs. Maximum efficiency achieved!`;
+    statusColor = '#3b82f6'; // Blue
+    priority = 'perfect';
   }
+
+  // ==========================================
+  // 4. CALCULATE EXPANSION (If needed)
+  // ==========================================
+  let panelsNeeded = 0;
+  let additionalCapacity = 0;
+  let estimatedPanelCost = 0;
   
-  // Additional insights
-  const insights = [];
-  
-  if (avgDailyExport > avgDailyImport * 1.5) {
-    insights.push('💡 High export suggests daytime surplus. Consider adding battery storage or shifting usage to daytime.');
+  if (priority === 'expand') {
+    additionalCapacity = Math.ceil(parseFloat(avgNetImport)); // Cover the deficit
+    panelsNeeded = Math.ceil(additionalCapacity / 2.5); // Approx 2.5 units per panel
+    estimatedPanelCost = panelsNeeded * 22000; // Approx cost per panel installed
   }
-  
-  if (avgDailyImport > avgDailyConsumption * 0.4) {
-    insights.push('🌙 High nighttime consumption detected. Battery storage could help use daytime solar at night.');
-  }
-  
-  if (selfConsumptionRatio < 60) {
-    insights.push('📊 Low self-consumption ratio. Consider energy-intensive activities during peak solar hours.');
-  }
-  
-  // Generate report HTML
+
+  // Format bill periods
+  const formatBillPeriod = (bill) => {
+    const d = bill['Bill From Date'] || bill.billFromDate;
+    return d ? new Date(d).toLocaleDateString('en-IN', {day:'numeric', month:'short'}) : 'N/A';
+  };
+  const firstBillPeriod = formatBillPeriod(bills[0]);
+  const lastBillPeriod = formatBillPeriod(bills[bills.length - 1]);
+
+  // ==========================================
+  // 5. GENERATE HTML REPORT
+  // ==========================================
   const analysisHTML = `
-    <div style="text-align: left; max-height: 70vh; overflow-y: auto; font-family: system-ui; line-height: 1.6;">
+    <div style="text-align: left; max-height: 75vh; overflow-y: auto; font-family: 'Segoe UI', system-ui, sans-serif;">
       
-      <!-- Header -->
-      <h4 style="color: #0b5ed7; margin-bottom: 1rem; border-bottom: 2px solid #0b5ed7; padding-bottom: 0.5rem;">
-        🔍 Solar Capacity Analysis Report
-      </h4>
-      
-      <!-- Analysis Period -->
-      <div style="background: #f0f9ff; padding: 0.75rem; border-radius: 6px; margin-bottom: 1rem;">
-        <strong>Analysis Period:</strong> ${totalDays} days (${bills.length} bills)<br>
-        <strong>Date Range:</strong> ${formatBillPeriod(bills[0])} to ${formatBillPeriod(bills[bills.length - 1])}
+      <div style="text-align: center; margin-bottom: 1.5rem;">
+        <h4 style="color: #1e3a8a; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 0.25rem;">
+          Solar Performance Report
+        </h4>
+        <div style="font-size: 0.85rem; color: #64748b; background: #f1f5f9; display: inline-block; padding: 4px 12px; border-radius: 20px;">
+          ${totalDays} Days Analysis (${firstBillPeriod} - ${lastBillPeriod})
+        </div>
       </div>
-      
-      <!-- Recommendation Box -->
-      <div style="background: ${color}22; border-left: 4px solid ${color}; padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
-        <h5 style="color: ${color}; margin: 0 0 0.5rem 0;">${recommendation}</h5>
-        <p style="margin: 0; color: #333;">${reason}</p>
+
+      <div style="background: linear-gradient(135deg, ${statusColor} 0%, ${statusColor}dd 100%); color: white; padding: 1.5rem; border-radius: 16px; margin-bottom: 1.5rem; box-shadow: 0 10px 25px -5px ${statusColor}66;">
+        <div style="display: flex; align-items: start; gap: 1rem;">
+          <div style="font-size: 2.5rem; line-height: 1;">
+            ${priority === 'optimize' ? '🚀' : priority === 'expand' ? '📈' : '💎'}
+          </div>
+          <div>
+            <h5 style="margin: 0; font-weight: 800; font-size: 1.25rem; letter-spacing: 0.5px;">${statusTitle}</h5>
+            <p style="margin: 0.5rem 0 0 0; font-size: 0.95rem; opacity: 0.95; line-height: 1.5;">${statusMsg}</p>
+          </div>
+        </div>
       </div>
-      
-      <!-- Key Metrics -->
-      <div style="background: linear-gradient(135deg, #e0e7ff, #c7d2fe); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-        <h6 style="color: #312e81; font-weight: 700; margin-bottom: 0.5rem;">📊 Key Performance Metrics</h6>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+        <div style="background: #fff; border: 1px solid #e2e8f0; padding: 1rem; border-radius: 12px; text-align: center;">
+          <div style="font-size: 0.8rem; color: #64748b; font-weight: 600; text-transform: uppercase;">Avg Generation</div>
+          <div style="font-size: 1.5rem; font-weight: 800; color: #f59e0b;">${avgDailyGeneration}</div>
+          <div style="font-size: 0.75rem; color: #94a3b8;">units / day</div>
+        </div>
+        <div style="background: #fff; border: 1px solid #e2e8f0; padding: 1rem; border-radius: 12px; text-align: center;">
+          <div style="font-size: 0.8rem; color: #64748b; font-weight: 600; text-transform: uppercase;">Avg Consumption</div>
+          <div style="font-size: 1.5rem; font-weight: 800; color: #3b82f6;">${avgDailyConsumption}</div>
+          <div style="font-size: 0.75rem; color: #94a3b8;">units / day</div>
+        </div>
+      </div>
+
+      <div style="background: #f8fafc; border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; border: 1px solid #e2e8f0;">
+        <h6 style="color: #334155; font-weight: 700; margin-bottom: 1rem; font-size: 0.9rem;">⚡ ENERGY FLOW BREAKDOWN</h6>
         
-        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
-          <span>Solar Generation:</span>
-          <strong>${solarGenerated.toLocaleString()} units</strong>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <span style="font-size: 0.9rem; color: #475569;">🏠 Self Consumed</span>
+          <span style="font-weight: 700; color: #16a34a;">${selfConsumptionRatio}%</span>
         </div>
-        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
-          <span>Self Consumption:</span>
-          <strong style="color: #10b981;">${selfConsumption.toLocaleString()} units (${selfConsumptionRatio}%)</strong>
+        <div style="width: 100%; background: #e2e8f0; height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 1.25rem;">
+          <div style="width: ${selfConsumptionRatio}%; background: #16a34a; height: 100%;"></div>
         </div>
-        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
-          <span>Export to Grid:</span>
-          <strong>${totalExport.toLocaleString()} units (${exportRatio}%)</strong>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <span style="font-size: 0.9rem; color: #475569;">📤 Sent to Grid</span>
+          <span style="font-weight: 700; color: #f59e0b;">${exportRatio}%</span>
         </div>
-        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
-          <span>Import from Grid:</span>
-          <strong>${totalImport.toLocaleString()} units (${importRatio}%)</strong>
+        <div style="width: 100%; background: #e2e8f0; height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 1.25rem;">
+          <div style="width: ${exportRatio}%; background: #f59e0b; height: 100%;"></div>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <span style="font-size: 0.9rem; color: #475569;">📥 Grid Reliance</span>
+          <span style="font-weight: 700; color: #ef4444;">${gridDependency}%</span>
+        </div>
+        <div style="width: 100%; background: #e2e8f0; height: 8px; border-radius: 4px; overflow: hidden;">
+          <div style="width: ${gridDependency}%; background: #ef4444; height: 100%;"></div>
         </div>
       </div>
-      
-      <!-- Daily Averages -->
-      <div style="background: linear-gradient(135deg, #fef3c7, #fde68a); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-        <h6 style="color: #92400e; font-weight: 700; margin-bottom: 0.5rem;">📅 Daily Averages</h6>
-        
-        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
-          <span>Avg Daily Generation:</span>
-          <strong>${avgDailyGeneration} units/day</strong>
+
+      <div style="background: #fff; border: 2px solid ${statusColor}; border-radius: 16px; overflow: hidden;">
+        <div style="background: ${statusColor}15; padding: 1rem; border-bottom: 1px solid ${statusColor}30;">
+          <h6 style="color: ${statusColor}; margin: 0; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;">
+            💡 EXPERT RECOMMENDATION
+          </h6>
         </div>
-        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
-          <span>Avg Daily Consumption:</span>
-          <strong>${avgDailyConsumption} units/day</strong>
-        </div>
-        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
-          <span>Avg Daily Import:</span>
-          <strong>${avgDailyImport} units/day</strong>
-        </div>
-        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
-          <span>Avg Daily Export:</span>
-          <strong>${avgDailyExport} units/day</strong>
+        <div style="padding: 1.25rem;">
+          
+          ${priority === 'optimize' ? `
+            <strong style="color: #334155; font-size: 1.1rem; display: block; margin-bottom: 0.5rem;">
+              Shift your Load to Daytime! ☀️
+            </strong>
+            <p style="color: #64748b; font-size: 0.95rem; margin-bottom: 1rem;">
+              You are sending a lot of power to the grid. To save even more money, try running heavy appliances (Washing Machine, Water Pump, AC) between <strong>10:00 AM and 3:00 PM</strong>.
+            </p>
+            <div style="background: #ecfdf5; color: #065f46; padding: 0.75rem; border-radius: 8px; font-size: 0.9rem; font-weight: 600;">
+              Using your own solar power directly is always 100% free!
+            </div>
+          ` : ''}
+
+          ${priority === 'expand' ? `
+            <strong style="color: #334155; font-size: 1.1rem; display: block; margin-bottom: 0.5rem;">
+              Achieve 100% Freedom 🚀
+            </strong>
+            <p style="color: #64748b; font-size: 0.95rem; margin-bottom: 1rem;">
+              You are very close! To eliminate that final grid bill, consider a small upgrade.
+            </p>
+            <ul style="color: #475569; font-size: 0.95rem; margin-bottom: 0; padding-left: 1.2rem;">
+              <li style="margin-bottom: 0.5rem;"><strong>Plan:</strong> Add ${panelsNeeded} more Solar Panels.</li>
+              <li style="margin-bottom: 0.5rem;"><strong>Result:</strong> Generate ~${additionalCapacity} extra units/day.</li>
+              <li><strong>Benefit:</strong> Reduces your variable electricity bill to near zero.</li>
+            </ul>
+          ` : ''}
+
+          ${priority === 'perfect' ? `
+            <strong style="color: #334155; font-size: 1.1rem; display: block; margin-bottom: 0.5rem;">
+              Keep doing what you're doing! 👍
+            </strong>
+            <p style="color: #64748b; font-size: 0.95rem; margin-bottom: 0;">
+              Your system is sized perfectly for your home. You don't need to spend a single rupee on upgrades. Just ensure you clean your panels once a week to keep this efficiency high.
+            </p>
+          ` : ''}
+          
         </div>
       </div>
-      
-      ${insights.length > 0 ? `
-      <!-- Insights -->
-      <div style="background: linear-gradient(135deg, #dcfce7, #bbf7d0); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-        <h6 style="color: #14532d; font-weight: 700; margin-bottom: 0.5rem;">💡 Additional Insights</h6>
-        ${insights.map(insight => `
-          <div style="padding: 0.3rem 0; color: #166534;">• ${insight}</div>
-        `).join('')}
-      </div>
-      ` : ''}
-      
-      <!-- Capacity Recommendations -->
-      <div style="background: #f3f4f6; padding: 1rem; border-radius: 8px;">
-        <h6 style="color: #1f2937; font-weight: 700; margin-bottom: 0.5rem;">🎯 Action Items</h6>
-        
-        ${importRatio > 60 ? `
-        <div style="padding: 0.3rem 0;">
-          ✓ Consider adding <strong>${(avgDailyImport * 0.8).toFixed(0)} units/day</strong> solar capacity
-        </div>
-        <div style="padding: 0.3rem 0;">
-          ✓ Estimated additional panels needed: <strong>${Math.ceil(avgDailyImport * 0.8 / 4)} panels</strong> (assuming 4 units/panel/day)
-        </div>
-        ` : ''}
-        
-        ${exportRatio > 40 ? `
-        <div style="padding: 0.3rem 0;">
-          ✓ Consider reducing capacity or adding battery storage
-        </div>
-        <div style="padding: 0.3rem 0;">
-          ✓ Potential battery capacity: <strong>${(avgDailyExport * 1.2).toFixed(0)} units</strong> for storing excess
-        </div>
-        ` : ''}
-        
-        ${selfConsumptionRatio > 70 ? `
-        <div style="padding: 0.3rem 0;">
-          ✓ Maintain current solar capacity
-        </div>
-        <div style="padding: 0.3rem 0;">
-          ✓ Monitor seasonal variations
-        </div>
-        ` : ''}
-      </div>
-      
+
     </div>
   `;
-  
+
+  // Update global data for sharing
+  currentAnalysisData = {
+    totalDays: totalDays,
+    savedBills: bills,
+    avgDailyConsumption: avgDailyConsumption,
+    avgDailySolar: avgDailyGeneration,
+    avgDailyImport: avgDailyImport, // Now defined
+    avgDailyExport: avgDailyExport, // Now defined
+    avgNetImport: avgNetImport,
+    totalBillAmount: totalBillAmount,
+    totalFixedCharges: totalFixedCharges
+  };
+
   showModal(
-    '🔍',
-    'Solar Capacity Analysis',
+    '📊',
+    'Analysis Report',
     analysisHTML,
     [
       { 
-        text: '📱 Share Analysis', 
+        text: '🖨️ Print Report', 
+        type: 'primary', 
+        action: () => printModalWithContent() 
+      },
+      { 
+        text: '📱 Share WhatsApp', 
         type: 'success', 
-        action: () => shareAnalysisViaWhatsApp(recommendation, reason, selfConsumptionRatio, importRatio, exportRatio) 
+        action: () => shareAnalysisViaWhatsApp()      
       },
       { 
         text: '✕ Close', 
@@ -5422,65 +5834,283 @@ function generateSolarAnalysis() {
     ]
   );
 }
-
-function shareAnalysisViaWhatsApp(recommendation, reason, selfConsumption, importRatio, exportRatio) {
-  const text = `
-*🔍 SolarSanchay - Capacity Analysis*
-
-*Recommendation:*
-${recommendation}
-
-*Reason:*
-${reason}
-
-*Key Metrics:*
-• Self Consumption: ${selfConsumption}%
-• Import from Grid: ${importRatio}%
-• Export to Grid: ${exportRatio}%
-
-_Generated by SolarSanchay_
-  `.trim();
+function shareAnalysisReport(recommendation, saving, capacity, payback, priority) {
+  let message = `🔍 Solar Performance Analysis\n\n${recommendation}\n\n`;
   
-  const encodedText = encodeURIComponent(text);
-  const whatsappUrl = `https://wa.me/?text=${encodedText}`;
-  window.open(whatsappUrl, '_blank');
+  if (priority === 'battery') {
+    message += `💰 Saving: ₹${saving}/day\n🔋 Battery: ${capacity} kWh\n⏱️ Payback: ${payback} years`;
+  } else if (priority === 'small-addition') {
+    message += `System already ${(100 - (Math.abs(parseFloat(avgNetImport)) / parseFloat(avgDailyConsumption)) * 100).toFixed(0)}% efficient!`;
+  }
+  
+  message += `\n\nGenerated by SolarSanchay\nGovernment of Haryana`;
+  
+  if (navigator.share) {
+    navigator.share({ title: 'Solar Analysis', text: message });
+  } else {
+    alert('Share feature not available.');
+  }
+}
+function shareMultiBillViaWhatsApp(summary, bills) {
+  // Build comprehensive WhatsApp message
+  let message = '*📊 Multi-Bill Summary*\n\n';
+  message += '*🌞 SolarSanchay Report*\n';
+  message += 'Government of Haryana\n\n';
+  
+  // Period Summary
+  message += '📅 *Period Summary*\n';
+  message += 'Total Days: ' + summary.totalDays + ' days\n';
+  message += 'Bills Analyzed: ' + summary.count + ' bills\n';
+  
+  // Get first and last bill dates
+  if (bills.length > 0) {
+    const firstBill = bills[bills.length - 1];
+    const lastBill = bills[0];
+    const fromDate = firstBill['Bill From Date'];
+    const toDate = lastBill['Bill To Date'];
+    
+    if (fromDate && toDate) {
+      message += 'From: ' + new Date(fromDate).toLocaleDateString('en-GB') + '\n';
+      message += 'To: ' + new Date(toDate).toLocaleDateString('en-GB') + '\n';
+    }
+  }
+  message += '\n';
+  
+  // Units Summary
+  message += '⚡ *Units Summary*\n';
+  message += 'Total Gross: ' + summary.totalGross.toLocaleString() + ' units\n';
+  message += 'Total Import: ' + summary.totalImport.toLocaleString() + ' units\n';
+  message += 'Total Export: ' + summary.totalExport.toLocaleString() + ' units\n';
+  message += 'Solar Generated: ' + summary.totalSolarGenerated.toLocaleString() + ' units\n';
+  message += 'Self Consumed: ' + summary.selfConsumption.toLocaleString() + ' units\n';
+  message += '\n';
+  
+  // Financial Summary
+  message += '💰 *Financial Summary*\n';
+  message += 'Total Bill: ₹' + summary.totalBillAmount.toLocaleString() + '\n';
+  message += 'Without Solar: ₹' + summary.totalWithoutSolar.toLocaleString() + '\n';
+  message += 'Total Savings: ₹' + summary.totalSavings.toLocaleString() + '\n';
+  message += 'Avg Saving: ' + summary.avgSavingPercent + '%\n';
+  message += 'Daily Saving: ₹' + summary.perDaySaving + '/day\n';
+  message += '\n';
+  
+  // Bill-wise Breakdown (first 3 bills)
+  message += '📋 *Bill Breakdown*\n';
+  const maxBills = Math.min(3, bills.length);
+  for (let i = 0; i < maxBills; i++) {
+    const bill = bills[i];
+    const billNumber = bill['Bill Number'] || 'N/A';
+    const fromDate = bill['Bill From Date'];
+    const toDate = bill['Bill To Date'];
+    const billAmount = parseFloat(bill['Total Bill Amount'] || bill['Bill Amount'] || 0);
+    const withoutSolar = parseFloat(bill['Bill Without Solar'] || 0);
+    const saving = withoutSolar - billAmount;
+    
+    message += (i + 1) + '. Bill #' + billNumber + '\n';
+    
+    if (fromDate && toDate) {
+      const from = new Date(fromDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+      const to = new Date(toDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+      message += '   Period: ' + from + ' - ' + to + '\n';
+    }
+    
+    message += '   Saving: ₹' + Math.round(saving).toLocaleString() + '\n';
+  }
+  
+  if (bills.length > 3) {
+    message += '   ... and ' + (bills.length - 3) + ' more bills\n';
+  }
+  message += '\n';
+  
+  // Footer
+  message += '_Generated by SolarSanchay_\n';
+  message += '_NIC, Kurukshetra_\n';
+  message += '_Government of Haryana_\n\n';
+  message += '🔗 vksinglakkr.github.io/SolarSaving';
+  
+  console.log('=== Multi-Bill WhatsApp Message ===');
+  console.log(message);
+  
+  // Encode and open WhatsApp
+  const encodedMessage = encodeURIComponent(message);
+  const whatsappURL = 'https://wa.me/?text=' + encodedMessage;
+  
+  window.open(whatsappURL, '_blank');
+}
+function printModalWithContent() {
+  // Get the content RIGHT NOW while modal is visible
+  const modalElement = document.getElementById('customModal');
+  
+  if (!modalElement) {
+    alert('Modal not found');
+    return;
+  }
+  
+  const titleElement = modalElement.querySelector('.modal-title');
+  const contentElement = modalElement.querySelector('div[style*="max-height"]') || 
+                         modalElement.querySelector('.modal-body') ||
+                         modalElement.querySelector('div > div > div:nth-child(2)');
+  
+  if (!contentElement) {
+    alert('Content not found. Modal structure: ' + modalElement.innerHTML.substring(0, 200));
+    return;
+  }
+  
+  const title = titleElement ? titleElement.textContent : 'Solar Analysis Report';
+  const content = contentElement.innerHTML;
+  
+  console.log('Got title:', title);
+  console.log('Got content length:', content.length);
+  
+  // Now print with this content
+  printContent(title, content);
 }
 
-function shareViaWhatsApp(summary, bills) {
-  // Create text summary
-  const text = `
-*📊 SolarSanchay - Multi-Bill Summary*
-
-📅 *Period:* ${summary.totalDays} days (${summary.count} bills)
-
-⚡ *Units Summary:*
-• Total Gross: ${summary.totalGross} units
-• Solar Generated: ${summary.totalSolarGenerated} units
-• Self Consumed: ${summary.selfConsumption} units
-
-💰 *Financial Summary:*
-• Total Bill: ₹${summary.totalBillAmount.toLocaleString()}
-• Without Solar: ₹${summary.totalWithoutSolar.toLocaleString()}
-• Total Savings: ₹${summary.totalSavings.toLocaleString()}
-• Saving %: ${summary.avgSavingPercent}%
-• Daily Saving: ₹${summary.perDaySaving}/day
-
-📈 *Bill Details:*
-${bills.map((b, idx) => `
-${idx + 1}. Bill #${b['Bill Number']}
-   Saving: ₹${parseFloat(b['Solar Saving Amount'] || 0).toLocaleString()} (${parseFloat(b['Saving Percentage'] || 0).toFixed(1)}%)
-`).join('')}
-
-_Generated by SolarSanchay - Haryana Solar Savings Calculator_
-  `.trim();
+function printContent(title, content) {
+  const timestamp = new Date().toLocaleString('en-IN');
+  const printWindow = window.open('', '_blank');
   
-  // Encode for WhatsApp
-  const encodedText = encodeURIComponent(text);
-  const whatsappUrl = `https://wa.me/?text=${encodedText}`;
+  printWindow.document.write('<!DOCTYPE html>');
+  printWindow.document.write('<html><head>');
+  printWindow.document.write('<meta charset="UTF-8">');
+  printWindow.document.write('<title>' + title + '</title>');
+  printWindow.document.write('<style>');
+  printWindow.document.write('@page { size: A4; margin: 2cm; }');
+  printWindow.document.write('body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; }');
+  printWindow.document.write('.print-header { text-align: center; margin-bottom: 30px; border-bottom: 3px solid #1e40af; padding-bottom: 15px; }');
+  printWindow.document.write('.print-header h1 { color: #1e40af; margin: 0 0 10px 0; font-size: 24px; }');
+  printWindow.document.write('.print-header p { color: #666; margin: 5px 0; font-size: 14px; }');
+  printWindow.document.write('h4, h5, h6 { color: #1e40af; margin-top: 20px; margin-bottom: 10px; }');
+  printWindow.document.write('@media print { body { margin: 0; padding: 20px; } }');
+  printWindow.document.write('</style></head><body>');
+  printWindow.document.write('<div class="print-header">');
+  printWindow.document.write('<h1>' + title + '</h1>');
+  printWindow.document.write('<p><strong>SolarSanchay</strong> - Government of Haryana</p>');
+  printWindow.document.write('<p>Generated: ' + timestamp + '</p>');
+  printWindow.document.write('</div>');
+  printWindow.document.write(content);
+  printWindow.document.write('<div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #e5e7eb; text-align: center; color: #666; font-size: 12px;">');
+  printWindow.document.write('<p><strong>SolarSanchay</strong> - Solar Savings Calculator</p>');
+  printWindow.document.write('<p>NIC, Kurukshetra | Government of Haryana</p>');
+  printWindow.document.write('</div>');
+  printWindow.document.write('</body></html>');
   
-  // Open WhatsApp
-  window.open(whatsappUrl, '_blank');
+  printWindow.document.close();
+  
+  setTimeout(function() {
+    printWindow.print();
+    printWindow.onafterprint = function() {
+      printWindow.close();
+    };
+  }, 250);
 }
+function shareAnalysisViaWhatsApp() {
+  // Check if analysis data is available
+  if (!currentAnalysisData) {
+    alert('No analysis data available');
+    return;
+  }
+  
+  // Get the modal content
+  const modalElement = document.getElementById('customModal');
+  
+  if (!modalElement) {
+    alert('Modal not found');
+    return;
+  }
+  
+  const titleElement = modalElement.querySelector('.modal-title');
+  const title = titleElement ? titleElement.textContent.trim() : 'Solar Performance Analysis';
+  
+  // Extract data from global variable
+  const data = currentAnalysisData;
+  
+  // Build comprehensive WhatsApp message
+  let message = '*' + title + '*\n\n';
+  message += '*🌞 SolarSanchay Report*\n';
+  message += 'Government of Haryana\n\n';
+  
+  // Analysis Period
+  message += '📅 *Analysis Period*\n';
+  message += 'Period: ' + data.totalDays + ' days (' + data.savedBills.length + ' bills)\n';
+  if (data.savedBills.length > 0) {
+    message += 'From: ' + data.savedBills[data.savedBills.length - 1].billFrom + '\n';
+    message += 'To: ' + data.savedBills[0].billTo + '\n';
+  }
+  message += '\n';
+  
+  // Energy Summary
+  message += '⚡ *Energy Summary*\n';
+  message += 'Daily Consumption: ' + data.avgDailyConsumption + ' units\n';
+  message += 'Daily Solar: ' + data.avgDailySolar + ' units\n';
+  message += 'Daily Import: ' + data.avgDailyImport + ' units\n';
+  message += 'Daily Export: ' + data.avgDailyExport + ' units\n';
+  message += 'Net Grid: ' + data.avgNetImport + ' units/day\n';
+  message += '\n';
+  
+  // Financial Summary
+  message += '💰 *Bill Summary*\n';
+  message += 'Daily Bill: ₹' + Math.round(data.totalBillAmount / data.totalDays) + '\n';
+  message += 'Daily Fixed: ₹' + Math.round(data.totalFixedCharges / data.totalDays) + '\n';
+  message += 'Daily Variable: ₹' + Math.round((data.totalBillAmount - data.totalFixedCharges) / data.totalDays) + '\n';
+  message += '\n';
+  
+  // Recommendation (extract from modal)
+  const contentElement = modalElement.querySelector('div[style*="max-height"]');
+  if (contentElement) {
+    const fullText = contentElement.innerText;
+    
+    if (fullText.includes('BATTERY BENEFICIAL') || fullText.includes('BATTERY STORAGE RECOMMENDED')) {
+      message += '🔋 *Recommendation: BATTERY STORAGE*\n';
+      
+      const capacityMatch = fullText.match(/(\d+)\s*kWh/i);
+      const savingMatch = fullText.match(/₹(\d+)\/day/i);
+      const paybackMatch = fullText.match(/(\d+)\s*years?/i);
+      
+      if (capacityMatch) message += 'Capacity: ' + capacityMatch[1] + ' kWh\n';
+      if (savingMatch) message += 'Savings: ₹' + savingMatch[1] + '/day\n';
+      if (paybackMatch) message += 'Payback: ' + paybackMatch[1] + ' years\n';
+      
+    } else if (fullText.includes('SYSTEM WORKING WELL') || (fullText.includes('already') && fullText.includes('efficient'))) {
+      message += '✅ *System Working Well*\n';
+      
+      const efficiencyMatch = fullText.match(/(\d+)%\s*(?:efficient|grid reduction)/i);
+      if (efficiencyMatch) {
+        message += 'Grid Reduction: ' + efficiencyMatch[1] + '%\n';
+      }
+      message += 'Battery not needed\n';
+      
+    } else if (fullText.includes('INCREASE') || fullText.includes('ADD') || fullText.includes('Additional')) {
+      message += '☀️ *Increase Solar Capacity*\n';
+      
+      const unitsMatch = fullText.match(/(\d+\.?\d*)\s*units/i);
+      if (unitsMatch) {
+        message += 'Add: ' + unitsMatch[1] + ' units/day\n';
+      }
+    } else {
+      message += '💡 *Recommendation*\n';
+      message += 'Check portal for details\n';
+    }
+  }
+  
+  message += '\n';
+  
+  // Footer
+  message += '_Generated by SolarSanchay_\n';
+  message += '_NIC, Kurukshetra_\n';
+  message += '_Government of Haryana_\n\n';
+  message += '🔗 vksinglakkr.github.io/SolarSaving';
+  
+  console.log('=== WhatsApp Message ===');
+  console.log(message);
+  
+  // Encode and open WhatsApp
+  const encodedMessage = encodeURIComponent(message);
+  const whatsappURL = 'https://wa.me/?text=' + encodedMessage;
+  
+  window.open(whatsappURL, '_blank');
+}
+
 function goBack() {
   window.history.back();
 }
@@ -5583,6 +6213,36 @@ function showHomeButton() {
   if (homeBtn) {
     homeBtn.style.display = 'block';
   }
+}
+function exitBillEntryMode() {
+  [
+    "identitySection",
+    "billPeriodSection",
+    "consumptionSection",
+    "carryForwardSection",
+    "result"
+  ].forEach(id => {
+    document.getElementById(id)?.classList.add("d-none");
+  });
+
+  document.getElementById("actionBtn")?.classList.add("d-none");
+  document.getElementById("cancelEditBtn").style.display = "none";
+}
+function resetDashboardActions() {
+  document.getElementById("viewBtn").disabled = true;
+  document.getElementById("editBtn").disabled = true;
+  document.getElementById("deleteBtn").disabled = true;
+}
+function clearBillForm() {
+  [
+    "billNumber","meter","accountNum",
+    "billFrom","billTo",
+    "gross","importU","exportU",
+    "openingCarry","fixed","totalBill","arrears"
+  ].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = "";
+  });
 }
 
 // Hide home button on home page
@@ -5800,6 +6460,9 @@ function closeBillScanner() {
         }
       }
     });
+function openVerificationGuide() {
+  window.open('assests/SolarSanchayDemo.jpg', '_blank');
+}
 </script>
  </div>
 </body>
