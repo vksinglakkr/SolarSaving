@@ -5619,9 +5619,11 @@ function generateSolarAnalysis() {
   const exportRatio = (solarGenerated > 0) ? (totalExport / solarGenerated * 100).toFixed(0) : 0;
   const gridDependency = (totalGross > 0) ? (totalImport / totalGross * 100).toFixed(0) : 0;
   
-  // Daily Averages
+  // Daily Averages (FIXED: Added missing definitions)
   const avgDailyGeneration = (solarGenerated / totalDays).toFixed(1);
   const avgDailyConsumption = (totalGross / totalDays).toFixed(1);
+  const avgDailyImport = (totalImport / totalDays).toFixed(1); // ✅ Restored
+  const avgDailyExport = (totalExport / totalDays).toFixed(1); // ✅ Restored
   const avgNetImport = (netImport / totalDays).toFixed(1);
   
   // Financials
@@ -5802,8 +5804,8 @@ function generateSolarAnalysis() {
     savedBills: bills,
     avgDailyConsumption: avgDailyConsumption,
     avgDailySolar: avgDailyGeneration,
-    avgDailyImport: avgDailyImport,
-    avgDailyExport: avgDailyExport,
+    avgDailyImport: avgDailyImport, // Now defined
+    avgDailyExport: avgDailyExport, // Now defined
     avgNetImport: avgNetImport,
     totalBillAmount: totalBillAmount,
     totalFixedCharges: totalFixedCharges
