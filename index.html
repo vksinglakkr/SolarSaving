@@ -2855,54 +2855,28 @@ function editBill() {
   }, 600);
 }
 function cancelEdit() {
-  console.log('Cancelling edit...');
-  
-  // Clear editing state
-  window.isEditingBill = false;
-  window.editingBillIndex = null;
-  
-  // Reset and re-enable button
-  const actionBtn = document.getElementById('actionBtn');
-  if (actionBtn) {
-    actionBtn.disabled = false;
-    actionBtn.style.opacity = '1';
-    actionBtn.style.cursor = 'pointer';
-    actionBtn.textContent = 'Calculate Solar Benefit';
-  }
-  
-  // Hide cancel button
-  const cancelBtn = document.getElementById('cancelEditBtn');
-  if (cancelBtn) {
-    cancelBtn.style.display = 'none';
-  }
-  
-  // Clear form fields
-  const fieldsToReset = [
-    'billNumber', 'meter', 'accountNum',
-    'billFrom', 'billTo',
-    'gross', 'importU', 'exportU',
-    'fixed', 'totalBill', 'arrears', 'openingCarry'
-  ];
-  
-  fieldsToReset.forEach(fieldId => {
-    const field = document.getElementById(fieldId);
-    if (field) field.value = '';
-  });
-  
-  // Hide carry forward section
-  const carryForwardSection = document.getElementById('carryForwardSection');
-  if (carryForwardSection) carryForwardSection.classList.add('d-none');
-  
-  // Return to dashboard immediately
-  selectIntent('dashboard');
-  
-  // Scroll to top
-  setTimeout(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, 100);
-  
-  console.log('✅ Edit cancelled, returned to dashboard');
+  console.log("❌ Edit cancelled. Returning to dashboard.");
+
+  // clear edit state
+  isEditMode = false;
+  editingIndex = null;
+
+  // clear all form fields INCLUDING openingCarry
+  clearBillForm();
+
+  // hide award summary
+  document.getElementById("awardSummary")?.classList.add("d-none");
+
+  // exit entry mode
+  exitBillEntryMode();
+
+  // reset dashboard buttons
+  resetDashboardActions();
+
+  // show dashboard
+  document.getElementById("dashboardSection").classList.remove("d-none");
 }
+
 // Delete button - removes selected bill
 function deleteBill() {
   if (selectedBillIndex === null || selectedBillIndex === undefined) {
