@@ -2340,6 +2340,8 @@ let currentUser = null;
 // Initialize and synchronize userBills
 let userBills = [];
 let currentAnalysisData = null;
+window.isEditMode = false;
+window.ignoreNextBillSelection = false;
 
 // Create two-way binding with window.userBills
 Object.defineProperty(window, 'userBills', {
@@ -2720,17 +2722,18 @@ if (fromDate && toDate) {
   const billAmount = parseFloat(bill['Total Bill Amount'] || 0);
   
 return `
-  <div class="bill-card" onclick="handleBillCardClick(${index})">
+  <div class="bill-card" onclick="handleBillCardClick(event, ${index})">
+
     <div class="d-flex align-items-center gap-3">
       
       <!-- Single Selection Radio (default visible) -->
       <input type="radio" 
-             name="billSelection" 
-             id="single_${index}"
-             class="single-selector"
-             value="${index}" 
-             style="width: 20px; height: 20px; cursor: pointer;"
-             onchange="selectSingleBill(${index})">
+       name="billSelection" 
+       id="single_${index}"
+       class="single-selector"
+       value="${index}" 
+       style="width: 20px; height: 20px; cursor: pointer;"
+       onclick="selectSingleBill(${index})">
       
       <!-- Multi Selection Checkbox (hidden by default) -->
       <input type="checkbox" 
@@ -2811,6 +2814,7 @@ function editBill() {
     alert('Please select a bill first.');
     return;
   }
+window.isEditMode = true;
   
   const bills = window.userBills || [];
   const bill = bills[selectedBillIndex];
@@ -2833,12 +2837,14 @@ function editBill() {
   setTimeout(function() {
     loadBillForEditing(bill);
     
-    // Update button text AFTER selectIntent has run
-    const actionBtn = document.getElementById('actionBtn');
-    if (actionBtn) {
-      actionBtn.textContent = '💾 Update Bill';
-      actionBtn.classList.remove('d-none'); // Make sure it's visible
-    }
+  const actionBtn = document.getElementById('actionBtn');
+if (actionBtn) {
+  actionBtn.textContent = '💾 Update Bill';
+  actionBtn.classList.remove('d-none');   // ensure visible
+  actionBtn.disabled = false;             // 🔥 IMPORTANT
+  actionBtn.style.opacity = '1';          // restore normal look
+  actionBtn.style.cursor = 'pointer';     // UX polish
+}
     
     // Show cancel button
     const cancelBtn = document.getElementById('cancelEditBtn');
@@ -2918,13 +2924,21 @@ function deleteBill() {
     alert('Bill deleted successfully!');
   }
 }
-// Handle bill card click
 function handleBillCardClick(index) {
+
+  // 🔥 Ignore auto-selection after dashboard restore
+  if (window.ignoreNextBillSelection === true) {
+    console.log("Ignored auto bill selection:", index);
+    window.ignoreNextBillSelection = false; // reset after first ignore
+    return;
+  }
+
   if (currentSelectionMode === 'single') {
+    console.log("User clicked bill card:", index);
     selectSingleBill(index);
   }
-  // In summary mode, let checkbox handle it
 }
+
 
 // Select single bill (radio button)
 function selectSingleBill(index) {
@@ -3719,6 +3733,10 @@ console.log("Sending to webhook:", webhookData);
         }
         
   console.log("✅ Bill saved successfully");
+  if (window.isEditMode === true) {
+  exitAfterSuccessfulEdit();
+  return;
+}
         
         // CHECK IF EDITING OR ADDING NEW
         if (window.isEditingBill && window.editingBillIndex !== null) {
@@ -3737,7 +3755,11 @@ console.log("Sending to webhook:", webhookData);
           window.editingBillIndex = null;
           
           console.log('Bill updated successfully');
-        } else {
+               if (isEditMode === true || editingIndex !== null) {
+                    exitAfterSuccessfulEdit();
+                    return;
+               }        
+        } else {   
           // ADD NEW BILL
           console.log('Adding new bill');
           
@@ -3975,6 +3997,41 @@ const isEditing = window.isEditingBill;
   );
 // ===== Award Summary Hook (UI only) =====
 // ===== Award Summary Hook (UI only) =====
+
+// 🔁 EDIT MODE: detect via editingIndex (source of truth)
+if (editingIndex !== null && editingIndex !== undefined) {
+  console.log("✅ Edit-mode save detected. Returning to dashboard.");
+
+  // reset edit state
+  isEditMode = false;
+  editingIndex = null;
+
+  // clear form
+  clearBillForm();
+
+  // clear radio + card selection
+  clearBillSelection();
+
+  // hide award summary
+  const awardSummary = document.getElementById("awardSummary");
+  if (awardSummary) awardSummary.classList.add("d-none");
+
+  // exit entry UI
+  exitBillEntryMode();
+
+  // reset dashboard buttons
+  resetDashboardActions();
+
+  // show dashboard
+  document.getElementById("dashboardSection")?.classList.remove("d-none");
+
+  return; // ⛔ STOP here – do NOT render summary
+}
+
+/* =====================================================
+   🟢 NON-EDIT MODE (New / Quick Calculation)
+   ===================================================== */
+
 const awardSavingEl = document.getElementById("awardSaving");
 const awardUnitsEl = document.getElementById("awardUnits");
 const awardPercentEl = document.getElementById("awardPercent");
@@ -3983,31 +4040,45 @@ const awardWithoutSolarEl = document.getElementById("awardWithoutSolar");
 
 if (awardSavingEl) awardSavingEl.innerText = saving.toFixed(0);
 if (awardUnitsEl) awardUnitsEl.innerText = e || 0;
-if (awardPercentEl) awardPercentEl.innerText = without > 0 ? ((saving / without) * 100).toFixed(1) : 0;
+if (awardPercentEl)
+  awardPercentEl.innerText =
+    without > 0 ? ((saving / without) * 100).toFixed(1) : 0;
 if (awardPayableEl) awardPayableEl.innerText = t || 0;
 if (awardWithoutSolarEl) awardWithoutSolarEl.innerText = without.toFixed(0);
 
 const awardSummary = document.getElementById("awardSummary");
 if (awardSummary) awardSummary.classList.remove("d-none");
 
-// Update button state based on mode
+// Update button state
 if (actionBtn) {
-  const isEditing = window.isEditingBill;
-  
-  if (isEditing) {
-    // For editing: Re-enable button and reset text
-    actionBtn.disabled = false;
-    actionBtn.style.opacity = '1';
-    actionBtn.style.cursor = 'pointer';
-    actionBtn.innerText = 'Calculate Solar Benefit';
-  } else {
-    // For new bills: Disable and mark as saved
-    actionBtn.disabled = true;
-    actionBtn.style.opacity = '0.5';
-    actionBtn.innerText = entryMode === 'save' ? '✅ Saved' : '✅ Calculated';
-  }
+  actionBtn.disabled = true;
+  actionBtn.style.opacity = "0.5";
+  actionBtn.innerText = entryMode === "save" ? "✅ Saved" : "✅ Calculated";
 }
+
 }
+function exitAfterSuccessfulEdit() {
+  console.log("↩ Exiting edit mode");
+
+  window.ignoreNextBillSelection = true; // 🔥 IMPORTANT
+
+  window.isEditMode = false;
+  editingIndex = null;
+
+  clearBillForm();
+  clearBillSelection();
+
+  document.getElementById("awardSummary")?.classList.add("d-none");
+
+  exitBillEntryMode();
+  resetDashboardActions();
+
+  renderBillCards(userBills);
+
+  document.getElementById("dashboardSection")?.classList.remove("d-none");
+}
+
+
 
 function shareWhatsApp(data){
   const msg = encodeURIComponent(
