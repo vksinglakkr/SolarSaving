@@ -3737,7 +3737,11 @@ console.log("Sending to webhook:", webhookData);
           window.editingBillIndex = null;
           
           console.log('Bill updated successfully');
-        } else {
+               if (isEditMode === true || editingIndex !== null) {
+                    exitAfterSuccessfulEdit();
+                    return;
+               }        
+        } else {   
           // ADD NEW BILL
           console.log('Adding new bill');
           
@@ -4034,6 +4038,22 @@ if (actionBtn) {
   actionBtn.innerText = entryMode === "save" ? "✅ Saved" : "✅ Calculated";
 }
 
+}
+function exitAfterSuccessfulEdit() {
+  console.log("↩ Exiting edit mode after successful save");
+
+  isEditMode = false;
+  editingIndex = null;
+
+  clearBillForm();
+  clearBillSelection();
+
+  document.getElementById("awardSummary")?.classList.add("d-none");
+
+  exitBillEntryMode();
+  resetDashboardActions();
+
+  document.getElementById("dashboardSection")?.classList.remove("d-none");
 }
 
 function shareWhatsApp(data){
