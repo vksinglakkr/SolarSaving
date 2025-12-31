@@ -2625,9 +2625,16 @@ async function authenticateUserSilent() {
     let data = await response.json();
     if (Array.isArray(data)) data = data[0];
     
-    if (data.status === 'success' && data.authenticated) {
+if (data.status === 'success' && data.authenticated) {
       currentUser = { meter, account };
-      userBills = Array.isArray(data.bills) ? data.bills : [];
+      
+      // ✅ CRITICAL FIX: Properly store bills
+      const bills = Array.isArray(data.bills) ? data.bills : [];
+      userBills = bills;
+      window.userBills = bills;
+      
+      console.log('✅ Silent auth: Bills refreshed:', bills.length);
+      
       displayBillsList();
     } else {
       showErrorModal('Failed to refresh dashboard');
@@ -2821,13 +2828,27 @@ function editBill() {
     alert('Please select a bill first.');
     return;
   }
-window.isEditMode = true;
   
+  window.isEditMode = true;
+  
+  // ✅ CRITICAL FIX: Ensure bills are loaded
   const bills = window.userBills || [];
+  
+  console.log('=== EDIT BILL DEBUG ===');
+  console.log('Selected index:', selectedBillIndex);
+  console.log('Total bills available:', bills.length);
+  console.log('Bills array:', bills);
+  
+  if (bills.length === 0) {
+    alert('❌ No bills loaded! Please refresh the page.');
+    return;
+  }
+  
   const bill = bills[selectedBillIndex];
   
   if (!bill) {
-    alert('Bill not found.');
+    alert(`❌ Bill not found at index ${selectedBillIndex}. Total bills: ${bills.length}`);
+    console.error('Bill not found. Index:', selectedBillIndex, 'Bills:', bills);
     return;
   }
   
@@ -2931,7 +2952,11 @@ function deleteBill() {
     alert('Bill deleted successfully!');
   }
 }
-function handleBillCardClick(index) {
+function handleBillCardClick(event, index) {
+  console.log('=== BILL CARD CLICKED ===');
+  console.log('Index:', index);
+  console.log('Current mode:', currentSelectionMode);
+  console.log('Ignore flag:', window.ignoreNextBillSelection);
 
   // 🔥 Ignore auto-selection after dashboard restore
   if (window.ignoreNextBillSelection === true) {
@@ -2941,20 +2966,44 @@ function handleBillCardClick(index) {
   }
 
   if (currentSelectionMode === 'single') {
-    console.log("User clicked bill card:", index);
+    console.log("User clicked bill card - selecting:", index);
     selectSingleBill(index);
+  } else {
+    console.log('Not in single mode - mode is:', currentSelectionMode);
   }
 }
 
 
 // Select single bill (radio button)
+// Select single bill (radio button)
 function selectSingleBill(index) {
+  console.log('=== SELECT SINGLE BILL ===');
+  console.log('Index:', index);
+  
   selectedBillIndex = index;
   
   // Enable action buttons
-  document.getElementById('viewBtn').disabled = false;
-  document.getElementById('editBtn').disabled = false;
-  document.getElementById('deleteBtn').disabled = false;
+  const viewBtn = document.getElementById('viewBtn');
+  const editBtn = document.getElementById('editBtn');
+  const deleteBtn = document.getElementById('deleteBtn');
+  
+  if (viewBtn) {
+    viewBtn.disabled = false;
+    console.log('✅ View button enabled');
+  }
+  if (editBtn) {
+    editBtn.disabled = false;
+    console.log('✅ Edit button enabled');
+  }
+  if (deleteBtn) {
+    deleteBtn.disabled = false;
+    console.log('✅ Delete button enabled');
+  }
+  
+  // Update radio button selection
+  document.querySelectorAll('.single-selector').forEach((radio, i) => {
+    radio.checked = (i === index);
+  });
   
   // Update visual selection
   document.querySelectorAll('.bill-card').forEach((card, i) => {
@@ -2964,6 +3013,8 @@ function selectSingleBill(index) {
       card.classList.remove('selected');
     }
   });
+  
+  console.log('✅ Bill selected:', index);
 }
 
 // Load bill data into form for editing
