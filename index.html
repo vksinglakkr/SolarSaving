@@ -4169,6 +4169,9 @@ function exitAfterSuccessfulEdit() {
 
    if (singleActions) singleActions.style.display = 'flex';   // ← SHOW single
    if (summaryActions) summaryActions.style.display = 'none'; // ← HIDE summary
+   document.getElementById('viewBtn').disabled = true;
+document.getElementById('editBtn').disabled = true;
+document.getElementById('deleteBtn').disabled = true;
 }
 
 
