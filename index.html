@@ -3976,21 +3976,21 @@ const isEditing = window.isEditingBill;
 // ===== Award Summary Hook (UI only) =====
 // ===== Award Summary Hook (UI only) =====
 
-// 🔁 EDIT MODE: behave like Cancel and return to dashboard
-if (isEditMode === true) {
-  console.log("✅ Bill updated (edit mode). Returning to dashboard.");
+// 🔁 EDIT MODE: detect via editingIndex (source of truth)
+if (editingIndex !== null && editingIndex !== undefined) {
+  console.log("✅ Edit-mode save detected. Returning to dashboard.");
 
-  // reset edit flags
+  // reset edit state
   isEditMode = false;
   editingIndex = null;
 
-  // clear form fields
+  // clear form
   clearBillForm();
 
   // clear radio + card selection
   clearBillSelection();
 
-  // hide award summary explicitly
+  // hide award summary
   const awardSummary = document.getElementById("awardSummary");
   if (awardSummary) awardSummary.classList.add("d-none");
 
@@ -4000,13 +4000,16 @@ if (isEditMode === true) {
   // reset dashboard buttons
   resetDashboardActions();
 
-  // show dashboard (original post-login state)
+  // show dashboard
   document.getElementById("dashboardSection")?.classList.remove("d-none");
 
-  return; // ⛔ IMPORTANT: stop further UI rendering
+  return; // ⛔ STOP here – do NOT render summary
 }
 
-// 🟢 NORMAL MODE (New / Quick Check): show award summary
+/* =====================================================
+   🟢 NON-EDIT MODE (New / Quick Calculation)
+   ===================================================== */
+
 const awardSavingEl = document.getElementById("awardSaving");
 const awardUnitsEl = document.getElementById("awardUnits");
 const awardPercentEl = document.getElementById("awardPercent");
@@ -4024,7 +4027,7 @@ if (awardWithoutSolarEl) awardWithoutSolarEl.innerText = without.toFixed(0);
 const awardSummary = document.getElementById("awardSummary");
 if (awardSummary) awardSummary.classList.remove("d-none");
 
-// Update button state for new entries
+// Update button state
 if (actionBtn) {
   actionBtn.disabled = true;
   actionBtn.style.opacity = "0.5";
