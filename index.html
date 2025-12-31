@@ -2879,7 +2879,11 @@ if (actionBtn) {
     if (cancelBtn) {
       cancelBtn.style.display = 'block';
     }
-    
+     // ✅ CRITICAL FIX: Hide dashboard action buttons during edit
+    const singleActions = document.getElementById('singleModeActions');
+    if (singleActions) {
+      singleActions.style.display = 'none';
+    }
     console.log('Bill data loaded, buttons updated');
   }, 500); // Increased timeout to 500ms
   
