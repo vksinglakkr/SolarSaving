@@ -3953,40 +3953,45 @@ console.log("Sending to webhook:", webhookData);
 
 const isEditing = window.isEditingBill;
   
+// Check if editing - skip modal and go straight to dashboard
+  if (isEditing) {
+    // Show success message
+    alert('✅ Bill Updated Successfully!');
+    
+    // Reset edit state
+    window.isEditingBill = false;
+    window.editingBillIndex = null;
+    
+    // Hide cancel button
+    const cancelBtn = document.getElementById('cancelEditBtn');
+    if (cancelBtn) cancelBtn.style.display = 'none';
+    
+    // Reset action button
+    const actionBtn = document.getElementById('actionBtn');
+    if (actionBtn) {
+      actionBtn.disabled = false;
+      actionBtn.style.opacity = '1';
+      actionBtn.style.cursor = 'pointer';
+      actionBtn.textContent = 'Calculate Solar Benefit';
+    }
+    
+    // Go back to dashboard
+    selectIntent('dashboard');
+    
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    return; // Exit function - don't show modal
+  }
+  
+  // For new bills - show modal as usual
   showModal(
     '📊', 
-    isEditing ? "✅ Bill Updated Successfully!" : (entryMode === "one" ? "Quick Calculator Result" : "✅ Bill Saved Successfully!"), 
+    entryMode === "one" ? "Quick Calculator Result" : "✅ Bill Saved Successfully!", 
     modalContent, 
     [
       { text: 'Share on WhatsApp', type: 'success', action: () => { shareWhatsApp(window.lastCalculation); closeModal(); } },
-      { 
-        text: isEditing ? 'Back to Dashboard' : 'Close', 
-        type: 'secondary', 
-        action: () => { 
-          closeModal(); 
-          if (isEditing) {
-            // Reset edit state
-            window.isEditingBill = false;
-            window.editingBillIndex = null;
-            
-            // Hide cancel button
-            const cancelBtn = document.getElementById('cancelEditBtn');
-            if (cancelBtn) cancelBtn.style.display = 'none';
-            
-            // Reset action button
-            const actionBtn = document.getElementById('actionBtn');
-            if (actionBtn) {
-              actionBtn.disabled = false;
-              actionBtn.style.opacity = '1';
-              actionBtn.style.cursor = 'pointer';
-              actionBtn.textContent = 'Calculate Solar Benefit';
-            }
-            
-            // Go to dashboard
-            selectIntent('dashboard');
-          }
-        }
-      }
+      { text: 'Close', type: 'secondary', action: closeModal }
     ]
   );
 // ===== Award Summary Hook (UI only) =====
