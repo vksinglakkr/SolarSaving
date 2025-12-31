@@ -3977,12 +3977,12 @@ const isEditing = window.isEditingBill;
 // ===== Award Summary Hook (UI only) =====
 
 // 🔁 EDIT MODE: behave like Cancel and return to dashboard
-if (window.isEditingBill) {
-  console.log("✅ Edit mode calculation complete. Returning to dashboard.");
+if (isEditMode === true) {
+  console.log("✅ Bill updated (edit mode). Returning to dashboard.");
 
   // reset edit flags
-  window.isEditingBill = false;
-  window.editingIndex = null;
+  isEditMode = false;
+  editingIndex = null;
 
   // clear form fields
   clearBillForm();
@@ -4000,36 +4000,35 @@ if (window.isEditingBill) {
   // reset dashboard buttons
   resetDashboardActions();
 
-  // show dashboard
+  // show dashboard (original post-login state)
   document.getElementById("dashboardSection")?.classList.remove("d-none");
 
-} else {
-  // 🟢 NORMAL MODE (New / Quick Check): show award summary
+  return; // ⛔ IMPORTANT: stop further UI rendering
+}
 
-  const awardSavingEl = document.getElementById("awardSaving");
-  const awardUnitsEl = document.getElementById("awardUnits");
-  const awardPercentEl = document.getElementById("awardPercent");
-  const awardPayableEl = document.getElementById("awardPayable");
-  const awardWithoutSolarEl = document.getElementById("awardWithoutSolar");
+// 🟢 NORMAL MODE (New / Quick Check): show award summary
+const awardSavingEl = document.getElementById("awardSaving");
+const awardUnitsEl = document.getElementById("awardUnits");
+const awardPercentEl = document.getElementById("awardPercent");
+const awardPayableEl = document.getElementById("awardPayable");
+const awardWithoutSolarEl = document.getElementById("awardWithoutSolar");
 
-  if (awardSavingEl) awardSavingEl.innerText = saving.toFixed(0);
-  if (awardUnitsEl) awardUnitsEl.innerText = e || 0;
-  if (awardPercentEl) {
-    awardPercentEl.innerText =
-      without > 0 ? ((saving / without) * 100).toFixed(1) : 0;
-  }
-  if (awardPayableEl) awardPayableEl.innerText = t || 0;
-  if (awardWithoutSolarEl) awardWithoutSolarEl.innerText = without.toFixed(0);
+if (awardSavingEl) awardSavingEl.innerText = saving.toFixed(0);
+if (awardUnitsEl) awardUnitsEl.innerText = e || 0;
+if (awardPercentEl)
+  awardPercentEl.innerText =
+    without > 0 ? ((saving / without) * 100).toFixed(1) : 0;
+if (awardPayableEl) awardPayableEl.innerText = t || 0;
+if (awardWithoutSolarEl) awardWithoutSolarEl.innerText = without.toFixed(0);
 
-  const awardSummary = document.getElementById("awardSummary");
-  if (awardSummary) awardSummary.classList.remove("d-none");
+const awardSummary = document.getElementById("awardSummary");
+if (awardSummary) awardSummary.classList.remove("d-none");
 
-  // Update button state for new entries
-  if (actionBtn) {
-    actionBtn.disabled = true;
-    actionBtn.style.opacity = "0.5";
-    actionBtn.innerText = entryMode === "save" ? "✅ Saved" : "✅ Calculated";
-  }
+// Update button state for new entries
+if (actionBtn) {
+  actionBtn.disabled = true;
+  actionBtn.style.opacity = "0.5";
+  actionBtn.innerText = entryMode === "save" ? "✅ Saved" : "✅ Calculated";
 }
 
 }
