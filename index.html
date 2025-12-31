@@ -2341,6 +2341,7 @@ let currentUser = null;
 let userBills = [];
 let currentAnalysisData = null;
 window.isEditMode = false;
+window.ignoreNextBillSelection = false;
 
 // Create two-way binding with window.userBills
 Object.defineProperty(window, 'userBills', {
@@ -2923,18 +2924,12 @@ function deleteBill() {
     alert('Bill deleted successfully!');
   }
 }
-// Handle bill card click
-function handleBillCardClick(event, index) {
+function handleBillCardClick(index) {
 
-  // ❌ Ignore synthetic / programmatic clicks
-  if (!event.isTrusted) {
-    console.log("Ignored non-user card click");
-    return;
-  }
-
-  // ❌ Ignore clicks while exiting edit mode
-  if (window.isEditMode === true) {
-    console.log("Ignored card click during edit exit");
+  // 🔥 Ignore auto-selection after dashboard restore
+  if (window.ignoreNextBillSelection === true) {
+    console.log("Ignored auto bill selection:", index);
+    window.ignoreNextBillSelection = false; // reset after first ignore
     return;
   }
 
@@ -2942,7 +2937,6 @@ function handleBillCardClick(event, index) {
     console.log("User clicked bill card:", index);
     selectSingleBill(index);
   }
-  // In summary mode, let checkbox handle it
 }
 
 
@@ -4066,7 +4060,8 @@ if (actionBtn) {
 function exitAfterSuccessfulEdit() {
   console.log("↩ Exiting edit mode");
 
-  // 🔥 RESET EDIT STATE FIRST (CRITICAL)
+  window.ignoreNextBillSelection = true; // 🔥 IMPORTANT
+
   window.isEditMode = false;
   editingIndex = null;
 
@@ -4078,11 +4073,11 @@ function exitAfterSuccessfulEdit() {
   exitBillEntryMode();
   resetDashboardActions();
 
-  // 🔥 RENDER AFTER RESET
   renderBillCards(userBills);
 
   document.getElementById("dashboardSection")?.classList.remove("d-none");
 }
+
 
 
 function shareWhatsApp(data){
