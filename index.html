@@ -4048,9 +4048,9 @@ if (actionBtn) {
 
 }
 function exitAfterSuccessfulEdit() {
-  console.log("↩ Exiting edit mode after successful save");
+  console.log("↩ Exiting edit mode");
 
-  isEditMode = false;
+  window.isEditMode = false;
   editingIndex = null;
 
   clearBillForm();
@@ -4061,8 +4061,13 @@ function exitAfterSuccessfulEdit() {
   exitBillEntryMode();
   resetDashboardActions();
 
+  // 🔥 CRITICAL LINE: refresh dashboard list with updated data
+  renderBillCards(bills);
+
+  // show dashboard
   document.getElementById("dashboardSection")?.classList.remove("d-none");
 }
+
 
 function shareWhatsApp(data){
   const msg = encodeURIComponent(
