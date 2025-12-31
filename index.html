@@ -4147,31 +4147,48 @@ if (actionBtn) {
 }
 function exitAfterSuccessfulEdit() {
   console.log("↩ Exiting edit mode");
- const singleActions = document.getElementById('singleModeActions');
-   const summaryActions = document.getElementById('summaryModeActions');
+  
+  // ✅ SHOW single mode actions, HIDE summary mode actions
+  const singleActions = document.getElementById('singleModeActions');
+  const summaryActions = document.getElementById('summaryModeActions');
 
-   if (singleActions) singleActions.style.display = 'flex';   // ← SHOW single
-   if (summaryActions) summaryActions.style.display = 'none'; // ← HIDE summary
-   document.getElementById('viewBtn').disabled = true;
-document.getElementById('editBtn').disabled = true;
-document.getElementById('deleteBtn').disabled = true;
-  window.ignoreNextBillSelection = true; // 🔥 IMPORTANT
-
+  if (singleActions) singleActions.style.display = 'flex';
+  if (summaryActions) summaryActions.style.display = 'none';
+  
+  // ✅ CRITICAL FIX: Disable all action buttons
+  const viewBtn = document.getElementById('viewBtn');
+  const editBtn = document.getElementById('editBtn');
+  const deleteBtn = document.getElementById('deleteBtn');
+  
+  if (viewBtn) viewBtn.disabled = true;
+  if (editBtn) editBtn.disabled = true;
+  if (deleteBtn) deleteBtn.disabled = true;
+  
+  // ✅ Reset selected bill index
+  selectedBillIndex = null;
+  
+  // Clear edit state
   window.isEditMode = false;
+  window.editingBillIndex = null;
   editingIndex = null;
 
+  // Clear form and selections
   clearBillForm();
   clearBillSelection();
 
+  // Hide award summary
   document.getElementById("awardSummary")?.classList.add("d-none");
 
+  // Exit bill entry UI
   exitBillEntryMode();
-  resetDashboardActions();
 
-  renderBillCards(userBills);
+  // Render bills (this will redraw all cards)
+  renderBillCards(window.userBills || []);
 
+  // Show dashboard
   document.getElementById("dashboardSection")?.classList.remove("d-none");
   
+  console.log("✅ All buttons disabled, no bill selected");
 }
 
 
