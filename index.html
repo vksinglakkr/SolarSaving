@@ -6141,6 +6141,36 @@ function showHomeButton() {
     homeBtn.style.display = 'block';
   }
 }
+function exitBillEntryMode() {
+  [
+    "identitySection",
+    "billPeriodSection",
+    "consumptionSection",
+    "carryForwardSection",
+    "result"
+  ].forEach(id => {
+    document.getElementById(id)?.classList.add("d-none");
+  });
+
+  document.getElementById("actionBtn")?.classList.add("d-none");
+  document.getElementById("cancelEditBtn").style.display = "none";
+}
+function resetDashboardActions() {
+  document.getElementById("viewBtn").disabled = true;
+  document.getElementById("editBtn").disabled = true;
+  document.getElementById("deleteBtn").disabled = true;
+}
+function clearBillForm() {
+  [
+    "billNumber","meter","accountNum",
+    "billFrom","billTo",
+    "gross","importU","exportU",
+    "openingCarry","fixed","totalBill","arrears"
+  ].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = "";
+  });
+}
 
 // Hide home button on home page
 function hideHomeButton() {
