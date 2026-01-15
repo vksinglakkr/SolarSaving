@@ -548,7 +548,164 @@ body {
     font-size: 0.7rem !important;
   }
 }
+/* ========================================
+   AUTHENTICATION / LOGIN CARD - ENHANCED
+   ======================================== */
+.auth-container {
+  max-width: 500px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
 
+.auth-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 20px;
+  padding: 2.5rem;
+  box-shadow: 0 10px 40px rgba(30, 64, 175, 0.15);
+  border: 2px solid #e0e7ff;
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%);
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid #e0e7ff;
+}
+
+.auth-icon {
+  font-size: 3rem;
+  margin-bottom: 0.75rem;
+  display: inline-block;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.auth-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1e3a8a;
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.auth-subtitle {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin-top: 0.5rem;
+}
+
+.auth-input-group {
+  margin-bottom: 1.5rem;
+}
+
+.auth-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.auth-input {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  font-size: 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  background: white;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.auth-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+  transform: translateY(-2px);
+}
+
+.auth-input::placeholder {
+  color: #94a3b8;
+}
+
+.auth-btn-primary {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: white;
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(30, 64, 175, 0.25);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.auth-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(30, 64, 175, 0.35);
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+}
+
+.auth-btn-primary:active {
+  transform: translateY(0);
+}
+
+.auth-btn-secondary {
+  width: 100%;
+  padding: 0.875rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #475569;
+  background: #f1f5f9;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 0.75rem;
+}
+
+.auth-btn-secondary:hover {
+  background: #e2e8f0;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .auth-card {
+    padding: 1.5rem;
+    border-radius: 16px;
+  }
+  
+  .auth-title {
+    font-size: 1.25rem;
+  }
+  
+  .auth-icon {
+    font-size: 2.5rem;
+  }
+}
 /* ========================================
    VERIFICATION MODAL
    ======================================== */
@@ -1649,14 +1806,44 @@ div[style*="background: linear-gradient(135deg, #e0f2fe"] {
   <span id="intentText"></span>
  </div>
 <!-- AUTHENTICATION SECTION (for Dashboard) -->
-<div class="card p-3 mb-3 d-none" id="authSection">
-  <h6>🔐 Login to Dashboard</h6>
-  <label>Meter Number</label>
-  <input id="authMeter" class="form-control mb-2" placeholder="Enter meter number">
-  <label>Account Number</label>
-  <input id="authAccount" class="form-control mb-2" placeholder="Enter account number">
-  <button class="btn btn-primary w-100" onclick="authenticateUser()">Login</button>
-  <button class="btn btn-secondary w-100 mt-2" onclick="resetIntent()">Back</button>
+<!-- AUTHENTICATION SECTION (for Dashboard) -->
+<div class="d-none" id="authSection">
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="auth-icon">🔐</div>
+        <h2 class="auth-title">Login to Dashboard</h2>
+        <p class="auth-subtitle">Enter your credentials to view saved bills</p>
+      </div>
+      
+      <div class="auth-input-group">
+        <label class="auth-label" for="authMeter">
+          <span style="margin-right: 0.5rem;">🔢</span>Meter Number
+        </label>
+        <input id="authMeter" 
+               class="auth-input" 
+               placeholder="Enter your meter number"
+               inputmode="numeric">
+      </div>
+      
+      <div class="auth-input-group">
+        <label class="auth-label" for="authAccount">
+          <span style="margin-right: 0.5rem;">📋</span>Account Number
+        </label>
+        <input id="authAccount" 
+               class="auth-input" 
+               placeholder="Enter your account number">
+      </div>
+      
+      <button class="auth-btn-primary" onclick="authenticateUser()">
+        Login
+      </button>
+      
+      <button class="auth-btn-secondary" onclick="resetIntent()">
+        ← Back to Home
+      </button>
+    </div>
+  </div>
 </div>
 
 <!-- DASHBOARD SECTION -->
