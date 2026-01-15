@@ -5013,15 +5013,16 @@ function showMultiBillSummary() {
   const resultDiv = document.getElementById("result");
 
   /* ==============================
-     1. GET SELECTED BILLS FROM UI
+     1. GET SELECTED BILLS (CORRECT WAY)
      ============================== */
 
   const selectedBills = [];
 
-  document.querySelectorAll(".bill-checkbox:checked").forEach(cb => {
-    const billNo = cb.dataset.billno;
-    const bill = userBills.find(b => b.billNo === billNo);
-    if (bill) selectedBills.push(bill);
+  document.querySelectorAll(".summary-selector:checked").forEach(cb => {
+    const index = parseInt(cb.value, 10);
+    if (!isNaN(index) && userBills[index]) {
+      selectedBills.push(userBills[index]);
+    }
   });
 
   if (selectedBills.length === 0) {
