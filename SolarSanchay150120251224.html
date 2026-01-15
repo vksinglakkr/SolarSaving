@@ -5009,66 +5009,128 @@ function clearAllSelections() {
 
 // Show multi-bill summary modal
 function showMultiBillSummary() {
-  const checkedBoxes = document.querySelectorAll('.summary-selector:checked');
-  
-  if (checkedBoxes.length === 0) {
-    alert('कृपया कम से कम एक bill select करें।\nPlease select at least one bill.');
-    return;
-  }
-  
-  // Get all bills - try multiple sources
-  let allBills = window.userBills || [];
-  
-  // Fallback 1: Load from storage
-  if (allBills.length === 0) {
-    try {
-      const stored = localStorage.getItem('solarBills');
-      if (stored) {
-        allBills = JSON.parse(stored);
-        window.userBills = allBills; // Store for future use
-      }
-    } catch (e) {
-      console.error('Error loading bills:', e);
-    }
-  }
-  
-  // Fallback 2: Try getStoredBills function
-  if (allBills.length === 0 && typeof getStoredBills === 'function') {
-    allBills = getStoredBills() || [];
-    window.userBills = allBills;
-  }
-  
-  // Final check
-  if (allBills.length === 0) {
-    alert('कोई bills नहीं मिले। कृपया page refresh करें।\nNo bills found. Please refresh the page.');
-    return;
-  }
-  
-  console.log('Total bills available:', allBills.length);
-  console.log('Bills selected:', checkedBoxes.length);
-  
-  // Get selected bills data
-  const selectedBills = [];
-  checkedBoxes.forEach(cb => {
-    const index = parseInt(cb.value);
-    if (allBills[index]) {
-      selectedBills.push(allBills[index]);
-    }
-  });
-  
+
+  const resultDiv = document.getElementById("result");
+
+  /* ==============================
+     1. BASIC VALIDATION
+     ============================== */
   if (selectedBills.length === 0) {
-    alert('Selected bills data not found.');
+    alert("Please select at least one bill.");
     return;
   }
-  
-  console.log('Selected bills:', selectedBills.length);
-  
-  // Calculate aggregate statistics
-  const summary = calculateMultiBillSummary(selectedBills);
-  
-  // Show summary modal
-  displaySummaryModal(summary, selectedBills);
+
+  /* ==============================
+     2. AGGREGATE CALCULATIONS
+     (USES YOUR EXISTING DATA)
+     ============================== */
+
+  let totalDays = 0;
+  let totalGross = 0;
+  let totalImport = 0;
+  let totalExport = 0;
+  let totalPaid = 0;
+  let totalWithoutSolar = 0;
+
+  let overallStartDate = null;
+  let overallEndDate = null;
+
+  selectedBills.forEach(bill => {
+    totalDays += bill.days;
+    totalGross += bill.gross;
+    totalImport += bill.importU;
+    totalExport += bill.exportU;
+    totalPaid += bill.totalBill;
+    totalWithoutSolar += bill.withoutSolar;
+
+    if (!overallStartDate || bill.from < overallStartDate) overallStartDate = bill.from;
+    if (!overallEndDate || bill.to > overallEndDate) overallEndDate = bill.to;
+  });
+
+  const netFromGrid = totalImport - totalExport;
+  const solarGenerated = totalGross - totalImport + totalExport;
+  const totalSavings = totalWithoutSolar - totalPaid;
+  const avgSavingPercent = ((totalSavings / totalWithoutSolar) * 100).toFixed(1);
+  const dailySaving = (totalSavings / totalDays).toFixed(0);
+
+  /* ==============================
+     3. BUILD MASTER REPORT
+     ============================== */
+
+  let masterHTML = `
+    <div class="result-box"
+         style="border-left:6px solid #2563eb;background:#f8fafc;">
+
+      <h5 style="font-weight:800;color:#1e3a8a;">
+        📊 SolarSanchay – Master Performance Report
+      </h5>
+
+      <p><b>Period:</b> ${overallStartDate} – ${overallEndDate}
+         (${totalDays} days)</p>
+      <p><b>Bills Analysed:</b> ${selectedBills.length}</p>
+
+      <hr>
+
+      <p>⚡ <b>Total Consumption:</b> ${totalGross} units</p>
+      <p>☀️ <b>Solar Generated:</b> ${solarGenerated} units</p>
+      <p>🔌 <b>Grid Dependency:</b> ${netFromGrid} units</p>
+
+      <hr>
+
+      <p>💰 <b>Amount Paid:</b> ₹${totalPaid.toFixed(0)}</p>
+      <p>❌ <b>Without Solar:</b> ₹${totalWithoutSolar.toFixed(0)}</p>
+
+      <p class="fw-bold text-success">
+        ✅ Net Savings: ₹${totalSavings.toFixed(0)}
+        (${avgSavingPercent}%)
+      </p>
+
+      <p class="text-muted">
+        📅 Average Saving: ₹${dailySaving} / day
+      </p>
+
+      <button class="btn btn-sm btn-outline-secondary mt-2"
+              onclick="toggleDetailedReport()">
+        🔍 View Detailed Breakdown
+      </button>
+    </div>
+  `;
+
+  /* ==============================
+     4. BUILD DETAILED REPORT
+     (YOUR EXISTING CONTENT GOES HERE)
+     ============================== */
+
+  let detailedHTML = `
+    <div id="detailedReport" class="d-none mt-3">
+      <h6 class="fw-bold">📋 Detailed Multi-Bill Breakdown</h6>
+
+      ${selectedBills.map((bill, i) => `
+        <div class="border rounded p-2 mb-2">
+          <b>Bill ${i + 1}</b><br>
+          Period: ${bill.from} – ${bill.to} (${bill.days} days)<br>
+          Gross: ${bill.gross} units<br>
+          Import: ${bill.importU} units<br>
+          Export: ${bill.exportU} units<br>
+          Paid: ₹${bill.totalBill}<br>
+          Without Solar: ₹${bill.withoutSolar}<br>
+          Saved: ₹${(bill.withoutSolar - bill.totalBill).toFixed(0)}
+        </div>
+      `).join("")}
+    </div>
+  `;
+
+  /* ==============================
+     5. FINAL RENDER
+     ============================== */
+
+  resultDiv.innerHTML = masterHTML + detailedHTML;
 }
+function toggleDetailedReport() {
+  document.getElementById("detailedReport")
+          .classList.toggle("d-none");
+}
+
    
 function calculateMultiBillSummary(bills) {
   const summary = {
