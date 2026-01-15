@@ -5246,10 +5246,7 @@ function calculateMultiBillSummary(bills) {
 // ==========================================
 // OPTIMIZED MULTI-BILL SUMMARY - COMPLETE
 // ==========================================
-// ==========================================
-// FIXED MULTI-BILL SUMMARY DISPLAY
-// Fixes: 1) Period order, 2) Units showing as 0
-// ==========================================
+
 function displaySummaryModal(summary, bills) {
   // Calculate insights
   const solarSelfSufficiency = summary.totalGross > 0 
@@ -5267,10 +5264,9 @@ function displaySummaryModal(summary, bills) {
   const actualYearlySaving = Math.round(parseFloat(summary.perDaySaving) * 365);
   
   // ✅ FIX 1: CORRECT DATE RANGE ORDER
-  // Bills are sorted newest-first, so reverse the logic
-  const oldestBill = bills[bills.length - 1];  // Last in array = oldest
-  const newestBill = bills[0];                  // First in array = newest
-  
+// Format date range - oldest to newest
+  const oldestBill = bills[0];
+  const newestBill = bills[bills.length - 1];
   const fromDate = oldestBill['Bill From Date'] 
     ? new Date(oldestBill['Bill From Date']).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
     : 'N/A';
