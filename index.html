@@ -3150,6 +3150,12 @@ function loadBillForEditing(bill) {
 // Shows bill in calculation result format
 // ==========================================
 
+// ==========================================
+// UPDATED viewSelectedBill() Function
+// Replace lines 1466-1556 in your HTML
+// Shows bill in calculation result format with Print & WhatsApp buttons
+// ==========================================
+
 function viewSelectedBill() {
   if (selectedBillIndex === null) {
     showErrorModal('Please select a bill first');
@@ -3204,7 +3210,7 @@ function viewSelectedBill() {
         <b>Bill Period:</b> ${billFromDate} &nbsp; to &nbsp; ${billToDate} | 
         <b>Total Days:</b> ${days}<br>
 
-        <b>Gross Units:</b> ${g} <br>
+        <b>Total Consumed Units (Gross Units):</b> ${g} <br>
         <b>Import Units (KWHI):</b> ${i} &nbsp; | &nbsp;
         <b>Export Units (KWHE):</b> ${e} <br>
 
@@ -3217,7 +3223,7 @@ function viewSelectedBill() {
         <b>Fixed Charges:</b> ₹${f} <br>
         <b>Total Current Cycle Charges:</b> ₹${t} <br>
 
-      <b>Per-Unit Rate:</b> ₹${unitRate ? unitRate.toFixed(2) : "—"}
+        <b>Per-Unit Rate:</b> ₹${unitRate ? unitRate.toFixed(2) : "—"}
         <i class="text-muted">
           = (Total Bill − Fixed Charges) ÷ (Import − Export)
         </i>
@@ -3278,10 +3284,24 @@ function viewSelectedBill() {
   `;
   
   showModal('📄', 'Bill Details - ' + billNum, modalContent, [
-    { text: 'Share on WhatsApp', type: 'success', action: () => shareSelectedBillWhatsApp() },
-    { text: 'Close', type: 'secondary', action: closeModal }
+    { 
+      text: '🖨️ Print', 
+      type: 'primary', 
+      action: () => printModalWithContent() 
+    },
+    { 
+      text: '📱 WhatsApp', 
+      type: 'success', 
+      action: () => shareSelectedBillWhatsApp() 
+    },
+    { 
+      text: '✕ Close', 
+      type: 'secondary', 
+      action: closeModal 
+    }
   ]);
 }
+
 
 // ==========================================
 // NEW FUNCTION: Share selected bill on WhatsApp
@@ -5271,7 +5291,7 @@ function displaySummaryModal(summary, bills) {
           📊 Multi-Bill Summary Report
         </h2>
         <p style="margin: 0.5rem 0 0 0; font-size: 0.95rem; opacity: 0.95;">
-          ${summary.count} Bills Analyzed | ${fromDate} → ${toDate}
+          ${summary.count} Bills Analyzed
         </p>
       </div>
 
@@ -6365,33 +6385,454 @@ function shareMultiBillViaWhatsApp(summary, bills) {
   
   window.open(whatsappURL, '_blank');
 }
+// ==========================================
+// UNIVERSAL PRINT FUNCTIONALITY
+// Handles both Single Bill and Multi-Bill printing
+// ==========================================
+// ==========================================
+// FIXED PRINT FUNCTIONS - NO AUTO-PRINT ERRORS
+// ==========================================
+
 function printModalWithContent() {
-  // Get the content RIGHT NOW while modal is visible
+  console.log('🖨️ Print button clicked');
+  
+  // Get the modal element
   const modalElement = document.getElementById('customModal');
   
-  if (!modalElement) {
-    alert('Modal not found');
+  if (!modalElement || !modalElement.classList.contains('show')) {
+    alert('No content to print. Please open a report first.');
     return;
   }
   
-  const titleElement = modalElement.querySelector('.modal-title');
-  const contentElement = modalElement.querySelector('div[style*="max-height"]') || 
-                         modalElement.querySelector('.modal-body') ||
-                         modalElement.querySelector('div > div > div:nth-child(2)');
+  // Get title
+  const titleElement = document.getElementById('modalTitle');
+  const title = titleElement ? titleElement.textContent.trim() : 'SolarSanchay Report';
+  
+  // Get content - modalMessage is the container in your custom modal
+  const contentElement = document.getElementById('modalMessage');
   
   if (!contentElement) {
-    alert('Content not found. Modal structure: ' + modalElement.innerHTML.substring(0, 200));
+    alert('Content not found');
+    console.error('modalMessage element not found');
     return;
   }
   
-  const title = titleElement ? titleElement.textContent : 'Solar Analysis Report';
   const content = contentElement.innerHTML;
   
-  console.log('Got title:', title);
-  console.log('Got content length:', content.length);
+  console.log('📄 Title:', title);
+  console.log('📊 Content length:', content.length);
   
-  // Now print with this content
-  printContent(title, content);
+  if (!content || content.trim() === '') {
+    alert('No content to print');
+    return;
+  }
+  
+  // Detect if this is a multi-bill summary
+  const isMultiBill = content.includes('Multi-Bill Summary') || 
+                      content.includes('PERIOD SUMMARY') ||
+                      content.includes('Selected Bills:');
+  
+  console.log(`📋 Type: ${isMultiBill ? 'Multi-Bill Summary' : 'Single Bill'}`);
+  
+  // Print with appropriate styling
+  if (isMultiBill) {
+    printMultiBillContent(title, content);
+  } else {
+    printSingleBillContent(title, content);
+  }
+}
+
+// ==========================================
+// SINGLE BILL PRINT - FIXED AUTO-PRINT
+// ==========================================
+function printSingleBillContent(title, content) {
+  const timestamp = new Date().toLocaleString('en-IN', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+  
+  const printWindow = window.open('', '_blank', 'width=800,height=600');
+  
+  if (!printWindow) {
+    alert('Please allow pop-ups to print');
+    return;
+  }
+  
+  const htmlContent = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>${title}</title>
+  <style>
+    @page { size: A4; margin: 1.5cm; }
+    
+    body { 
+      font-family: 'Segoe UI', Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background: white;
+    }
+    
+    .print-header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 3px solid #1e40af;
+    }
+    
+    .print-header h1 {
+      color: #1e40af;
+      margin: 0 0 10px 0;
+      font-size: 28px;
+      font-weight: 800;
+    }
+    
+    .print-header .subtitle {
+      color: #64748b;
+      font-size: 14px;
+      margin: 5px 0;
+    }
+    
+    h2, h3, h4, h5, h6 {
+      color: #1e40af;
+      margin-top: 20px;
+      margin-bottom: 10px;
+      page-break-after: avoid;
+    }
+    
+    [style*="color"],
+    [style*="background"] {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    
+    .print-footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 2px solid #e5e7eb;
+      text-align: center;
+      color: #64748b;
+      font-size: 12px;
+    }
+    
+    @media print {
+      body { margin: 0; padding: 15px; }
+      * { -webkit-print-color-adjust: exact !important; }
+      button, .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="print-header">
+    <h1>☀️ ${title}</h1>
+    <div class="subtitle"><strong>SolarSanchay</strong> - Government of Haryana</div>
+    <div class="subtitle">Generated: ${timestamp}</div>
+  </div>
+  
+  <div class="print-content">
+    ${content}
+  </div>
+  
+  <div class="print-footer">
+    <p><strong>SolarSanchay</strong> - Solar Savings Calculator</p>
+    <p>NIC, Kurukshetra | Government of Haryana</p>
+  </div>
+</body>
+</html>`;
+  
+  printWindow.document.open();
+  printWindow.document.write(htmlContent);
+  printWindow.document.close();
+  
+  // Wait for content to load, then print
+  printWindow.onload = function() {
+    setTimeout(function() {
+      printWindow.print();
+      printWindow.onafterprint = function() {
+        printWindow.close();
+      };
+    }, 500);
+  };
+  
+  console.log('✅ Single bill print window opened');
+}
+
+// ==========================================
+// MULTI-BILL PRINT - FIXED FORMATTING
+// ==========================================
+function printMultiBillContent(title, content) {
+  const timestamp = new Date().toLocaleString('en-IN', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+  
+  const printWindow = window.open('', '_blank', 'width=900,height=700');
+  
+  if (!printWindow) {
+    alert('Please allow pop-ups to print');
+    return;
+  }
+  
+  const htmlContent = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>${title}</title>
+  <style>
+    @page { 
+      size: A4 portrait; 
+      margin: 1cm 1.5cm; 
+    }
+    
+    * {
+      box-sizing: border-box;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    
+    body { 
+      font-family: 'Segoe UI', Arial, sans-serif;
+      line-height: 1.4;
+      color: #1f2937;
+      margin: 0;
+      padding: 10px;
+      background: white;
+      font-size: 10pt;
+    }
+    
+    /* Header */
+    .print-header {
+      text-align: center;
+      margin-bottom: 20px;
+      padding: 15px;
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%) !important;
+      border: 2px solid #1e40af;
+      border-radius: 8px;
+      page-break-inside: avoid;
+    }
+    
+    .print-header h1 {
+      color: #1e40af !important;
+      margin: 0 0 5px 0;
+      font-size: 22px;
+      font-weight: 900;
+    }
+    
+    .print-header .subtitle {
+      color: #475569 !important;
+      font-size: 11px;
+      margin: 3px 0;
+      font-weight: 600;
+    }
+    
+    /* Headings */
+    h2, h3, h4, h5, h6 {
+      color: #1e40af !important;
+      margin: 12px 0 8px 0;
+      page-break-after: avoid;
+      font-weight: 700;
+    }
+    
+    h5 { font-size: 14pt; }
+    h6 { font-size: 12pt; }
+    
+    /* Sections - Force colors */
+    div[style*="background"] {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+      page-break-inside: avoid;
+      margin-bottom: 8px;
+      padding: 8px !important;
+      border-radius: 6px;
+    }
+    
+    /* Specific section backgrounds */
+    div[style*="linear-gradient(135deg, #e0f2fe"] {
+      background: #e0f2fe !important;
+      border: 1px solid #3b82f6 !important;
+    }
+    
+    div[style*="linear-gradient(135deg, #fef3c7"] {
+      background: #fef3c7 !important;
+      border: 1px solid #f59e0b !important;
+    }
+    
+    div[style*="linear-gradient(135deg, #e0e7ff"] {
+      background: #e0e7ff !important;
+      border: 1px solid #6366f1 !important;
+    }
+    
+    div[style*="linear-gradient(135deg, #dcfce7"] {
+      background: #dcfce7 !important;
+      border: 1px solid #10b981 !important;
+    }
+    
+    div[style*="background: #f0fdf4"] {
+      background: #f0fdf4 !important;
+      border: 1px solid #22c55e !important;
+    }
+    
+    div[style*="background: #f8fafc"] {
+      background: #f8fafc !important;
+      border: 1px solid #e2e8f0 !important;
+    }
+    
+    /* Grid layouts */
+    div[style*="display: grid"],
+    div[style*="grid-template-columns"] {
+      display: grid !important;
+      page-break-inside: avoid;
+      gap: 8px;
+    }
+    
+    div[style*="grid-template-columns: 1fr 1fr"] {
+      grid-template-columns: 1fr 1fr !important;
+    }
+    
+    div[style*="grid-template-columns: repeat(3"] {
+      grid-template-columns: 1fr 1fr 1fr !important;
+    }
+    
+    /* Flex layouts */
+    div[style*="display: flex"] {
+      display: flex !important;
+      page-break-inside: avoid;
+    }
+    
+    /* Text sizes */
+    div[style*="font-size: 2.5rem"],
+    div[style*="font-size: 3rem"] {
+      font-size: 20pt !important;
+    }
+    
+    div[style*="font-size: 1.5rem"] {
+      font-size: 14pt !important;
+    }
+    
+    div[style*="font-size: 2rem"] {
+      font-size: 16pt !important;
+    }
+    
+    /* Progress bars */
+    div[style*="height: 8px"] {
+      height: 8px !important;
+      background: #e5e7eb !important;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    /* Progress bar fills */
+    div[style*="background: #16a34a"] {
+      background: #16a34a !important;
+    }
+    
+    div[style*="background: #f59e0b"] {
+      background: #f59e0b !important;
+    }
+    
+    div[style*="background: #ef4444"] {
+      background: #ef4444!important;
+    }
+    
+    /* Bill cards */
+    div[style*="border: 2px solid #e2e8f0"] {
+      border: 2px solid #e2e8f0 !important;
+      padding: 8px !important;
+      margin-bottom: 8px;
+      page-break-inside: avoid;
+    }
+    
+    /* Footer */
+    .print-footer {
+      margin-top: 20px;
+      padding-top: 10px;
+      border-top: 2px solid #e5e7eb;
+      text-align: center;
+      color: #64748b;
+      font-size: 9px;
+      page-break-inside: avoid;
+    }
+    
+    /* Print-specific */
+    @media print {
+      body {
+        margin: 0;
+        padding: 8px;
+      }
+      
+      .page-break {
+        page-break-before: always;
+      }
+      
+      button, 
+      .no-print, 
+      [onclick],
+      a[href] {
+        display: none !important;
+      }
+      
+      /* Force all styled divs to print with colors */
+      div[style] {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      
+      /* Reduce spacing for print */
+      div[style*="padding"] {
+        padding: 6px !important;
+      }
+      
+      div[style*="margin-bottom"] {
+        margin-bottom: 6px !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="print-header">
+    <h1>📊 ${title}</h1>
+    <div class="subtitle"><strong>SolarSanchay</strong> - Government of Haryana</div>
+    <div class="subtitle">Solar Savings Calculator - Multi-Bill Analysis</div>
+    <div class="subtitle" style="margin-top: 5px;">Generated: ${timestamp}</div>
+  </div>
+  
+  <div class="print-content">
+    ${content}
+  </div>
+  
+  <div class="print-footer">
+    <p><strong>SolarSanchay</strong> - Solar Savings Calculator</p>
+    <p>Developed by National Informatics Centre (NIC), Kurukshetra</p>
+    <p>for District Administration, Kurukshetra</p>
+    <p style="margin-top: 5px;">A scalable Digital India initiative for solar transparency</p>
+  </div>
+</body>
+</html>`;
+  
+  printWindow.document.open();
+  printWindow.document.write(htmlContent);
+  printWindow.document.close();
+  
+  // Wait for content and styles to load
+  printWindow.onload = function() {
+    setTimeout(function() {
+      printWindow.print();
+      printWindow.onafterprint = function() {
+        printWindow.close();
+      };
+    }, 750); // Increased delay for better rendering
+  };
+  
+  console.log('✅ Multi-bill print window opened');
 }
 
 function printContent(title, content) {
