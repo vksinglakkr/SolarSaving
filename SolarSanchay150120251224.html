@@ -5008,15 +5008,12 @@ function clearAllSelections() {
 
 // Show multi-bill summary modal
 function showMultiBillSummary() {
-
-  const resultDiv = document.getElementById("result");
-
-  /* ==============================
-     1. GET SELECTED BILLS (CORRECT WAY)
-     ============================== */
-
+  console.log('=== SHOW MULTI-BILL SUMMARY ===');
+console.log('userBills:', userBills);
+console.log('Selected checkboxes:', document.querySelectorAll(".summary-selector:checked").length);
+  
+  // Get selected bills
   const selectedBills = [];
-
   document.querySelectorAll(".summary-selector:checked").forEach(cb => {
     const index = parseInt(cb.value, 10);
     if (!isNaN(index) && userBills[index]) {
@@ -5024,14 +5021,15 @@ function showMultiBillSummary() {
     }
   });
 
+  console.log('Selected bills:', selectedBills.length);
+  console.log('First bill:', selectedBills[0]);
+
   if (selectedBills.length === 0) {
     alert("Please select at least one bill.");
     return;
   }
 
-  /* ==============================
-     2. AGGREGATE CALCULATIONS
-     ============================== */
+  // ✅ FIX: Use correct property names
   let totalDays = 0;
   let totalGross = 0;
   let totalImport = 0;
@@ -5043,84 +5041,94 @@ function showMultiBillSummary() {
   let overallEndDate = null;
 
   selectedBills.forEach(bill => {
-    totalDays += bill.days;
-    totalGross += bill.gross;
-    totalImport += bill.importU;
-    totalExport += bill.exportU;
-    totalPaid += bill.totalBill;
-    totalWithoutSolar += bill.withoutSolar;
+    // ✅ Extract days correctly
+    let days = parseInt(bill['Billing Days'] || bill['Days in Bill Period']) || 0;
+    
+    // Fallback: calculate from dates
+    if (days === 0) {
+      const fromDate = new Date(bill['Bill From Date']);
+      const toDate = new Date(bill['Bill To Date']);
+      if (!isNaN(fromDate) && !isNaN(toDate)) {
+        days = Math.ceil((toDate - fromDate) / (1000 * 60 * 60 * 24)) + 1;
+      }
+    }
+    
+    // Final fallback
+    if (days === 0) days = 30;
+    
+    totalDays += days;
+    
+    // ✅ Use correct property names
+    totalGross += parseFloat(bill['Gross Units'] || 0);
+    totalImport += parseFloat(bill['Import Units'] || 0);
+    totalExport += parseFloat(bill['Export Units'] || 0);
+    totalPaid += parseFloat(bill['Total Bill Amount'] || 0);
+    
+    // ✅ Calculate "Without Solar" correctly
+    let withoutSolar = parseFloat(bill['Bill Without Solar'] || 0);
+    if (withoutSolar === 0) {
+      const saving = parseFloat(bill['Solar Saving Amount'] || 0);
+      const billAmt = parseFloat(bill['Total Bill Amount'] || 0);
+      withoutSolar = billAmt + saving;
+    }
+    totalWithoutSolar += withoutSolar;
 
-    if (!overallStartDate || bill.from < overallStartDate) overallStartDate = bill.from;
-    if (!overallEndDate || bill.to > overallEndDate) overallEndDate = bill.to;
+    // Track date range
+    const fromDate = bill['Bill From Date'];
+    const toDate = bill['Bill To Date'];
+    
+    if (fromDate) {
+      if (!overallStartDate || fromDate < overallStartDate) {
+        overallStartDate = fromDate;
+      }
+    }
+    if (toDate) {
+      if (!overallEndDate || toDate > overallEndDate) {
+        overallEndDate = toDate;
+      }
+    }
   });
 
+  console.log('Total Days:', totalDays);
+  console.log('Total Gross:', totalGross);
+  console.log('Total Import:', totalImport);
+  console.log('Total Export:', totalExport);
+
+  // Calculate summary values
   const netFromGrid = totalImport - totalExport;
   const solarGenerated = totalGross - totalImport + totalExport;
   const totalSavings = totalWithoutSolar - totalPaid;
-  const avgSavingPercent = ((totalSavings / totalWithoutSolar) * 100).toFixed(1);
-  const dailySaving = (totalSavings / totalDays).toFixed(0);
+  const avgSavingPercent = totalWithoutSolar > 0 
+    ? ((totalSavings / totalWithoutSolar) * 100).toFixed(1) 
+    : '0.0';
+  const dailySaving = totalDays > 0 ? (totalSavings / totalDays).toFixed(0) : '0';
 
-  /* ==============================
-     3. MASTER REPORT
-     ============================== */
-  const masterHTML = `
-    <div class="result-box"
-         style="border-left:6px solid #2563eb;background:#f8fafc;">
-      <h5 style="font-weight:800;color:#1e3a8a;">
-        📊 SolarSanchay – Master Performance Report
-      </h5>
+  console.log('Net From Grid:', netFromGrid);
+  console.log('Solar Generated:', solarGenerated);
+  console.log('Total Savings:', totalSavings);
 
-      <p><b>Period:</b> ${overallStartDate} – ${overallEndDate}
-         (${totalDays} days)</p>
-      <p><b>Bills Analysed:</b> ${selectedBills.length}</p>
+  // Format dates for display
+  const formatDate = (dateStr) => {
+    if (!dateStr) return 'N/A';
+    try {
+      return new Date(dateStr).toLocaleDateString('en-IN', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+      });
+    } catch (e) {
+      return 'N/A';
+    }
+  };
 
-      <hr>
-
-      <p>⚡ <b>Total Consumption:</b> ${totalGross} units</p>
-      <p>☀️ <b>Solar Generated:</b> ${solarGenerated} units</p>
-      <p>🔌 <b>Grid Dependency:</b> ${netFromGrid} units</p>
-
-      <hr>
-
-      <p>💰 <b>Paid:</b> ₹${totalPaid.toFixed(0)}</p>
-      <p>❌ <b>Without Solar:</b> ₹${totalWithoutSolar.toFixed(0)}</p>
-
-      <p class="fw-bold text-success">
-        ✅ Net Savings: ₹${totalSavings.toFixed(0)}
-        (${avgSavingPercent}%)
-      </p>
-
-      <p class="text-muted">
-        📅 Average Saving: ₹${dailySaving}/day
-      </p>
-
-      <button class="btn btn-sm btn-outline-secondary"
-              onclick="toggleDetailedReport()">
-        🔍 View Detailed Breakdown
-      </button>
-    </div>
-  `;
-
-  /* ==============================
-     4. DETAILED REPORT
-     ============================== */
-  const detailedHTML = `
-    <div id="detailedReport" class="d-none mt-3">
-      <h6 class="fw-bold">📋 Detailed Bill-wise Breakdown</h6>
-      ${selectedBills.map((b, i) => `
-        <div class="border rounded p-2 mb-2">
-          <b>Bill ${i + 1}:</b> ${b.billNo}<br>
-          Period: ${b.from} – ${b.to} (${b.days} days)<br>
-          Gross: ${b.gross} | Import: ${b.importU} | Export: ${b.exportU}<br>
-          Paid: ₹${b.totalBill} | Without Solar: ₹${b.withoutSolar}
-        </div>
-      `).join("")}
-    </div>
-  `;
-
-  resultDiv.innerHTML = masterHTML + detailedHTML;
+  // ✅ Call the summary calculation function
+  const summary = calculateMultiBillSummary(selectedBills);
+  
+  console.log('Summary calculated:', summary);
+  
+  // ✅ Display the modal
+  displaySummaryModal(summary, selectedBills);
 }
-
 function toggleDetailedReport() {
   document.getElementById("detailedReport")
           .classList.toggle("d-none");
@@ -5142,17 +5150,22 @@ function calculateMultiBillSummary(bills) {
   
   bills.forEach(bill => {
     // === DAYS ===
-    let days = 30;
-    const billFrom = bill['Bill From Date'];
-    const billTo = bill['Bill To Date'];
+    let days = parseInt(bill['Billing Days'] || bill['Days in Bill Period']) || 0;
     
-    if (billFrom && billTo) {
-      const fromDate = new Date(billFrom);
-      const toDate = new Date(billTo);
-      const diffTime = toDate - fromDate;
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      if (diffDays > 0) days = diffDays + 1;
+    if (days === 0) {
+      const billFrom = bill['Bill From Date'];
+      const billTo = bill['Bill To Date'];
+      
+      if (billFrom && billTo) {
+        const fromDate = new Date(billFrom);
+        const toDate = new Date(billTo);
+        const diffTime = toDate - fromDate;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        if (diffDays > 0) days = diffDays + 1;
+      }
     }
+    
+    if (days === 0) days = 30; // Final fallback
     
     summary.totalDays += days;
     
@@ -5170,7 +5183,7 @@ function calculateMultiBillSummary(bills) {
     const savings = parseFloat(bill['Solar Saving Amount'] || 0);
     
     // Calculate "Without Solar"
-    let withoutSolar = parseFloat(bill['Without Solar Amount'] || 0);
+    let withoutSolar = parseFloat(bill['Bill Without Solar'] || 0);
     if (withoutSolar === 0 && savings > 0) {
       withoutSolar = billAmount + savings;
     }
@@ -5210,7 +5223,6 @@ function calculateMultiBillSummary(bills) {
   
   return summary;
 }
-
 // Display summary modal
 function displaySummaryModal(summary, bills) {
   const modalHTML = `
