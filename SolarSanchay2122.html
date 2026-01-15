@@ -5246,6 +5246,9 @@ function calculateMultiBillSummary(bills) {
 // ==========================================
 // OPTIMIZED MULTI-BILL SUMMARY - COMPLETE
 // ==========================================
+// ==========================================
+// OPTIMIZED MULTI-BILL SUMMARY - FIXED
+// ==========================================
 function displaySummaryModal(summary, bills) {
   // Calculate insights
   const solarSelfSufficiency = summary.totalGross > 0 
@@ -5262,9 +5265,9 @@ function displaySummaryModal(summary, bills) {
   
   const actualYearlySaving = Math.round(parseFloat(summary.perDaySaving) * 365);
   
-  // Format date range - CORRECTED: oldest to newest
-  const oldestBill = bills[bills.length - 1];
-  const newestBill = bills[0];
+  // Format date range - oldest to newest
+  const oldestBill = bills[0];
+  const newestBill = bills[bills.length - 1];
   const fromDate = oldestBill['Bill From Date'] 
     ? new Date(oldestBill['Bill From Date']).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
     : 'N/A';
@@ -5412,11 +5415,13 @@ function displaySummaryModal(summary, bills) {
           const days = summary.monthlyBreakdown[idx].days;
           const saving = Math.round(summary.monthlyBreakdown[idx].saving);
           const savingPct = summary.monthlyBreakdown[idx].savingPercent;
-          const importUnits = Math.round(parseFloat(b['Total Import Units'] || 0));
-          const exportUnits = Math.round(parseFloat(b['Total Export Units'] || 0));
-          const grossUnits = Math.round(parseFloat(b['Total Gross Units'] || 0));
-          const fixedCharges = Math.round(parseFloat(b['Fixed Charges'] || 0));
-          const billAmount = Math.round(parseFloat(b['Total Bill Amount'] || 0));
+          
+          // Parse units correctly - remove commas first
+          const importUnits = Math.round(parseFloat(String(b['Total Import Units'] || '0').replace(/,/g, '')));
+          const exportUnits = Math.round(parseFloat(String(b['Total Export Units'] || '0').replace(/,/g, '')));
+          const grossUnits = Math.round(parseFloat(String(b['Total Gross Units'] || '0').replace(/,/g, '')));
+          const fixedCharges = Math.round(parseFloat(String(b['Fixed Charges'] || '0').replace(/,/g, '')));
+          const billAmount = Math.round(parseFloat(String(b['Total Bill Amount'] || '0').replace(/,/g, '')));
           
           return `
           <div style="background: ${idx % 2 === 0 ? '#f8fafc' : 'white'}; padding: 0.6rem; border-radius: 6px; 
