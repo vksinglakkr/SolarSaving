@@ -3150,6 +3150,12 @@ function loadBillForEditing(bill) {
 // Shows bill in calculation result format
 // ==========================================
 
+// ==========================================
+// UPDATED viewSelectedBill() Function
+// Replace lines 1466-1556 in your HTML
+// Shows bill in calculation result format with Print & WhatsApp buttons
+// ==========================================
+
 function viewSelectedBill() {
   if (selectedBillIndex === null) {
     showErrorModal('Please select a bill first');
@@ -3217,7 +3223,7 @@ function viewSelectedBill() {
         <b>Fixed Charges:</b> ₹${f} <br>
         <b>Total Current Cycle Charges:</b> ₹${t} <br>
 
-      <b>Per-Unit Rate:</b> ₹${unitRate ? unitRate.toFixed(2) : "—"}
+        <b>Per-Unit Rate:</b> ₹${unitRate ? unitRate.toFixed(2) : "—"}
         <i class="text-muted">
           = (Total Bill − Fixed Charges) ÷ (Import − Export)
         </i>
@@ -3278,10 +3284,24 @@ function viewSelectedBill() {
   `;
   
   showModal('📄', 'Bill Details - ' + billNum, modalContent, [
-    { text: 'Share on WhatsApp', type: 'success', action: () => shareSelectedBillWhatsApp() },
-    { text: 'Close', type: 'secondary', action: closeModal }
+    { 
+      text: '🖨️ Print', 
+      type: 'primary', 
+      action: () => printModalWithContent() 
+    },
+    { 
+      text: '📱 WhatsApp', 
+      type: 'success', 
+      action: () => shareSelectedBillWhatsApp() 
+    },
+    { 
+      text: '✕ Close', 
+      type: 'secondary', 
+      action: closeModal 
+    }
   ]);
 }
+
 
 // ==========================================
 // NEW FUNCTION: Share selected bill on WhatsApp
