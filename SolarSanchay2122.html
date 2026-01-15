@@ -5244,7 +5244,7 @@ function calculateMultiBillSummary(bills) {
   return summary;
 }
 // ==========================================
-// OPTIMIZED MULTI-BILL SUMMARY - 2-3 PAGES
+// OPTIMIZED MULTI-BILL SUMMARY - COMPLETE
 // ==========================================
 function displaySummaryModal(summary, bills) {
   // Calculate insights
@@ -5252,31 +5252,32 @@ function displaySummaryModal(summary, bills) {
     ? ((summary.selfConsumption / summary.totalGross) * 100).toFixed(0) 
     : 0;
   
-  const gridIndependence = summary.totalGross > 0
-    ? (100 - (summary.totalImport / summary.totalGross * 100)).toFixed(0)
+  const gridDependency = summary.totalGross > 0
+    ? ((summary.totalImport / summary.totalGross * 100)).toFixed(0)
     : 0;
   
   const exportEfficiency = summary.totalSolarGenerated > 0
     ? ((summary.totalExport / summary.totalSolarGenerated) * 100).toFixed(0)
     : 0;
   
-  const avgPerBillCycle = summary.count > 0 
-    ? (summary.totalSavings / summary.count).toFixed(0) 
-    : 0;
+  const actualYearlySaving = Math.round(parseFloat(summary.perDaySaving) * 365);
   
-  const actualYearlySaving = (parseFloat(summary.perDaySaving) * 365).toFixed(0);
+  // Format date range - CORRECTED: oldest to newest
+  const oldestBill = bills[bills.length - 1];
+  const newestBill = bills[0];
+  const fromDate = oldestBill['Bill From Date'] 
+    ? new Date(oldestBill['Bill From Date']).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+    : 'N/A';
+  const toDate = newestBill['Bill To Date']
+    ? new Date(newestBill['Bill To Date']).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+    : 'N/A';
   
-  // Format date range
-  const firstBill = bills[bills.length - 1];
-  const lastBill = bills[0];
-  const fromDate = firstBill['Bill From Date'] 
-    ? new Date(firstBill['Bill From Date']).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
-    : 'N/A';
-  const toDate = lastBill['Bill To Date']
-    ? new Date(lastBill['Bill To Date']).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
-    : 'N/A';
-
-  const totalFixedCharges = bills.reduce((sum, b) => sum + parseFloat(b['Fixed Charges'] || 0), 0);
+  // Calculate recommendation
+  const panelRecommendation = gridDependency > 80 
+    ? `Adding 2-3 more solar panels could reduce grid dependency from ${gridDependency}% to ~60% and save an additional ₹${Math.round(summary.totalSavings * 0.3).toLocaleString()}/year`
+    : gridDependency > 60
+    ? `Your system is performing well. Consider adding 1-2 panels to further reduce grid dependency from ${gridDependency}%`
+    : `Excellent solar performance! Your ${100-gridDependency}% self-sufficiency is optimal.`;
 
   const modalHTML = `
     <div style="font-family: 'Segoe UI', system-ui, sans-serif; max-height: 80vh; overflow-y: auto;">
@@ -5322,23 +5323,23 @@ function displaySummaryModal(summary, bills) {
         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; font-size: 0.85rem;">
           <div style="text-align: center;">
             <div style="color: #64748b; font-size: 0.75rem;">Total Paid</div>
-            <div style="font-weight: 800; color: #16a34a; font-size: 1.1rem;">₹${summary.totalBillAmount.toLocaleString()}</div>
+            <div style="font-weight: 800; color: #16a34a; font-size: 1.1rem;">₹${Math.round(summary.totalBillAmount).toLocaleString()}</div>
           </div>
           <div style="text-align: center;">
             <div style="color: #64748b; font-size: 0.75rem;">Without Solar</div>
-            <div style="font-weight: 800; color: #dc2626; font-size: 1.1rem;">₹${summary.totalWithoutSolar.toLocaleString()}</div>
+            <div style="font-weight: 800; color: #dc2626; font-size: 1.1rem;">₹${Math.round(summary.totalWithoutSolar).toLocaleString()}</div>
           </div>
           <div style="text-align: center;">
             <div style="color: #64748b; font-size: 0.75rem;">Total Savings</div>
-            <div style="font-weight: 800; color: #10b981; font-size: 1.3rem;">₹${summary.totalSavings.toLocaleString()}</div>
+            <div style="font-weight: 800; color: #10b981; font-size: 1.3rem;">₹${Math.round(summary.totalSavings).toLocaleString()}</div>
           </div>
         </div>
         
         <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #86efac;">
           <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; font-size: 0.8rem; text-align: center;">
             <div>
-              <span style="color: #166534;">Daily Saving:</span>
-              <strong style="color: #10b981;"> ₹${summary.perDaySaving}/day</strong>
+              <span style="color: #166534;">Daily:</span>
+              <strong style="color: #10b981;"> ₹${Math.round(parseFloat(summary.perDaySaving))}/day</strong>
             </div>
             <div>
               <span style="color: #166534;">Saving %:</span>
@@ -5346,7 +5347,7 @@ function displaySummaryModal(summary, bills) {
             </div>
             <div>
               <span style="color: #166534;">Yearly:</span>
-              <strong style="color: #8b5cf6;"> ₹${actualYearlySaving}</strong>
+              <strong style="color: #8b5cf6;"> ₹${actualYearlySaving.toLocaleString()}</strong>
             </div>
           </div>
         </div>
@@ -5380,43 +5381,27 @@ function displaySummaryModal(summary, bills) {
 
         <div>
           <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 0.25rem;">
-            <span style="color: #475569;">🔌 Grid Reliance</span>
-            <strong style="color: #ef4444;">${100 - gridIndependence}%</strong>
+            <span style="color: #475569;">🔌 Power from Grid</span>
+            <strong style="color: #ef4444;">${gridDependency}%</strong>
           </div>
           <div style="width: 100%; background: #e2e8f0; height: 6px; border-radius: 3px; overflow: hidden;">
-            <div style="width: ${100 - gridIndependence}%; background: #ef4444; height: 100%;"></div>
+            <div style="width: ${gridDependency}%; background: #ef4444; height: 100%;"></div>
           </div>
         </div>
       </div>
 
-      <!-- KEY INSIGHTS - COMPACT GRID -->
+      <!-- EXPERT RECOMMENDATION -->
       <div style="background: linear-gradient(135deg, #fef3c7 0%, #fef9c3 100%); 
                   border-radius: 10px; padding: 0.75rem; margin-bottom: 1rem; border-left: 4px solid #f59e0b;">
-        <h6 style="margin: 0 0 0.75rem 0; color: #92400e; font-weight: 700; font-size: 0.9rem;">
-          🎯 Key Insights
+        <h6 style="margin: 0 0 0.5rem 0; color: #92400e; font-weight: 700; font-size: 0.9rem;">
+          💡 Expert Recommendation
         </h6>
-        
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.8rem;">
-          <div style="background: white; padding: 0.5rem; border-radius: 6px; display: flex; justify-content: space-between;">
-            <span style="color: #334155;">📅 Avg/Bill</span>
-            <strong style="color: #10b981;">₹${avgPerBillCycle}</strong>
-          </div>
-          <div style="background: white; padding: 0.5rem; border-radius: 6px; display: flex; justify-content: space-between;">
-            <span style="color: #334155;">☀️ Solar Gen</span>
-            <strong style="color: #f59e0b;">${summary.totalSolarGenerated.toLocaleString()}u</strong>
-          </div>
-          <div style="background: white; padding: 0.5rem; border-radius: 6px; display: flex; justify-content: space-between;">
-            <span style="color: #334155;">🌍 CO₂ Saved</span>
-            <strong style="color: #10b981;">${(summary.totalSolarGenerated * 0.7).toFixed(0)}kg</strong>
-          </div>
-          <div style="background: white; padding: 0.5rem; border-radius: 6px; display: flex; justify-content: space-between;">
-            <span style="color: #334155;">🎯 Independence</span>
-            <strong style="color: #3b82f6;">${gridIndependence}%</strong>
-          </div>
-        </div>
+        <p style="margin: 0; color: #78350f; font-size: 0.85rem; line-height: 1.4;">
+          ${panelRecommendation}
+        </p>
       </div>
 
-      <!-- BILL-WISE BREAKDOWN - COMPACT TABLE -->
+      <!-- BILL-WISE BREAKDOWN - ENHANCED -->
       <div style="background: #fff; border-radius: 10px; padding: 0.75rem; margin-bottom: 1rem; border: 1px solid #e2e8f0;">
         <h6 style="color: #334155; font-weight: 700; margin-bottom: 0.75rem; font-size: 0.9rem;">
           📋 Bill-wise Breakdown
@@ -5425,20 +5410,33 @@ function displaySummaryModal(summary, bills) {
         ${bills.map((b, idx) => {
           const billNum = b['Bill Number'];
           const days = summary.monthlyBreakdown[idx].days;
-          const saving = summary.monthlyBreakdown[idx].saving;
+          const saving = Math.round(summary.monthlyBreakdown[idx].saving);
           const savingPct = summary.monthlyBreakdown[idx].savingPercent;
+          const importUnits = Math.round(parseFloat(b['Total Import Units'] || 0));
+          const exportUnits = Math.round(parseFloat(b['Total Export Units'] || 0));
+          const grossUnits = Math.round(parseFloat(b['Total Gross Units'] || 0));
+          const fixedCharges = Math.round(parseFloat(b['Fixed Charges'] || 0));
+          const billAmount = Math.round(parseFloat(b['Total Bill Amount'] || 0));
           
           return `
-          <div style="background: ${idx % 2 === 0 ? '#f8fafc' : 'white'}; padding: 0.5rem; border-radius: 6px; margin-bottom: 0.25rem; 
-                      display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem;">
-            <div style="flex: 1;">
-              <strong style="color: #1e40af;">Bill #${billNum}</strong>
-              <span style="color: #64748b; margin-left: 0.5rem;">(${formatBillPeriod(b)})</span>
+          <div style="background: ${idx % 2 === 0 ? '#f8fafc' : 'white'}; padding: 0.6rem; border-radius: 6px; 
+                      margin-bottom: 0.4rem; border-left: 3px solid #3b82f6;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">
+              <div>
+                <strong style="color: #1e40af; font-size: 0.85rem;">Bill #${billNum}</strong>
+                <span style="color: #64748b; margin-left: 0.5rem; font-size: 0.75rem;">(${formatBillPeriod(b)}, ${days}d)</span>
+              </div>
+              <div style="text-align: right;">
+                <strong style="color: #10b981; font-size: 0.9rem;">₹${saving.toLocaleString()}</strong>
+                <span style="color: #64748b; font-size: 0.75rem; margin-left: 0.3rem;">${savingPct.toFixed(1)}% saved</span>
+              </div>
             </div>
-            <div style="display: flex; gap: 1rem; align-items: center;">
-              <span style="color: #64748b;">${days}d</span>
-              <strong style="color: #10b981;">₹${Math.round(saving).toLocaleString()}</strong>
-              <span style="color: #64748b; font-size: 0.75rem;">${savingPct.toFixed(1)}%</span>
+            <div style="display: flex; gap: 0.8rem; font-size: 0.75rem; color: #475569; flex-wrap: wrap;">
+              <span>${importUnits.toLocaleString()}(I)</span>
+              <span>${exportUnits.toLocaleString()}(E)</span>
+              <span>${grossUnits.toLocaleString()}(G)</span>
+              <span>₹${fixedCharges}(FC)</span>
+              <span style="color: #1e40af; font-weight: 600;">₹${billAmount.toLocaleString()} Paid</span>
             </div>
           </div>
           `;
