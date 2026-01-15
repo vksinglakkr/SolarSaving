@@ -5032,6 +5032,7 @@ function showMultiBillSummary() {
   // Show summary modal
   displaySummaryModal(summary, selectedBills);
 }
+   
 function calculateMultiBillSummary(bills) {
   const summary = {
     count: bills.length,
@@ -5045,66 +5046,55 @@ function calculateMultiBillSummary(bills) {
     monthlyBreakdown: []
   };
   
-bills.forEach(bill => {
-  // === DAYS - CALCULATE FROM BILL DATES ===
-  let days = 30; // Default
-  
-  // Try to get actual days from bill period
-  const billFrom = bill['Bill From Date'];
-  const billTo = bill['Bill To Date'];
-  
-  if (billFrom && billTo) {
-    // Parse dates and calculate actual days
-    const fromDate = new Date(billFrom);
-    const toDate = new Date(billTo);
-    const diffTime = toDate - fromDate;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  bills.forEach(bill => {
+    // === DAYS ===
+    let days = 30;
+    const billFrom = bill['Bill From Date'];
+    const billTo = bill['Bill To Date'];
     
-    if (diffDays > 0) {
-      days = diffDays + 1; // Add 1 to include both start and end dates
+    if (billFrom && billTo) {
+      const fromDate = new Date(billFrom);
+      const toDate = new Date(billTo);
+      const diffTime = toDate - fromDate;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      if (diffDays > 0) days = diffDays + 1;
     }
-  } else if (bill['Days in Bill Period']) {
-    // Fallback to stored days
-    days = parseInt(bill['Days in Bill Period']);
-  }
-  
-  summary.totalDays += days;
-  
-  // === UNITS ===
-  const gross = parseFloat(bill['Gross Units'] || 0);
-  const imp = parseFloat(bill['Import Units'] || 0);
-  const exp = parseFloat(bill['Export Units'] || 0);
-  
-  summary.totalGross += gross;
-  summary.totalImport += imp;
-  summary.totalExport += exp;
-  
-  // === MONEY ===
-  const billAmount = parseFloat(bill['Total Bill Amount'] || 0);
-  const savings = parseFloat(bill['Solar Saving Amount'] || 0);
-  
-  // ✅ FIX: Calculate "Without Solar" properly
-  let withoutSolar = parseFloat(bill['Without Solar Amount'] || 0);
-  
-  // If Without Solar is 0 or missing, calculate it
-  if (withoutSolar === 0 && savings > 0) {
-    // Without Solar = Bill Amount + Savings
-    withoutSolar = billAmount + savings;
-  }
-  
-  summary.totalBillAmount += billAmount;
-  summary.totalWithoutSolar += withoutSolar;
-  summary.totalSavings += savings;
-  
-  // === BREAKDOWN ===
-  summary.monthlyBreakdown.push({
-    billNumber: bill['Bill Number'],
-    days: days,  // Store calculated days
-    saving: savings,
-    withoutSolar: withoutSolar,  // Store calculated without solar
-    savingPercent: parseFloat(bill['Saving Percentage'] || 0)
+    
+    summary.totalDays += days;
+    
+    // === UNITS ===
+    const gross = parseFloat(bill['Gross Units'] || 0);
+    const imp = parseFloat(bill['Import Units'] || 0);
+    const exp = parseFloat(bill['Export Units'] || 0);
+    
+    summary.totalGross += gross;
+    summary.totalImport += imp;
+    summary.totalExport += exp;
+    
+    // === MONEY ===
+    const billAmount = parseFloat(bill['Total Bill Amount'] || 0);
+    const savings = parseFloat(bill['Solar Saving Amount'] || 0);
+    
+    // Calculate "Without Solar"
+    let withoutSolar = parseFloat(bill['Without Solar Amount'] || 0);
+    if (withoutSolar === 0 && savings > 0) {
+      withoutSolar = billAmount + savings;
+    }
+    
+    summary.totalBillAmount += billAmount;
+    summary.totalWithoutSolar += withoutSolar;
+    summary.totalSavings += savings;
+    
+    // === BREAKDOWN ===
+    summary.monthlyBreakdown.push({
+      billNumber: bill['Bill Number'],
+      days: days,
+      saving: savings,
+      withoutSolar: withoutSolar,
+      savingPercent: parseFloat(bill['Saving Percentage'] || 0)
+    });
   });
-});  
+  
   // === CALCULATED VALUES ===
   summary.netFromGrid = summary.totalImport - summary.totalExport;
   summary.totalSolarGenerated = summary.totalGross - summary.totalImport + summary.totalExport;
@@ -5113,7 +5103,6 @@ bills.forEach(bill => {
   // === AVERAGES ===
   summary.avgDaysPerBill = (summary.totalDays / bills.length).toFixed(1);
   
-  // Safe division to avoid Infinity
   if (summary.totalWithoutSolar > 0) {
     summary.avgSavingPercent = (summary.totalSavings / summary.totalWithoutSolar * 100).toFixed(1);
   } else {
@@ -5233,11 +5222,81 @@ function displaySummaryModal(summary, bills) {
           (Gross ${summary.totalGross} - Import ${summary.totalImport})
         </div>
       </div>
-      
+
+      <!-- Add after Units Summary section -->
+<div style="background: #f0fdf4; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; border-left: 4px solid #22c55e;">
+  <h6 style="color: #14532d; font-weight: 700; margin-bottom: 0.75rem;">⚡ GRID SUPPLY ANALYSIS</h6>
+  
+  <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
+    <span style="color: #166534; font-weight: 600;">Net Grid Supply:</span>
+    <span style="font-weight: 700; color: #14532d;">${summary.netFromGrid.toLocaleString()} units</span>
+  </div>
+  <div style="padding-left: 1rem; font-size: 0.8rem; color: #166534; padding: 0.2rem 0;">
+    Import: ${summary.totalImport.toLocaleString()} - Export: ${summary.totalExport.toLocaleString()}
+  </div>
+  
+  <!-- Bill-wise breakdown -->
+  ${bills.map((b, idx) => {
+    const imp = parseFloat(b['Import Units'] || 0);
+    const exp = parseFloat(b['Export Units'] || 0);
+    const net = imp - exp;
+    return `
+    <div style="padding-left: 1.5rem; font-size: 0.75rem; color: #065f46; padding: 0.15rem 0;">
+      Bill ${idx + 1}: ${net > 0 ? '+' : ''}${net.toFixed(0)} units 
+      (${imp} - ${exp})
+    </div>`;
+  }).join('')}
+</div>
       <!-- Financial Summary -->
       <div style="background: linear-gradient(135deg, #dcfce7, #bbf7d0); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid #10b981;">
         <h6 style="color: #14532d; font-weight: 700; margin-bottom: 0.75rem;">💰 FINANCIAL SUMMARY</h6>
-        
+      <!-- Add before Financial Summary -->
+<div style="background: #fff; border: 2px solid #e2e8f0; border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem;">
+  <h6 style="color: #1e3a8a; font-weight: 700; margin-bottom: 1rem; text-align: center;">
+    💰 Comparison (Cumulative Bills)
+  </h6>
+  
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; text-align: center;">
+    <!-- Without Solar -->
+    <div style="border-right: 2px solid #e2e8f0;">
+      <h6 style="color: #ef4444; margin-bottom: 0.5rem;">❌ Without Solar</h6>
+      <div style="font-size: 2rem; font-weight: 700; color: #dc2626;">
+        ₹${summary.totalWithoutSolar.toLocaleString()}
+      </div>
+      <div style="font-size: 0.75rem; color: #64748b; margin-top: 0.25rem;">
+        (${summary.totalGross} × ₹${(summary.totalWithoutSolar/summary.totalGross).toFixed(2)})
+      </div>
+      <div style="margin-top: 0.75rem; padding: 0.5rem; background: #fee2e2; border-radius: 6px;">
+        <b>Per Day:</b> ₹${summary.perDayWithoutSolar}/day
+      </div>
+    </div>
+    
+    <!-- With Solar -->
+    <div>
+      <h6 style="color: #10b981; margin-bottom: 0.5rem;">☀️ With Solar</h6>
+      <div style="font-size: 2rem; font-weight: 700; color: #059669;">
+        ₹${summary.totalBillAmount.toLocaleString()}
+      </div>
+      <div style="font-size: 0.75rem; color: #64748b; margin-top: 0.25rem;">
+        (Actual bills paid)
+      </div>
+      <div style="margin-top: 0.75rem; padding: 0.5rem; background: #dcfce7; border-radius: 6px;">
+        <b>Per Day:</b> ₹${summary.perDayWithSolar}/day
+      </div>
+    </div>
+  </div>
+  
+  <!-- Savings Highlight -->
+  <div style="margin-top: 1.5rem; padding: 1rem; background: linear-gradient(135deg, #10b981, #059669); border-radius: 8px; text-align: center; color: white;">
+    <div style="font-size: 0.9rem; opacity: 0.9;">💰 Total Savings</div>
+    <div style="font-size: 2.5rem; font-weight: 800; margin: 0.5rem 0;">
+      ₹${summary.totalSavings.toLocaleString()}
+    </div>
+    <div style="font-size: 0.85rem; opacity: 0.95;">
+      = (₹${summary.totalWithoutSolar.toLocaleString()} - ₹${summary.totalBillAmount.toLocaleString()})
+    </div>
+  </div>
+</div>  
         <!-- Total Bill Amount -->
         <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
           <span style="color: #166534; font-weight: 600;">Total Current Cycle Charges:</span>
@@ -5310,6 +5369,81 @@ ${bills.map((b, idx) => {
           </div>
         </div>
       </div>   
+      <!-- ✅✅✅ INSERT NEW BILL BREAKDOWN HERE ✅✅✅ -->
+      
+      <div style="background: #f8fafc; border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; border: 1px solid #e2e8f0;">
+        <h6 style="color: #334155; font-weight: 700; margin-bottom: 1rem;">📋 BILL-WISE DETAILED BREAKDOWN</h6>
+        
+        ${bills.map((b, idx) => {
+          const billNum = b['Bill Number'];
+          const days = summary.monthlyBreakdown[idx].days;
+          
+          const gross = parseFloat(b['Gross Units'] || 0);
+          const imp = parseFloat(b['Import Units'] || 0);
+          const exp = parseFloat(b['Export Units'] || 0);
+          const direct = gross - imp;
+          
+          const billAmt = parseFloat(b['Total Bill Amount'] || 0);
+          const withoutSolar = summary.monthlyBreakdown[idx].withoutSolar;
+          const saving = summary.monthlyBreakdown[idx].saving;
+          const savingPct = summary.monthlyBreakdown[idx].savingPercent;
+          
+          return `
+          <div style="background: white; border: 2px solid #e2e8f0; border-radius: 10px; padding: 1rem; margin-bottom: 1rem;">
+            <!-- Header -->
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 2px solid #f1f5f9;">
+              <div>
+                <h6 style="margin: 0; color: #1e40af; font-weight: 700;">${idx + 1}. Bill #${billNum}</h6>
+                <div style="font-size: 0.8rem; color: #64748b; margin-top: 0.25rem;">
+                  ${formatBillPeriod(b)} | ${days} days
+                </div>
+              </div>
+              <div style="text-align: right;">
+                <div style="font-size: 1.5rem; font-weight: 800; color: #10b981;">₹${Math.round(saving).toLocaleString()}</div>
+                <div style="font-size: 0.75rem; color: #64748b;">Saved (${savingPct.toFixed(1)}%)</div>
+              </div>
+            </div>
+            
+            <!-- Units Grid -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem; font-size: 0.85rem;">
+              <div>
+                <div style="color: #64748b;">Gross</div>
+                <div style="font-weight: 700; color: #334155;">${gross} units</div>
+              </div>
+              <div>
+                <div style="color: #64748b;">Import</div>
+                <div style="font-weight: 700; color: #3b82f6;">${imp} units</div>
+              </div>
+              <div>
+                <div style="color: #64748b;">Export</div>
+                <div style="font-weight: 700; color: #f59e0b;">${exp} units</div>
+              </div>
+            </div>
+            
+            <!-- Direct Solar Used -->
+            <div style="background: #fef3c7; padding: 0.5rem; border-radius: 6px; margin-bottom: 1rem; font-size: 0.85rem;">
+              <span style="color: #92400e;">☀️ Direct Solar Used:</span>
+              <span style="font-weight: 700; color: #78350f;">${direct} units</span>
+              <span style="color: #a16207; font-size: 0.75rem;">(Gross - Import)</span>
+            </div>
+            
+            <!-- Financial Comparison -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; font-size: 0.85rem;">
+              <div style="background: #fee2e2; padding: 0.75rem; border-radius: 6px; text-align: center;">
+                <div style="color: #991b1b; font-size: 0.7rem;">Without Solar</div>
+                <div style="font-weight: 700; color: #dc2626; font-size: 1.1rem;">₹${Math.round(withoutSolar)}</div>
+              </div>
+              <div style="background: #dcfce7; padding: 0.75rem; border-radius: 6px; text-align: center;">
+                <div style="color: #14532d; font-size: 0.7rem;">With Solar</div>
+                <div style="font-weight: 700; color: #16a34a; font-size: 1.1rem;">₹${Math.round(billAmt)}</div>
+              </div>
+            </div>
+          </div>
+          `;
+        }).join('')}
+      </div>
+      <!-- ✅✅✅ END OF NEW BILL BREAKDOWN ✅✅✅ -->
+   
     </div>
   `;
   
