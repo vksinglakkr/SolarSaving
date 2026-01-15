@@ -2122,6 +2122,43 @@ div[style*="background: linear-gradient(135deg, #e0f2fe"] {
 </button>
 
 <div id="result" class="mt-4"></div>
+    <!-- MASTER REPORT (DEFAULT VIEW) -->
+<div id="masterReport" class="result-box d-none"
+     style="border-left:6px solid #2563eb;background:#f8fafc;">
+
+  <h5 style="font-weight:800;color:#1e3a8a;">
+    📊 SolarSanchay – Master Performance Report
+  </h5>
+
+  <p><b>Period Covered:</b> <span id="mrPeriod">—</span></p>
+  <p><b>Total Bills:</b> <span id="mrBills">—</span></p>
+
+  <hr>
+
+  <p>⚡ <b>Total Consumption:</b> <span id="mrGross">—</span> units</p>
+  <p>☀️ <b>Solar Generated:</b> <span id="mrSolar">—</span> units</p>
+  <p>🔌 <b>Grid Dependency:</b> <span id="mrGrid">—</span> units</p>
+
+  <hr>
+
+  <p>💰 <b>Total Paid:</b> ₹ <span id="mrPaid">—</span></p>
+  <p>❌ <b>Without Solar:</b> ₹ <span id="mrWithout">—</span></p>
+
+  <p class="fw-bold text-success">
+    ✅ Net Savings: ₹ <span id="mrSaving">—</span>
+    (<span id="mrPercent">—</span>%)
+  </p>
+
+  <p class="text-muted">
+    📅 Average Saving: ₹ <span id="mrDaily">—</span> / day
+  </p>
+
+  <button class="btn btn-outline-secondary btn-sm mt-2"
+          onclick="toggleDetailedReport()">
+    🔍 View Detailed Breakdown
+  </button>
+</div>
+
 <div id="awardSummary" class="result-box d-none"
      style="border-left:6px solid #198754;background:#f0fdf4;">
   
@@ -4638,20 +4675,19 @@ function loadBillsFromStorage() {
 // INITIALIZE DASHBOARD
 // ==========================================
 function initializeDashboard() {
-  // Load bills
-  const bills = loadBillsFromStorage();
-  window.userBills = bills;
-  
-  // Render bills
-  renderBillCards(bills);
-  
-  // Update stats if function exists
-  if (typeof updateDashboardStats === 'function') {
-    updateDashboardStats(bills);
-  }
-  
-  console.log('Dashboard initialized with', bills.length, 'bills');
+
+  if (!Array.isArray(userBills)) return;
+  if (initializeDashboard._running) return;
+
+  initializeDashboard._running = true;
+
+  console.log("Dashboard initialized with", userBills.length, "bills");
+
+  /* ---- existing dashboard rendering code ---- */
+
+  initializeDashboard._running = false;
 }
+
 
 // Call initialize when page loads
 if (document.readyState === 'loading') {
@@ -4972,66 +5008,133 @@ function clearAllSelections() {
 
 // Show multi-bill summary modal
 function showMultiBillSummary() {
-  const checkedBoxes = document.querySelectorAll('.summary-selector:checked');
+  console.log('=== SHOW MULTI-BILL SUMMARY ===');
+console.log('userBills:', userBills);
+console.log('Selected checkboxes:', document.querySelectorAll(".summary-selector:checked").length);
   
-  if (checkedBoxes.length === 0) {
-    alert('कृपया कम से कम एक bill select करें।\nPlease select at least one bill.');
-    return;
-  }
-  
-  // Get all bills - try multiple sources
-  let allBills = window.userBills || [];
-  
-  // Fallback 1: Load from storage
-  if (allBills.length === 0) {
-    try {
-      const stored = localStorage.getItem('solarBills');
-      if (stored) {
-        allBills = JSON.parse(stored);
-        window.userBills = allBills; // Store for future use
-      }
-    } catch (e) {
-      console.error('Error loading bills:', e);
-    }
-  }
-  
-  // Fallback 2: Try getStoredBills function
-  if (allBills.length === 0 && typeof getStoredBills === 'function') {
-    allBills = getStoredBills() || [];
-    window.userBills = allBills;
-  }
-  
-  // Final check
-  if (allBills.length === 0) {
-    alert('कोई bills नहीं मिले। कृपया page refresh करें।\nNo bills found. Please refresh the page.');
-    return;
-  }
-  
-  console.log('Total bills available:', allBills.length);
-  console.log('Bills selected:', checkedBoxes.length);
-  
-  // Get selected bills data
+  // Get selected bills
   const selectedBills = [];
-  checkedBoxes.forEach(cb => {
-    const index = parseInt(cb.value);
-    if (allBills[index]) {
-      selectedBills.push(allBills[index]);
+  document.querySelectorAll(".summary-selector:checked").forEach(cb => {
+    const index = parseInt(cb.value, 10);
+    if (!isNaN(index) && userBills[index]) {
+      selectedBills.push(userBills[index]);
     }
   });
-  
+
+  console.log('Selected bills:', selectedBills.length);
+  console.log('First bill:', selectedBills[0]);
+
   if (selectedBills.length === 0) {
-    alert('Selected bills data not found.');
+    alert("Please select at least one bill.");
     return;
   }
-  
-  console.log('Selected bills:', selectedBills.length);
-  
-  // Calculate aggregate statistics
+
+  // ✅ FIX: Use correct property names
+  let totalDays = 0;
+  let totalGross = 0;
+  let totalImport = 0;
+  let totalExport = 0;
+  let totalPaid = 0;
+  let totalWithoutSolar = 0;
+
+  let overallStartDate = null;
+  let overallEndDate = null;
+
+  selectedBills.forEach(bill => {
+    // ✅ Extract days correctly
+    let days = parseInt(bill['Billing Days'] || bill['Days in Bill Period']) || 0;
+    
+    // Fallback: calculate from dates
+    if (days === 0) {
+      const fromDate = new Date(bill['Bill From Date']);
+      const toDate = new Date(bill['Bill To Date']);
+      if (!isNaN(fromDate) && !isNaN(toDate)) {
+        days = Math.ceil((toDate - fromDate) / (1000 * 60 * 60 * 24)) + 1;
+      }
+    }
+    
+    // Final fallback
+    if (days === 0) days = 30;
+    
+    totalDays += days;
+    
+    // ✅ Use correct property names
+    totalGross += parseFloat(bill['Gross Units'] || 0);
+    totalImport += parseFloat(bill['Import Units'] || 0);
+    totalExport += parseFloat(bill['Export Units'] || 0);
+    totalPaid += parseFloat(bill['Total Bill Amount'] || 0);
+    
+    // ✅ Calculate "Without Solar" correctly
+    let withoutSolar = parseFloat(bill['Bill Without Solar'] || 0);
+    if (withoutSolar === 0) {
+      const saving = parseFloat(bill['Solar Saving Amount'] || 0);
+      const billAmt = parseFloat(bill['Total Bill Amount'] || 0);
+      withoutSolar = billAmt + saving;
+    }
+    totalWithoutSolar += withoutSolar;
+
+    // Track date range
+    const fromDate = bill['Bill From Date'];
+    const toDate = bill['Bill To Date'];
+    
+    if (fromDate) {
+      if (!overallStartDate || fromDate < overallStartDate) {
+        overallStartDate = fromDate;
+      }
+    }
+    if (toDate) {
+      if (!overallEndDate || toDate > overallEndDate) {
+        overallEndDate = toDate;
+      }
+    }
+  });
+
+  console.log('Total Days:', totalDays);
+  console.log('Total Gross:', totalGross);
+  console.log('Total Import:', totalImport);
+  console.log('Total Export:', totalExport);
+
+  // Calculate summary values
+  const netFromGrid = totalImport - totalExport;
+  const solarGenerated = totalGross - totalImport + totalExport;
+  const totalSavings = totalWithoutSolar - totalPaid;
+  const avgSavingPercent = totalWithoutSolar > 0 
+    ? ((totalSavings / totalWithoutSolar) * 100).toFixed(1) 
+    : '0.0';
+  const dailySaving = totalDays > 0 ? (totalSavings / totalDays).toFixed(0) : '0';
+
+  console.log('Net From Grid:', netFromGrid);
+  console.log('Solar Generated:', solarGenerated);
+  console.log('Total Savings:', totalSavings);
+
+  // Format dates for display
+  const formatDate = (dateStr) => {
+    if (!dateStr) return 'N/A';
+    try {
+      return new Date(dateStr).toLocaleDateString('en-IN', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+      });
+    } catch (e) {
+      return 'N/A';
+    }
+  };
+
+  // ✅ Call the summary calculation function
   const summary = calculateMultiBillSummary(selectedBills);
   
-  // Show summary modal
+  console.log('Summary calculated:', summary);
+  
+  // ✅ Display the modal
   displaySummaryModal(summary, selectedBills);
 }
+function toggleDetailedReport() {
+  document.getElementById("detailedReport")
+          .classList.toggle("d-none");
+}
+
+   
 function calculateMultiBillSummary(bills) {
   const summary = {
     count: bills.length,
@@ -5045,66 +5148,60 @@ function calculateMultiBillSummary(bills) {
     monthlyBreakdown: []
   };
   
-bills.forEach(bill => {
-  // === DAYS - CALCULATE FROM BILL DATES ===
-  let days = 30; // Default
-  
-  // Try to get actual days from bill period
-  const billFrom = bill['Bill From Date'];
-  const billTo = bill['Bill To Date'];
-  
-  if (billFrom && billTo) {
-    // Parse dates and calculate actual days
-    const fromDate = new Date(billFrom);
-    const toDate = new Date(billTo);
-    const diffTime = toDate - fromDate;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  bills.forEach(bill => {
+    // === DAYS ===
+    let days = parseInt(bill['Billing Days'] || bill['Days in Bill Period']) || 0;
     
-    if (diffDays > 0) {
-      days = diffDays + 1; // Add 1 to include both start and end dates
+    if (days === 0) {
+      const billFrom = bill['Bill From Date'];
+      const billTo = bill['Bill To Date'];
+      
+      if (billFrom && billTo) {
+        const fromDate = new Date(billFrom);
+        const toDate = new Date(billTo);
+        const diffTime = toDate - fromDate;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        if (diffDays > 0) days = diffDays + 1;
+      }
     }
-  } else if (bill['Days in Bill Period']) {
-    // Fallback to stored days
-    days = parseInt(bill['Days in Bill Period']);
-  }
-  
-  summary.totalDays += days;
-  
-  // === UNITS ===
-  const gross = parseFloat(bill['Gross Units'] || 0);
-  const imp = parseFloat(bill['Import Units'] || 0);
-  const exp = parseFloat(bill['Export Units'] || 0);
-  
-  summary.totalGross += gross;
-  summary.totalImport += imp;
-  summary.totalExport += exp;
-  
-  // === MONEY ===
-  const billAmount = parseFloat(bill['Total Bill Amount'] || 0);
-  const savings = parseFloat(bill['Solar Saving Amount'] || 0);
-  
-  // ✅ FIX: Calculate "Without Solar" properly
-  let withoutSolar = parseFloat(bill['Without Solar Amount'] || 0);
-  
-  // If Without Solar is 0 or missing, calculate it
-  if (withoutSolar === 0 && savings > 0) {
-    // Without Solar = Bill Amount + Savings
-    withoutSolar = billAmount + savings;
-  }
-  
-  summary.totalBillAmount += billAmount;
-  summary.totalWithoutSolar += withoutSolar;
-  summary.totalSavings += savings;
-  
-  // === BREAKDOWN ===
-  summary.monthlyBreakdown.push({
-    billNumber: bill['Bill Number'],
-    days: days,  // Store calculated days
-    saving: savings,
-    withoutSolar: withoutSolar,  // Store calculated without solar
-    savingPercent: parseFloat(bill['Saving Percentage'] || 0)
+    
+    if (days === 0) days = 30; // Final fallback
+    
+    summary.totalDays += days;
+    
+    // === UNITS ===
+    const gross = parseFloat(bill['Gross Units'] || 0);
+    const imp = parseFloat(bill['Import Units'] || 0);
+    const exp = parseFloat(bill['Export Units'] || 0);
+    
+    summary.totalGross += gross;
+    summary.totalImport += imp;
+    summary.totalExport += exp;
+    
+    // === MONEY ===
+    const billAmount = parseFloat(bill['Total Bill Amount'] || 0);
+    const savings = parseFloat(bill['Solar Saving Amount'] || 0);
+    
+    // Calculate "Without Solar"
+    let withoutSolar = parseFloat(bill['Bill Without Solar'] || 0);
+    if (withoutSolar === 0 && savings > 0) {
+      withoutSolar = billAmount + savings;
+    }
+    
+    summary.totalBillAmount += billAmount;
+    summary.totalWithoutSolar += withoutSolar;
+    summary.totalSavings += savings;
+    
+    // === BREAKDOWN ===
+    summary.monthlyBreakdown.push({
+      billNumber: bill['Bill Number'],
+      days: days,
+      saving: savings,
+      withoutSolar: withoutSolar,
+      savingPercent: parseFloat(bill['Saving Percentage'] || 0)
+    });
   });
-});  
+  
   // === CALCULATED VALUES ===
   summary.netFromGrid = summary.totalImport - summary.totalExport;
   summary.totalSolarGenerated = summary.totalGross - summary.totalImport + summary.totalExport;
@@ -5113,7 +5210,6 @@ bills.forEach(bill => {
   // === AVERAGES ===
   summary.avgDaysPerBill = (summary.totalDays / bills.length).toFixed(1);
   
-  // Safe division to avoid Infinity
   if (summary.totalWithoutSolar > 0) {
     summary.avgSavingPercent = (summary.totalSavings / summary.totalWithoutSolar * 100).toFixed(1);
   } else {
@@ -5127,163 +5223,235 @@ bills.forEach(bill => {
   
   return summary;
 }
-
 // Display summary modal
+// Display summary modal - Improved Version
 function displaySummaryModal(summary, bills) {
+  // Calculate additional insights
+  const solarSelfSufficiency = summary.totalGross > 0 
+    ? ((summary.selfConsumption / summary.totalGross) * 100).toFixed(0) 
+    : 0;
+  
+  const gridIndependence = summary.totalGross > 0
+    ? (100 - (summary.totalImport / summary.totalGross * 100)).toFixed(0)
+    : 0;
+  
+  const exportEfficiency = summary.totalSolarGenerated > 0
+    ? ((summary.totalExport / summary.totalSolarGenerated) * 100).toFixed(0)
+    : 0;
+  
+  // Average per billing cycle
+  const avgPerBillCycle = summary.count > 0 
+    ? (summary.totalSavings / summary.count).toFixed(0) 
+    : 0;
+  
+  // Actual yearly projection based on daily rate
+  const actualYearlySaving = (parseFloat(summary.perDaySaving) * 365).toFixed(0);
+  
+  // Format date range
+  const firstBill = bills[bills.length - 1];
+  const lastBill = bills[0];
+  const fromDate = firstBill['Bill From Date'] 
+    ? new Date(firstBill['Bill From Date']).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+    : 'N/A';
+  const toDate = lastBill['Bill To Date']
+    ? new Date(lastBill['Bill To Date']).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+    : 'N/A';
+
+  // Calculate total fixed charges
+  const totalFixedCharges = bills.reduce((sum, b) => sum + parseFloat(b['Fixed Charges'] || 0), 0);
+
   const modalHTML = `
-    <div style="text-align: left; max-height: 70vh; overflow-y: auto; font-family: system-ui; line-height: 1.6;">
+    <div style="font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; max-height: 80vh; overflow-y: auto;">
       
-      <!-- Header -->
-      <h4 style="color: #0b5ed7; margin-bottom: 1.5rem; border-bottom: 2px solid #0b5ed7; padding-bottom: 0.5rem;">
-        📊 Multi-Bill Summary
-      </h4>
-      
-      <!-- Selected Bills List -->
-      <div style="background: linear-gradient(135deg, #e0f2fe, #dbeafe); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; border-left: 4px solid #3b82f6;">
-        <div style="font-weight: 700; color: #1e3a8a; margin-bottom: 0.5rem;">
-          Selected Bills: ${summary.count}
+      <!-- HEADER -->
+      <div style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); 
+                  color: white; padding: 1.5rem; border-radius: 16px; text-align: center; 
+                  margin-bottom: 1.5rem; box-shadow: 0 8px 20px rgba(30, 64, 175, 0.3);">
+        <h2 style="margin: 0; font-size: 1.5rem; font-weight: 800; letter-spacing: 0.5px;">
+          📊 Multi-Bill Summary Report
+        </h2>
+        <p style="margin: 0.5rem 0 0 0; font-size: 0.95rem; opacity: 0.95;">
+          ${summary.count} Bills Analyzed | ${fromDate} → ${toDate}
+        </p>
+      </div>
+
+      <!-- SELECTED BILLS LIST -->
+      <div style="background: linear-gradient(135deg, #e0f2fe, #dbeafe); padding: 1rem; border-radius: 12px; 
+                  margin-bottom: 1.5rem; border-left: 4px solid #3b82f6;">
+        <div style="font-weight: 700; color: #1e3a8a; margin-bottom: 0.5rem; font-size: 1rem;">
+          📋 Selected Bills: ${summary.count}
         </div>
         ${bills.map((b, idx) => `
-          <div style="padding: 0.25rem 0; color: #1e40af;">
+          <div style="padding: 0.3rem 0; color: #1e40af; font-size: 0.9rem;">
             ${idx + 1}. Bill #${b['Bill Number'] || b.billNumber} 
-            <span style="color: #64748b; font-size: 0.9rem;">
+            <span style="color: #64748b; font-size: 0.85rem;">
               (${formatBillPeriod(b)})
             </span>
           </div>
         `).join('')}
       </div>
-      
-      <!-- Period Summary -->
-      <div style="background: linear-gradient(135deg, #fef3c7, #fde68a); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid #f59e0b;">
-        <h6 style="color: #92400e; font-weight: 700; margin-bottom: 0.75rem;">📅 PERIOD SUMMARY</h6>
+
+      <!-- PERIOD SUMMARY -->
+      <div style="background: linear-gradient(135deg, #fef3c7, #fde68a); padding: 1rem; border-radius: 12px; 
+                  margin-bottom: 1.5rem; border-left: 4px solid #f59e0b;">
+        <h6 style="color: #92400e; font-weight: 700; margin-bottom: 0.75rem; font-size: 1rem;">
+          📅 PERIOD SUMMARY
+        </h6>
         
-        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
+        <div style="display: flex; justify-content: space-between; padding: 0.3rem 0; font-size: 0.95rem;">
           <span style="color: #78350f; font-weight: 600;">Total Days:</span>
           <span style="font-weight: 700; color: #92400e;">${summary.totalDays} days</span>
         </div>
-        ${bills.map((b, idx) => `
-          <div style="padding-left: 1rem; font-size: 0.85rem; color: #78350f; padding: 0.2rem 0;">
-            ↳ Bill ${idx + 1}: ${summary.monthlyBreakdown[idx].days || 30} days
-          </div>
-        `).join('')}
         
-       </div>
+        <div style="padding-left: 1rem; font-size: 0.85rem; color: #78350f; margin-top: 0.5rem;">
+          ${bills.map((b, idx) => 
+            `Bill ${idx + 1}: ${summary.monthlyBreakdown[idx].days || 30} days`
+          ).join(' + ')}
+        </div>
+      </div>
       
-      <!-- Units Summary -->
-      <div style="background: linear-gradient(135deg, #e0e7ff, #c7d2fe); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid #6366f1;">
-        <h6 style="color: #312e81; font-weight: 700; margin-bottom: 0.75rem;">⚡ UNITS SUMMARY</h6>
+      <!-- UNITS SUMMARY -->
+      <div style="background: linear-gradient(135deg, #e0e7ff, #c7d2fe); padding: 1rem; border-radius: 12px; 
+                  margin-bottom: 1.5rem; border-left: 4px solid #6366f1;">
+        <h6 style="color: #312e81; font-weight: 700; margin-bottom: 0.75rem; font-size: 1rem;">
+          ⚡ UNITS SUMMARY
+        </h6>
         
         <!-- Gross Units -->
-        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
-          <span style="color: #4338ca; font-weight: 600;">Total Gross:</span>
+        <div style="display: flex; justify-content: space-between; padding: 0.3rem 0; font-size: 0.95rem;">
+          <span style="color: #4338ca; font-weight: 600;">Total Gross Consumed:</span>
           <span style="font-weight: 700; color: #312e81;">${summary.totalGross.toLocaleString()} units</span>
         </div>
-        ${bills.map((b, idx) => `
-          <div style="padding-left: 1rem; font-size: 0.85rem; color: #4338ca; padding: 0.2rem 0;">
-            ↳ Bill ${idx + 1}: ${parseFloat(b['Gross Units'] || 0).toLocaleString()} units
-          </div>
-        `).join('')}
+        <div style="padding-left: 1rem; font-size: 0.8rem; color: #6366f1; margin-top: 0.3rem;">
+          ${bills.map(b => parseFloat(b['Gross Units'] || 0).toFixed(0)).join(' + ')}
+        </div>
         
         <!-- Import Units -->
-        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0; margin-top: 0.5rem;">
-          <span style="color: #4338ca; font-weight: 600;">Total Import:</span>
+        <div style="display: flex; justify-content: space-between; padding: 0.3rem 0; margin-top: 0.75rem; font-size: 0.95rem;">
+          <span style="color: #4338ca; font-weight: 600;">Total Import (KWHI):</span>
           <span style="font-weight: 700; color: #312e81;">${summary.totalImport.toLocaleString()} units</span>
         </div>
-        ${bills.map((b, idx) => `
-          <div style="padding-left: 1rem; font-size: 0.85rem; color: #4338ca; padding: 0.2rem 0;">
-            ↳ Bill ${idx + 1}: ${parseFloat(b['Import Units'] || 0).toLocaleString()} units
-          </div>
-        `).join('')}
+        <div style="padding-left: 1rem; font-size: 0.8rem; color: #6366f1; margin-top: 0.3rem;">
+          ${bills.map(b => parseFloat(b['Import Units'] || 0).toFixed(0)).join(' + ')}
+        </div>
         
         <!-- Export Units -->
-        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0; margin-top: 0.5rem;">
-          <span style="color: #4338ca; font-weight: 600;">Total Export:</span>
+        <div style="display: flex; justify-content: space-between; padding: 0.3rem 0; margin-top: 0.75rem; font-size: 0.95rem;">
+          <span style="color: #4338ca; font-weight: 600;">Total Export (KWHE):</span>
           <span style="font-weight: 700; color: #312e81;">${summary.totalExport.toLocaleString()} units</span>
         </div>
-        ${bills.map((b, idx) => `
-          <div style="padding-left: 1rem; font-size: 0.85rem; color: #4338ca; padding: 0.2rem 0;">
-            ↳ Bill ${idx + 1}: ${parseFloat(b['Export Units'] || 0).toLocaleString()} units
-          </div>
-        `).join('')}
+        <div style="padding-left: 1rem; font-size: 0.8rem; color: #6366f1; margin-top: 0.3rem;">
+          ${bills.map(b => parseFloat(b['Export Units'] || 0).toFixed(0)).join(' + ')}
+        </div>
         
         <div style="border-top: 1px solid #a5b4fc; margin: 0.75rem 0;"></div>
         
         <!-- Calculated Values -->
-        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
-          <span style="color: #4338ca;">Net from Grid:</span>
+        <div style="display: flex; justify-content: space-between; padding: 0.3rem 0; font-size: 0.95rem;">
+          <span style="color: #4338ca; font-weight: 600;">Net from Grid:</span>
           <span style="font-weight: 700; color: #312e81;">${summary.netFromGrid.toLocaleString()} units</span>
         </div>
-        <div style="padding-left: 1rem; font-size: 0.8rem; color: #6366f1; padding: 0.2rem 0;">
+        <div style="padding-left: 1rem; font-size: 0.75rem; color: #6366f1; margin-top: 0.2rem;">
           (Import ${summary.totalImport} - Export ${summary.totalExport})
         </div>
         
-        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0; margin-top: 0.3rem;">
-          <span style="color: #4338ca;">Solar Generated:</span>
+        <div style="display: flex; justify-content: space-between; padding: 0.3rem 0; margin-top: 0.5rem; font-size: 0.95rem;">
+          <span style="color: #4338ca; font-weight: 600;">Solar Generated:</span>
           <span style="font-weight: 700; color: #10b981;">${summary.totalSolarGenerated.toLocaleString()} units</span>
         </div>
-        <div style="padding-left: 1rem; font-size: 0.8rem; color: #6366f1; padding: 0.2rem 0;">
+        <div style="padding-left: 1rem; font-size: 0.75rem; color: #6366f1; margin-top: 0.2rem;">
           (Gross ${summary.totalGross} - Import ${summary.totalImport} + Export ${summary.totalExport})
         </div>
         
-        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0; margin-top: 0.3rem;">
-          <span style="color: #4338ca;">Self Consumed:</span>
+        <div style="display: flex; justify-content: space-between; padding: 0.3rem 0; margin-top: 0.5rem; font-size: 0.95rem;">
+          <span style="color: #4338ca; font-weight: 600;">Self Consumed Solar:</span>
           <span style="font-weight: 700; color: #312e81;">${summary.selfConsumption.toLocaleString()} units</span>
         </div>
-        <div style="padding-left: 1rem; font-size: 0.8rem; color: #6366f1; padding: 0.2rem 0;">
+        <div style="padding-left: 1rem; font-size: 0.75rem; color: #6366f1; margin-top: 0.2rem;">
           (Gross ${summary.totalGross} - Import ${summary.totalImport})
         </div>
       </div>
-      
-      <!-- Financial Summary -->
-      <div style="background: linear-gradient(135deg, #dcfce7, #bbf7d0); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid #10b981;">
-        <h6 style="color: #14532d; font-weight: 700; margin-bottom: 0.75rem;">💰 FINANCIAL SUMMARY</h6>
+
+      <!-- GRID SUPPLY ANALYSIS -->
+      <div style="background: #f0fdf4; border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem; 
+                  border-left: 4px solid #22c55e;">
+        <h6 style="color: #14532d; font-weight: 700; margin-bottom: 0.75rem; font-size: 1rem;">
+          ⚡ GRID SUPPLY ANALYSIS
+        </h6>
+        
+        <div style="display: flex; justify-content: space-between; padding: 0.3rem 0; font-size: 0.95rem;">
+          <span style="color: #166534; font-weight: 600;">Net Grid Supply:</span>
+          <span style="font-weight: 700; color: #14532d;">${summary.netFromGrid.toLocaleString()} units</span>
+        </div>
+        <div style="padding-left: 1rem; font-size: 0.8rem; color: #166534; margin-top: 0.3rem;">
+          Import: ${summary.totalImport.toLocaleString()} - Export: ${summary.totalExport.toLocaleString()}
+        </div>
+        
+        <!-- Bill-wise Net Supply -->
+        <div style="padding-left: 1.5rem; font-size: 0.75rem; color: #065f46; margin-top: 0.5rem;">
+          ${bills.map((b, idx) => {
+            const imp = parseFloat(b['Import Units'] || 0);
+            const exp = parseFloat(b['Export Units'] || 0);
+            const net = imp - exp;
+            return `Bill ${idx + 1}: ${net > 0 ? '+' : ''}${net.toFixed(0)} units (${imp} - ${exp})`;
+          }).join(' | ')}
+        </div>
+      </div>
+
+      <!-- FINANCIAL SUMMARY -->
+      <div style="background: linear-gradient(135deg, #dcfce7, #bbf7d0); padding: 1rem; border-radius: 12px; 
+                  margin-bottom: 1.5rem; border-left: 4px solid #10b981;">
+        <h6 style="color: #14532d; font-weight: 700; margin-bottom: 0.75rem; font-size: 1rem;">
+          💰 FINANCIAL SUMMARY
+        </h6>
         
         <!-- Total Bill Amount -->
-        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
+        <div style="display: flex; justify-content: space-between; padding: 0.3rem 0; font-size: 0.95rem;">
           <span style="color: #166534; font-weight: 600;">Total Current Cycle Charges:</span>
           <span style="font-weight: 700; color: #14532d;">₹${summary.totalBillAmount.toLocaleString()}</span>
         </div>
-        ${bills.map((b, idx) => `
-          <div style="padding-left: 1rem; font-size: 0.85rem; color: #166534; padding: 0.2rem 0;">
-            ↳ Bill ${idx + 1}: ₹${parseFloat(b['Total Bill Amount'] || 0).toLocaleString()}
-          </div> 
-        `).join('')}
+        <div style="padding-left: 1rem; font-size: 0.8rem; color: #166534; margin-top: 0.3rem;">
+          ${bills.map(b => '₹' + parseFloat(b['Total Bill Amount'] || 0).toFixed(0)).join(' + ')}
+        </div>
+        
+        <!-- Fixed Charges -->
+        <div style="display: flex; justify-content: space-between; padding: 0.3rem 0; margin-top: 0.5rem; font-size: 0.95rem;">
+          <span style="color: #166534; font-weight: 600;">Total Fixed Charges:</span>
+          <span style="font-weight: 700; color: #14532d;">₹${totalFixedCharges.toLocaleString()}</span>
+        </div>
+        <div style="padding-left: 1rem; font-size: 0.8rem; color: #166534; margin-top: 0.3rem;">
+          ${bills.map(b => '₹' + parseFloat(b['Fixed Charges'] || 0).toFixed(0)).join(' + ')}
+        </div>
         
         <!-- Without Solar -->
-        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0; margin-top: 0.5rem;">
-          <span style="color: #166534; font-weight: 600;">Without Solar:</span>
+        <div style="display: flex; justify-content: space-between; padding: 0.3rem 0; margin-top: 0.75rem; font-size: 0.95rem;">
+          <span style="color: #166534; font-weight: 600;">Total Without Solar:</span>
           <span style="font-weight: 700; color: #14532d;">₹${summary.totalWithoutSolar.toLocaleString()}</span>
         </div>
-${bills.map((b, idx) => {
-  // Get without solar from breakdown (calculated in forEach)
-  const withoutSolar = summary.monthlyBreakdown[idx]?.withoutSolar || 0;
-  return `
-  <div style="padding-left: 1rem; font-size: 0.85rem; color: #166534; padding: 0.2rem 0;">
-    ↳ Bill ${idx + 1}: ₹${withoutSolar.toLocaleString()}
-  </div>
-`}).join('')}        
+        <div style="padding-left: 1rem; font-size: 0.8rem; color: #166534; margin-top: 0.3rem;">
+          ${bills.map((b, idx) => '₹' + (summary.monthlyBreakdown[idx]?.withoutSolar || 0).toFixed(0)).join(' + ')}
+        </div>
+        
         <div style="border-top: 2px solid #10b981; margin: 0.75rem 0;"></div>
         
         <!-- Total Savings -->
-        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0;">
+        <div style="display: flex; justify-content: space-between; padding: 0.3rem 0; font-size: 0.95rem;">
           <span style="color: #166534; font-weight: 700; font-size: 1rem;">Total Savings:</span>
           <span style="font-weight: 700; color: #10b981; font-size: 1.2rem;">₹${summary.totalSavings.toLocaleString()}</span>
         </div>
-        ${bills.map((b, idx) => `
-          <div style="padding-left: 1rem; font-size: 0.85rem; color: #166534; padding: 0.2rem 0;">
-            ↳ Bill ${idx + 1}: ₹${parseFloat(b['Solar Saving Amount'] || 0).toLocaleString()}
-          </div>
-        `).join('')}
+        <div style="padding-left: 1rem; font-size: 0.8rem; color: #166534; margin-top: 0.3rem;">
+          ${bills.map(b => '₹' + parseFloat(b['Solar Saving Amount'] || 0).toFixed(0)).join(' + ')}
+        </div>
         
-        <div style="display: flex; justify-content: space-between; padding: 0.2rem 0; margin-top: 0.3rem;">
-          <span style="color: #166534;">Avg Saving %:</span>
+        <div style="display: flex; justify-content: space-between; padding: 0.3rem 0; margin-top: 0.5rem; font-size: 0.95rem;">
+          <span style="color: #166534;">Avg Saving Percentage:</span>
           <span style="font-weight: 700; color: #10b981; font-size: 1rem;">${summary.avgSavingPercent}%</span>
         </div>
         
         <!-- Per Day Breakdown -->
         <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #86efac;">
           <div style="font-weight: 700; color: #14532d; margin-bottom: 0.5rem; font-size: 0.95rem;">
-            Per Day Average:
+            Daily Average Breakdown:
           </div>
           <div style="display: flex; justify-content: space-between; padding: 0.3rem 0;">
             <span style="color: #166534; font-size: 0.9rem;">• With Solar:</span>
@@ -5309,33 +5477,293 @@ ${bills.map((b, idx) => {
             (₹${summary.totalSavings.toLocaleString()} ÷ ${summary.totalDays} days)
           </div>
         </div>
-      </div>   
+      </div>
+
+      <!-- COMPARISON SECTION -->
+      <div style="background: #fff; border: 2px solid #e2e8f0; border-radius: 16px; padding: 1.5rem; 
+                  margin-bottom: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+        <h5 style="margin: 0 0 1.5rem 0; color: #10b981; font-weight: 800; text-align: center; font-size: 1.2rem;">
+          💰 Comparison (Cumulative Bills)
+        </h5>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; text-align: center;">
+          
+          <!-- Without Solar -->
+          <div style="border-right: 2px solid #e2e8f0;">
+            <h6 style="color: #ef4444; margin: 0 0 0.5rem 0; font-size: 1rem;">❌ Without Solar</h6>
+            <div style="font-size: 2.5rem; font-weight: 900; color: #dc2626;">
+              ₹${summary.totalWithoutSolar.toLocaleString()}
+            </div>
+            <div style="font-size: 0.8rem; color: #64748b; margin-top: 0.25rem;">
+              (${summary.totalGross} × ₹${(summary.totalWithoutSolar / summary.totalGross).toFixed(2)})
+            </div>
+            <div style="margin-top: 0.75rem; padding: 0.5rem; background: #fee2e2; border-radius: 8px;">
+              <strong style="font-size: 0.9rem;">Per Day:</strong>
+              <span style="font-weight: 700; margin-left: 0.5rem;">₹${summary.perDayWithoutSolar}/day</span>
+            </div>
+          </div>
+          
+          <!-- With Solar -->
+          <div>
+            <h6 style="color: #10b981; margin: 0 0 0.5rem 0; font-size: 1rem;">☀️ With Solar</h6>
+            <div style="font-size: 2.5rem; font-weight: 900; color: #059669;">
+              ₹${summary.totalBillAmount.toLocaleString()}
+            </div>
+            <div style="font-size: 0.8rem; color: #64748b; margin-top: 0.25rem;">
+              (Actual bills paid)
+            </div>
+            <div style="margin-top: 0.75rem; padding: 0.5rem; background: #dcfce7; border-radius: 8px;">
+              <strong style="font-size: 0.9rem;">Per Day:</strong>
+              <span style="font-weight: 700; margin-left: 0.5rem;">₹${summary.perDayWithSolar}/day</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Total Savings -->
+        <div style="margin-top: 1.5rem; padding: 1.25rem; background: linear-gradient(135deg, #10b981, #059669); 
+                    border-radius: 12px; text-align: center; color: white;">
+          <div style="font-size: 0.95rem; opacity: 0.95; margin-bottom: 0.5rem;">💰 Total Savings</div>
+          <div style="font-size: 3rem; font-weight: 900; margin-bottom: 0.5rem;">
+            ₹${summary.totalSavings.toLocaleString()}
+          </div>
+          <div style="font-size: 0.9rem; opacity: 0.95;">
+            = (₹${summary.totalWithoutSolar.toLocaleString()} − ₹${summary.totalBillAmount.toLocaleString()})
+          </div>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; 
+                      padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.3);">
+            <div>
+              <div style="font-size: 0.85rem; opacity: 0.9;">Saving Per Day</div>
+              <div style="font-size: 1.5rem; font-weight: 800;">₹${summary.perDaySaving}</div>
+              <div style="font-size: 0.75rem; opacity: 0.85;">(Total ÷ ${summary.totalDays} days)</div>
+            </div>
+            <div>
+              <div style="font-size: 0.85rem; opacity: 0.9;">Saving Percentage</div>
+              <div style="font-size: 1.5rem; font-weight: 800;">${summary.avgSavingPercent}%</div>
+              <div style="font-size: 0.75rem; opacity: 0.85;">Avg reduction</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ENERGY FLOW ANALYSIS -->
+      <div style="background: #fff; border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; 
+                  box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
+        <h6 style="margin: 0 0 1.5rem 0; color: #1e3a8a; font-weight: 800; font-size: 1.1rem; text-align: center;">
+          📊 Energy Flow Analysis
+        </h6>
+        
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; text-align: center;">
+          
+          <!-- Self Consumption -->
+          <div>
+            <div style="position: relative; width: 100px; height: 100px; margin: 0 auto;">
+              <svg width="100" height="100" style="transform: rotate(-90deg);">
+                <circle cx="50" cy="50" r="42" fill="none" stroke="#e5e7eb" stroke-width="10"/>
+                <circle cx="50" cy="50" r="42" fill="none" stroke="#10b981" stroke-width="10"
+                        stroke-dasharray="${(solarSelfSufficiency * 264) / 100} 264"
+                        stroke-linecap="round"/>
+              </svg>
+              <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+                          font-size: 1.5rem; font-weight: 900; color: #10b981;">
+                ${solarSelfSufficiency}%
+              </div>
+            </div>
+            <div style="margin-top: 0.75rem; font-weight: 700; color: #334155; font-size: 0.95rem;">🏠 Self Use</div>
+            <div style="font-size: 0.8rem; color: #64748b;">Direct consumption</div>
+          </div>
+
+          <!-- Export -->
+          <div>
+            <div style="position: relative; width: 100px; height: 100px; margin: 0 auto;">
+              <svg width="100" height="100" style="transform: rotate(-90deg);">
+                <circle cx="50" cy="50" r="42" fill="none" stroke="#e5e7eb" stroke-width="10"/>
+                <circle cx="50" cy="50" r="42" fill="none" stroke="#f59e0b" stroke-width="10"
+                        stroke-dasharray="${(exportEfficiency * 264) / 100} 264"
+                        stroke-linecap="round"/>
+              </svg>
+              <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+                          font-size: 1.5rem; font-weight: 900; color: #f59e0b;">
+                ${exportEfficiency}%
+              </div>
+            </div>
+            <div style="margin-top: 0.75rem; font-weight: 700; color: #334155; font-size: 0.95rem;">📤 Exported</div>
+            <div style="font-size: 0.8rem; color: #64748b;">Sent to grid</div>
+          </div>
+
+          <!-- Grid Reliance -->
+          <div>
+            <div style="position: relative; width: 100px; height: 100px; margin: 0 auto;">
+              <svg width="100" height="100" style="transform: rotate(-90deg);">
+                <circle cx="50" cy="50" r="42" fill="none" stroke="#e5e7eb" stroke-width="10"/>
+                <circle cx="50" cy="50" r="42" fill="none" stroke="#ef4444" stroke-width="10"
+                        stroke-dasharray="${((100 - gridIndependence) * 264) / 100} 264"
+                        stroke-linecap="round"/>
+              </svg>
+              <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+                          font-size: 1.5rem; font-weight: 900; color: #ef4444;">
+                ${100 - gridIndependence}%
+              </div>
+            </div>
+            <div style="margin-top: 0.75rem; font-weight: 700; color: #334155; font-size: 0.95rem;">🔌 Grid Use</div>
+            <div style="font-size: 0.8rem; color: #64748b;">From utility</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KEY INSIGHTS -->
+      <div style="background: linear-gradient(135deg, #fef3c7 0%, #fef9c3 100%); 
+                  border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; border-left: 5px solid #f59e0b;">
+        <h6 style="margin: 0 0 1rem 0; color: #92400e; font-weight: 800; font-size: 1.1rem;">
+          🎯 Key Insights
+        </h6>
+        
+        <div style="display: grid; gap: 0.75rem; font-size: 0.95rem;">
+          
+          <div style="display: flex; justify-content: space-between; align-items: center; 
+                      background: white; padding: 0.75rem 1rem; border-radius: 10px;">
+            <span style="color: #334155;">📅 Average per Bill Cycle</span>
+            <strong style="color: #10b981; font-size: 1.1rem;">₹${avgPerBillCycle}</strong>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; 
+                      background: white; padding: 0.75rem 1rem; border-radius: 10px;">
+            <span style="color: #334155;">📈 Projected Annual Saving</span>
+            <strong style="color: #8b5cf6; font-size: 1.1rem;">₹${actualYearlySaving}</strong>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; 
+                      background: white; padding: 0.75rem 1rem; border-radius: 10px;">
+            <span style="color: #334155;">🌍 CO₂ Avoided</span>
+            <strong style="color: #10b981; font-size: 1.1rem;">${(summary.totalSolarGenerated * 0.7).toFixed(0)} kg</strong>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; 
+                      background: white; padding: 0.75rem 1rem; border-radius: 10px;">
+            <span style="color: #334155;">⚡ Solar Generated</span>
+            <strong style="color: #f59e0b; font-size: 1.1rem;">${summary.totalSolarGenerated.toLocaleString()} units</strong>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; 
+                      background: white; padding: 0.75rem 1rem; border-radius: 10px;">
+            <span style="color: #334155;">🎯 Grid Independence</span>
+            <strong style="color: #3b82f6; font-size: 1.1rem;">${gridIndependence}%</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- BILL-WISE DETAILED BREAKDOWN -->
+      <div style="background: #f8fafc; border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; border: 1px solid #e2e8f0;">
+        <h6 style="color: #334155; font-weight: 700; margin-bottom: 1rem; font-size: 1rem;">
+          📋 BILL-WISE DETAILED BREAKDOWN
+        </h6>
+        
+        ${bills.map((b, idx) => {
+          const billNum = b['Bill Number'];
+          const days = summary.monthlyBreakdown[idx].days;
+          
+          const gross = parseFloat(b['Gross Units'] || 0);
+          const imp = parseFloat(b['Import Units'] || 0);
+          const exp = parseFloat(b['Export Units'] || 0);
+          const direct = gross - imp;
+          
+          const billAmt = parseFloat(b['Total Bill Amount'] || 0);
+          const fixedCharges = parseFloat(b['Fixed Charges'] || 0);
+          const withoutSolar = summary.monthlyBreakdown[idx].withoutSolar;
+          const saving = summary.monthlyBreakdown[idx].saving;
+          const savingPct = summary.monthlyBreakdown[idx].savingPercent;
+          
+          return `
+          <div style="background: white; border: 2px solid #e2e8f0; border-radius: 10px; padding: 1rem; margin-bottom: 1rem;">
+            <!-- Header -->
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 2px solid #f1f5f9;">
+              <div>
+                <h6 style="margin: 0; color: #1e40af; font-weight: 700;">${idx + 1}. Bill #${billNum}</h6>
+                <div style="font-size: 0.8rem; color: #64748b; margin-top: 0.25rem;">
+                  ${formatBillPeriod(b)} | ${days} days
+                </div>
+              </div>
+              <div style="text-align: right;">
+                <div style="font-size: 1.5rem; font-weight: 800; color: #10b981;">₹${Math.round(saving).toLocaleString()}</div>
+                <div style="font-size: 0.75rem; color: #64748b;">Saved (${savingPct.toFixed(1)}%)</div>
+              </div>
+            </div>
+            
+            <!-- Units Grid -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem; font-size: 0.85rem;">
+              <div>
+                <div style="color: #64748b;">Gross</div>
+                <div style="font-weight: 700; color: #334155;">${gross} units</div>
+              </div>
+              <div>
+                <div style="color: #64748b;">Import</div>
+                <div style="font-weight: 700; color: #3b82f6;">${imp} units</div>
+              </div>
+              <div>
+                <div style="color: #64748b;">Export</div>
+                <div style="font-weight: 700; color: #f59e0b;">${exp} units</div>
+              </div>
+            </div>
+            
+            <!-- Direct Solar Used -->
+            <div style="background: #fef3c7; padding: 0.5rem; border-radius: 6px; margin-bottom: 1rem; font-size: 0.85rem;">
+              <span style="color: #92400e;">☀️ Direct Solar Used:</span>
+              <span style="font-weight: 700; color: #78350f;">${direct} units</span>
+              <span style="color: #a16207; font-size: 0.75rem;">(Gross - Import)</span>
+            </div>
+            
+            <!-- Financial Comparison -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; font-size: 0.85rem; margin-bottom: 0.75rem;">
+              <div style="background: #fee2e2; padding: 0.75rem; border-radius: 6px; text-align: center;">
+                <div style="color: #991b1b; font-size: 0.7rem;">Without Solar</div>
+                <div style="font-weight: 700; color: #dc2626; font-size: 1.1rem;">₹${Math.round(withoutSolar)}</div>
+              </div>
+              <div style="background: #dcfce7; padding: 0.75rem; border-radius: 6px; text-align: center;">
+                <div style="color: #14532d; font-size: 0.7rem;">With Solar</div>
+                <div style="font-weight: 700; color: #16a34a; font-size: 1.1rem;">₹${Math.round(billAmt)}</div>
+              </div>
+            </div>
+            
+            <!-- Fixed Charges -->
+            <div style="background: #fef9c3; padding: 0.5rem; border-radius: 6px; font-size: 0.8rem; text-align: center;">
+              <span style="color: #854d0e;">Fixed Charges:</span>
+              <span style="font-weight: 700; color: #713f12;">₹${fixedCharges.toFixed(2)}</span>
+            </div>
+          </div>
+          `;
+        }).join('')}
+      </div>
+
     </div>
   `;
-  
-showModal(
-  '📊',
-  'Multi-Bill Summary',
-  modalHTML,
-  [
-       { 
+
+  showModal(
+    '📊',
+    'Multi-Bill Summary Report',
+    modalHTML,
+    [
+      { 
         text: '🖨️ Print', 
         type: 'primary', 
         action: () => printModalWithContent()
       },
-    { 
-      text: '📱 WhatsApp', 
-      type: 'success', 
-      action: () => shareMultiBillViaWhatsApp(summary, bills) 
-    },
-    { text: '🔍 Analysis', type: 'info', action: () => { closeModal(); generateSolarAnalysis(); } },
-    { 
-      text: '✕ Close', 
-      type: 'secondary', 
-      action: closeModal 
-    }
-  ]
-);
+      { 
+        text: '📱 WhatsApp', 
+        type: 'success', 
+        action: () => shareMultiBillViaWhatsApp(summary, bills) 
+      },
+      { 
+        text: '📊 Analysis', 
+        type: 'info', 
+        action: () => { closeModal(); generateSolarAnalysis(); } 
+      },
+      { 
+        text: '✕ Close', 
+        type: 'secondary', 
+        action: closeModal 
+      }
+    ]
+  );
 }
 function downloadAsPDF(summary, bills) {
   // Create printable HTML
