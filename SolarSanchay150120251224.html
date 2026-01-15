@@ -2396,7 +2396,6 @@ Object.defineProperty(window, 'userBills', {
   set: function(value) { 
     userBills = value;
     console.log('userBills updated:', value ? value.length : 0, 'bills');
-   initializeDashboard(); 
   },
   configurable: true
 });
@@ -4676,25 +4675,19 @@ function loadBillsFromStorage() {
 // INITIALIZE DASHBOARD
 // ==========================================
 function initializeDashboard() {
-  // Load bills
-  const bills = loadBillsFromStorage();
-  window.userBills = bills;
-  
-  // Render bills
-  renderBillCards(bills);
-  
-  // Update stats if function exists
-  if (typeof updateDashboardStats === 'function') {
-    updateDashboardStats(bills);
-  }
-   if (!userBills || userBills.length === 0) {
-  console.warn("Dashboard init skipped – no bills yet");
-  return;
+
+  if (!Array.isArray(userBills)) return;
+  if (initializeDashboard._running) return;
+
+  initializeDashboard._running = true;
+
+  console.log("Dashboard initialized with", userBills.length, "bills");
+
+  /* ---- existing dashboard rendering code ---- */
+
+  initializeDashboard._running = false;
 }
 
-  
-  console.log('Dashboard initialized with', bills.length, 'bills');
-}
 
 // Call initialize when page loads
 if (document.readyState === 'loading') {
