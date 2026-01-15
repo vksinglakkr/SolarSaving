@@ -5224,6 +5224,7 @@ function calculateMultiBillSummary(bills) {
   return summary;
 }
 // Display summary modal
+// Display summary modal - Improved Version
 function displaySummaryModal(summary, bills) {
   // Calculate additional insights
   const solarSelfSufficiency = summary.totalGross > 0 
@@ -5238,12 +5239,12 @@ function displaySummaryModal(summary, bills) {
     ? ((summary.totalExport / summary.totalSolarGenerated) * 100).toFixed(0)
     : 0;
   
-  // ✅ CORRECTED: Average per billing cycle (not month)
+  // Average per billing cycle
   const avgPerBillCycle = summary.count > 0 
     ? (summary.totalSavings / summary.count).toFixed(0) 
     : 0;
   
-  // ✅ CORRECTED: Actual yearly projection based on daily rate
+  // Actual yearly projection based on daily rate
   const actualYearlySaving = (parseFloat(summary.perDaySaving) * 365).toFixed(0);
   
   // Format date range
@@ -5256,10 +5257,13 @@ function displaySummaryModal(summary, bills) {
     ? new Date(lastBill['Bill To Date']).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
     : 'N/A';
 
+  // Calculate total fixed charges
+  const totalFixedCharges = bills.reduce((sum, b) => sum + parseFloat(b['Fixed Charges'] || 0), 0);
+
   const modalHTML = `
     <div style="font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; max-height: 80vh; overflow-y: auto;">
       
-      <!-- 📊 HEADER - Compact & Professional -->
+      <!-- HEADER -->
       <div style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); 
                   color: white; padding: 1.5rem; border-radius: 16px; text-align: center; 
                   margin-bottom: 1.5rem; box-shadow: 0 8px 20px rgba(30, 64, 175, 0.3);">
@@ -5271,94 +5275,211 @@ function displaySummaryModal(summary, bills) {
         </p>
       </div>
 
-      <!-- 💰 INPUT SUMMARY (Like Single Bill) -->
-      <div style="background: #f8fafc; border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; 
-                  border-left: 5px solid #3b82f6; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-        <h6 style="margin: 0 0 1rem 0; color: #1e3a8a; font-weight: 800; font-size: 1.1rem;">
-          📥 Input Summary
+      <!-- SELECTED BILLS LIST -->
+      <div style="background: linear-gradient(135deg, #e0f2fe, #dbeafe); padding: 1rem; border-radius: 12px; 
+                  margin-bottom: 1.5rem; border-left: 4px solid #3b82f6;">
+        <div style="font-weight: 700; color: #1e3a8a; margin-bottom: 0.5rem; font-size: 1rem;">
+          📋 Selected Bills: ${summary.count}
+        </div>
+        ${bills.map((b, idx) => `
+          <div style="padding: 0.3rem 0; color: #1e40af; font-size: 0.9rem;">
+            ${idx + 1}. Bill #${b['Bill Number'] || b.billNumber} 
+            <span style="color: #64748b; font-size: 0.85rem;">
+              (${formatBillPeriod(b)})
+            </span>
+          </div>
+        `).join('')}
+      </div>
+
+      <!-- PERIOD SUMMARY -->
+      <div style="background: linear-gradient(135deg, #fef3c7, #fde68a); padding: 1rem; border-radius: 12px; 
+                  margin-bottom: 1.5rem; border-left: 4px solid #f59e0b;">
+        <h6 style="color: #92400e; font-weight: 700; margin-bottom: 0.75rem; font-size: 1rem;">
+          📅 PERIOD SUMMARY
         </h6>
         
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; font-size: 0.95rem;">
-          <div>
-            <span style="color: #64748b;">Bill Period:</span>
-            <strong style="color: #1e3a8a; display: block;">${fromDate} to ${toDate}</strong>
-          </div>
-          <div>
-            <span style="color: #64748b;">Total Days:</span>
-            <strong style="color: #1e3a8a; display: block;">${summary.totalDays} days</strong>
-          </div>
+        <div style="display: flex; justify-content: space-between; padding: 0.3rem 0; font-size: 0.95rem;">
+          <span style="color: #78350f; font-weight: 600;">Total Days:</span>
+          <span style="font-weight: 700; color: #92400e;">${summary.totalDays} days</span>
         </div>
-
-        <hr style="margin: 1rem 0; border: none; border-top: 1px solid #e2e8f0;">
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; font-size: 0.95rem;">
-          <div>
-            <span style="color: #64748b;">Total Consumed Units:</span>
-            <strong style="color: #1e3a8a; display: block;">${summary.totalGross.toLocaleString()}</strong>
-          </div>
-          <div>
-            <span style="color: #64748b;">Import Units (KWHI):</span>
-            <strong style="color: #3b82f6; display: block;">${summary.totalImport.toLocaleString()}</strong>
-          </div>
-          <div>
-            <span style="color: #64748b;">Export Units (KWHE):</span>
-            <strong style="color: #f59e0b; display: block;">${summary.totalExport.toLocaleString()}</strong>
-          </div>
+        
+        <div style="padding-left: 1rem; font-size: 0.85rem; color: #78350f; margin-top: 0.5rem;">
+          ${bills.map((b, idx) => 
+            `Bill ${idx + 1}: ${summary.monthlyBreakdown[idx].days || 30} days`
+          ).join(' + ')}
         </div>
-
-        <div style="background: #fef3c7; padding: 0.75rem; border-radius: 8px; margin-top: 1rem;">
-          <strong style="color: #92400e;">☀️ Direct Solar Used:</strong>
-          <span style="color: #78350f; font-weight: 700; margin-left: 0.5rem;">
-            ${summary.selfConsumption.toLocaleString()} units
-          </span>
-          <span style="color: #a16207; font-size: 0.85rem; margin-left: 0.5rem;">
-            (Gross − Import)
-          </span>
+      </div>
+      
+      <!-- UNITS SUMMARY -->
+      <div style="background: linear-gradient(135deg, #e0e7ff, #c7d2fe); padding: 1rem; border-radius: 12px; 
+                  margin-bottom: 1.5rem; border-left: 4px solid #6366f1;">
+        <h6 style="color: #312e81; font-weight: 700; margin-bottom: 0.75rem; font-size: 1rem;">
+          ⚡ UNITS SUMMARY
+        </h6>
+        
+        <!-- Gross Units -->
+        <div style="display: flex; justify-content: space-between; padding: 0.3rem 0; font-size: 0.95rem;">
+          <span style="color: #4338ca; font-weight: 600;">Total Gross Consumed:</span>
+          <span style="font-weight: 700; color: #312e81;">${summary.totalGross.toLocaleString()} units</span>
         </div>
+        <div style="padding-left: 1rem; font-size: 0.8rem; color: #6366f1; margin-top: 0.3rem;">
+          ${bills.map(b => parseFloat(b['Gross Units'] || 0).toFixed(0)).join(' + ')}
+        </div>
+        
+        <!-- Import Units -->
+        <div style="display: flex; justify-content: space-between; padding: 0.3rem 0; margin-top: 0.75rem; font-size: 0.95rem;">
+          <span style="color: #4338ca; font-weight: 600;">Total Import (KWHI):</span>
+          <span style="font-weight: 700; color: #312e81;">${summary.totalImport.toLocaleString()} units</span>
+        </div>
+        <div style="padding-left: 1rem; font-size: 0.8rem; color: #6366f1; margin-top: 0.3rem;">
+          ${bills.map(b => parseFloat(b['Import Units'] || 0).toFixed(0)).join(' + ')}
+        </div>
+        
+        <!-- Export Units -->
+        <div style="display: flex; justify-content: space-between; padding: 0.3rem 0; margin-top: 0.75rem; font-size: 0.95rem;">
+          <span style="color: #4338ca; font-weight: 600;">Total Export (KWHE):</span>
+          <span style="font-weight: 700; color: #312e81;">${summary.totalExport.toLocaleString()} units</span>
+        </div>
+        <div style="padding-left: 1rem; font-size: 0.8rem; color: #6366f1; margin-top: 0.3rem;">
+          ${bills.map(b => parseFloat(b['Export Units'] || 0).toFixed(0)).join(' + ')}
+        </div>
+        
+        <div style="border-top: 1px solid #a5b4fc; margin: 0.75rem 0;"></div>
+        
+        <!-- Calculated Values -->
+        <div style="display: flex; justify-content: space-between; padding: 0.3rem 0; font-size: 0.95rem;">
+          <span style="color: #4338ca; font-weight: 600;">Net from Grid:</span>
+          <span style="font-weight: 700; color: #312e81;">${summary.netFromGrid.toLocaleString()} units</span>
+        </div>
+        <div style="padding-left: 1rem; font-size: 0.75rem; color: #6366f1; margin-top: 0.2rem;">
+          (Import ${summary.totalImport} - Export ${summary.totalExport})
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; padding: 0.3rem 0; margin-top: 0.5rem; font-size: 0.95rem;">
+          <span style="color: #4338ca; font-weight: 600;">Solar Generated:</span>
+          <span style="font-weight: 700; color: #10b981;">${summary.totalSolarGenerated.toLocaleString()} units</span>
+        </div>
+        <div style="padding-left: 1rem; font-size: 0.75rem; color: #6366f1; margin-top: 0.2rem;">
+          (Gross ${summary.totalGross} - Import ${summary.totalImport} + Export ${summary.totalExport})
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; padding: 0.3rem 0; margin-top: 0.5rem; font-size: 0.95rem;">
+          <span style="color: #4338ca; font-weight: 600;">Self Consumed Solar:</span>
+          <span style="font-weight: 700; color: #312e81;">${summary.selfConsumption.toLocaleString()} units</span>
+        </div>
+        <div style="padding-left: 1rem; font-size: 0.75rem; color: #6366f1; margin-top: 0.2rem;">
+          (Gross ${summary.totalGross} - Import ${summary.totalImport})
+        </div>
+      </div>
 
-        <hr style="margin: 1rem 0; border: none; border-top: 1px solid #e2e8f0;">
+      <!-- GRID SUPPLY ANALYSIS -->
+      <div style="background: #f0fdf4; border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem; 
+                  border-left: 4px solid #22c55e;">
+        <h6 style="color: #14532d; font-weight: 700; margin-bottom: 0.75rem; font-size: 1rem;">
+          ⚡ GRID SUPPLY ANALYSIS
+        </h6>
+        
+        <div style="display: flex; justify-content: space-between; padding: 0.3rem 0; font-size: 0.95rem;">
+          <span style="color: #166534; font-weight: 600;">Net Grid Supply:</span>
+          <span style="font-weight: 700; color: #14532d;">${summary.netFromGrid.toLocaleString()} units</span>
+        </div>
+        <div style="padding-left: 1rem; font-size: 0.8rem; color: #166534; margin-top: 0.3rem;">
+          Import: ${summary.totalImport.toLocaleString()} - Export: ${summary.totalExport.toLocaleString()}
+        </div>
+        
+        <!-- Bill-wise Net Supply -->
+        <div style="padding-left: 1.5rem; font-size: 0.75rem; color: #065f46; margin-top: 0.5rem;">
+          ${bills.map((b, idx) => {
+            const imp = parseFloat(b['Import Units'] || 0);
+            const exp = parseFloat(b['Export Units'] || 0);
+            const net = imp - exp;
+            return `Bill ${idx + 1}: ${net > 0 ? '+' : ''}${net.toFixed(0)} units (${imp} - ${exp})`;
+          }).join(' | ')}
+        </div>
+      </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; font-size: 0.95rem;">
-          <div>
-            <span style="color: #64748b;">Total Current Cycle Charges:</span>
-            <strong style="color: #1e3a8a; display: block;">₹${summary.totalBillAmount.toLocaleString()}</strong>
+      <!-- FINANCIAL SUMMARY -->
+      <div style="background: linear-gradient(135deg, #dcfce7, #bbf7d0); padding: 1rem; border-radius: 12px; 
+                  margin-bottom: 1.5rem; border-left: 4px solid #10b981;">
+        <h6 style="color: #14532d; font-weight: 700; margin-bottom: 0.75rem; font-size: 1rem;">
+          💰 FINANCIAL SUMMARY
+        </h6>
+        
+        <!-- Total Bill Amount -->
+        <div style="display: flex; justify-content: space-between; padding: 0.3rem 0; font-size: 0.95rem;">
+          <span style="color: #166534; font-weight: 600;">Total Current Cycle Charges:</span>
+          <span style="font-weight: 700; color: #14532d;">₹${summary.totalBillAmount.toLocaleString()}</span>
+        </div>
+        <div style="padding-left: 1rem; font-size: 0.8rem; color: #166534; margin-top: 0.3rem;">
+          ${bills.map(b => '₹' + parseFloat(b['Total Bill Amount'] || 0).toFixed(0)).join(' + ')}
+        </div>
+        
+        <!-- Fixed Charges -->
+        <div style="display: flex; justify-content: space-between; padding: 0.3rem 0; margin-top: 0.5rem; font-size: 0.95rem;">
+          <span style="color: #166534; font-weight: 600;">Total Fixed Charges:</span>
+          <span style="font-weight: 700; color: #14532d;">₹${totalFixedCharges.toLocaleString()}</span>
+        </div>
+        <div style="padding-left: 1rem; font-size: 0.8rem; color: #166534; margin-top: 0.3rem;">
+          ${bills.map(b => '₹' + parseFloat(b['Fixed Charges'] || 0).toFixed(0)).join(' + ')}
+        </div>
+        
+        <!-- Without Solar -->
+        <div style="display: flex; justify-content: space-between; padding: 0.3rem 0; margin-top: 0.75rem; font-size: 0.95rem;">
+          <span style="color: #166534; font-weight: 600;">Total Without Solar:</span>
+          <span style="font-weight: 700; color: #14532d;">₹${summary.totalWithoutSolar.toLocaleString()}</span>
+        </div>
+        <div style="padding-left: 1rem; font-size: 0.8rem; color: #166534; margin-top: 0.3rem;">
+          ${bills.map((b, idx) => '₹' + (summary.monthlyBreakdown[idx]?.withoutSolar || 0).toFixed(0)).join(' + ')}
+        </div>
+        
+        <div style="border-top: 2px solid #10b981; margin: 0.75rem 0;"></div>
+        
+        <!-- Total Savings -->
+        <div style="display: flex; justify-content: space-between; padding: 0.3rem 0; font-size: 0.95rem;">
+          <span style="color: #166534; font-weight: 700; font-size: 1rem;">Total Savings:</span>
+          <span style="font-weight: 700; color: #10b981; font-size: 1.2rem;">₹${summary.totalSavings.toLocaleString()}</span>
+        </div>
+        <div style="padding-left: 1rem; font-size: 0.8rem; color: #166534; margin-top: 0.3rem;">
+          ${bills.map(b => '₹' + parseFloat(b['Solar Saving Amount'] || 0).toFixed(0)).join(' + ')}
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; padding: 0.3rem 0; margin-top: 0.5rem; font-size: 0.95rem;">
+          <span style="color: #166534;">Avg Saving Percentage:</span>
+          <span style="font-weight: 700; color: #10b981; font-size: 1rem;">${summary.avgSavingPercent}%</span>
+        </div>
+        
+        <!-- Per Day Breakdown -->
+        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #86efac;">
+          <div style="font-weight: 700; color: #14532d; margin-bottom: 0.5rem; font-size: 0.95rem;">
+            Daily Average Breakdown:
           </div>
-          <div>
-            <span style="color: #64748b;">Per-Unit Rate (Avg):</span>
-            <strong style="color: #1e3a8a; display: block;">
-              ₹${summary.netFromGrid > 0 ? ((summary.totalBillAmount - (summary.totalBillAmount * 0.15)) / summary.netFromGrid).toFixed(2) : 'N/A'}
-            </strong>
+          <div style="display: flex; justify-content: space-between; padding: 0.3rem 0;">
+            <span style="color: #166534; font-size: 0.9rem;">• With Solar:</span>
+            <span style="font-weight: 600; color: #14532d;">₹${summary.perDayWithSolar}/day</span>
+          </div>
+          <div style="padding-left: 1.5rem; font-size: 0.75rem; color: #6b7280;">
+            (₹${summary.totalBillAmount.toLocaleString()} ÷ ${summary.totalDays} days)
+          </div>
+          
+          <div style="display: flex; justify-content: space-between; padding: 0.3rem 0; margin-top: 0.3rem;">
+            <span style="color: #166534; font-size: 0.9rem;">• Without Solar:</span>
+            <span style="font-weight: 600; color: #14532d;">₹${summary.perDayWithoutSolar}/day</span>
+          </div>
+          <div style="padding-left: 1.5rem; font-size: 0.75rem; color: #6b7280;">
+            (₹${summary.totalWithoutSolar.toLocaleString()} ÷ ${summary.totalDays} days)
+          </div>
+          
+          <div style="display: flex; justify-content: space-between; padding: 0.3rem 0; margin-top: 0.3rem;">
+            <span style="color: #166534; font-size: 0.9rem;">• Daily Saving:</span>
+            <span style="font-weight: 700; color: #10b981;">₹${summary.perDaySaving}/day</span>
+          </div>
+          <div style="padding-left: 1.5rem; font-size: 0.75rem; color: #6b7280;">
+            (₹${summary.totalSavings.toLocaleString()} ÷ ${summary.totalDays} days)
           </div>
         </div>
       </div>
 
-      <!-- ⚡ GRID SUPPLY & CARRY FORWARD -->
-      <div style="background: #f0fdf4; border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; 
-                  border-left: 5px solid #22c55e; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-        <h6 style="margin: 0 0 1rem 0; color: #14532d; font-weight: 800; font-size: 1.1rem;">
-          ⚡ Grid Supply Analysis
-        </h6>
-        
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; font-size: 0.95rem; text-align: center;">
-          <div>
-            <div style="color: #64748b; font-size: 0.85rem;">Import from Grid</div>
-            <div style="font-size: 1.8rem; font-weight: 800; color: #3b82f6;">${summary.totalImport.toLocaleString()}</div>
-            <div style="color: #64748b; font-size: 0.8rem;">units</div>
-          </div>
-          <div>
-            <div style="color: #64748b; font-size: 0.85rem;">Export to Grid</div>
-            <div style="font-size: 1.8rem; font-weight: 800; color: #f59e0b;">${summary.totalExport.toLocaleString()}</div>
-            <div style="color: #64748b; font-size: 0.8rem;">units</div>
-          </div>
-          <div>
-            <div style="color: #64748b; font-size: 0.85rem;">Net Grid Supply</div>
-            <div style="font-size: 1.8rem; font-weight: 800; color: #14532d;">${summary.netFromGrid.toLocaleString()}</div>
-            <div style="color: #64748b; font-size: 0.8rem;">units</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 💰 COMPARISON (BILL) -->
+      <!-- COMPARISON SECTION -->
       <div style="background: #fff; border: 2px solid #e2e8f0; border-radius: 16px; padding: 1.5rem; 
                   margin-bottom: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
         <h5 style="margin: 0 0 1.5rem 0; color: #10b981; font-weight: 800; text-align: center; font-size: 1.2rem;">
@@ -5425,7 +5546,7 @@ function displaySummaryModal(summary, bills) {
         </div>
       </div>
 
-      <!-- 📊 ENERGY FLOW ANALYSIS -->
+      <!-- ENERGY FLOW ANALYSIS -->
       <div style="background: #fff; border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; 
                   box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
         <h6 style="margin: 0 0 1.5rem 0; color: #1e3a8a; font-weight: 800; font-size: 1.1rem; text-align: center;">
@@ -5490,7 +5611,7 @@ function displaySummaryModal(summary, bills) {
         </div>
       </div>
 
-      <!-- 🎯 KEY INSIGHTS -->
+      <!-- KEY INSIGHTS -->
       <div style="background: linear-gradient(135deg, #fef3c7 0%, #fef9c3 100%); 
                   border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; border-left: 5px solid #f59e0b;">
         <h6 style="margin: 0 0 1rem 0; color: #92400e; font-weight: 800; font-size: 1.1rem;">
@@ -5531,42 +5652,86 @@ function displaySummaryModal(summary, bills) {
         </div>
       </div>
 
-      <!-- 📋 BILLS INCLUDED -->
-      <div style="background: #fff; border-radius: 16px; padding: 1.5rem; 
-                  box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-        <h6 style="margin: 0 0 1rem 0; color: #1e3a8a; font-weight: 800; font-size: 1.1rem;">
-          📋 Bills Included (${summary.count})
+      <!-- BILL-WISE DETAILED BREAKDOWN -->
+      <div style="background: #f8fafc; border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; border: 1px solid #e2e8f0;">
+        <h6 style="color: #334155; font-weight: 700; margin-bottom: 1rem; font-size: 1rem;">
+          📋 BILL-WISE DETAILED BREAKDOWN
         </h6>
         
-        <div style="max-height: 250px; overflow-y: auto;">
-          ${bills.map((b, idx) => {
-            const billNum = b['Bill Number'];
-            const saving = parseFloat(b['Solar Saving Amount'] || 0);
-            const savingPct = parseFloat(b['Saving Percentage'] || 0);
-            
-            return `
-            <div style="display: flex; align-items: center; gap: 1rem; padding: 0.75rem; 
-                        background: ${idx % 2 === 0 ? '#f8fafc' : '#fff'}; 
-                        border-radius: 8px; margin-bottom: 0.5rem;">
-              <div style="font-size: 1.5rem;">📄</div>
-              <div style="flex: 1;">
-                <div style="font-weight: 700; color: #334155; font-size: 0.95rem;">#${billNum}</div>
-                <div style="font-size: 0.8rem; color: #64748b;">
-                  ${formatBillPeriod(b)}
+        ${bills.map((b, idx) => {
+          const billNum = b['Bill Number'];
+          const days = summary.monthlyBreakdown[idx].days;
+          
+          const gross = parseFloat(b['Gross Units'] || 0);
+          const imp = parseFloat(b['Import Units'] || 0);
+          const exp = parseFloat(b['Export Units'] || 0);
+          const direct = gross - imp;
+          
+          const billAmt = parseFloat(b['Total Bill Amount'] || 0);
+          const fixedCharges = parseFloat(b['Fixed Charges'] || 0);
+          const withoutSolar = summary.monthlyBreakdown[idx].withoutSolar;
+          const saving = summary.monthlyBreakdown[idx].saving;
+          const savingPct = summary.monthlyBreakdown[idx].savingPercent;
+          
+          return `
+          <div style="background: white; border: 2px solid #e2e8f0; border-radius: 10px; padding: 1rem; margin-bottom: 1rem;">
+            <!-- Header -->
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 2px solid #f1f5f9;">
+              <div>
+                <h6 style="margin: 0; color: #1e40af; font-weight: 700;">${idx + 1}. Bill #${billNum}</h6>
+                <div style="font-size: 0.8rem; color: #64748b; margin-top: 0.25rem;">
+                  ${formatBillPeriod(b)} | ${days} days
                 </div>
               </div>
               <div style="text-align: right;">
-                <div style="font-weight: 800; color: #10b981; font-size: 1rem;">
-                  ₹${Math.round(saving).toLocaleString()}
-                </div>
-                <div style="font-size: 0.75rem; color: #64748b;">
-                  ${savingPct.toFixed(1)}%
-                </div>
+                <div style="font-size: 1.5rem; font-weight: 800; color: #10b981;">₹${Math.round(saving).toLocaleString()}</div>
+                <div style="font-size: 0.75rem; color: #64748b;">Saved (${savingPct.toFixed(1)}%)</div>
               </div>
             </div>
-            `;
-          }).join('')}
-        </div>
+            
+            <!-- Units Grid -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem; font-size: 0.85rem;">
+              <div>
+                <div style="color: #64748b;">Gross</div>
+                <div style="font-weight: 700; color: #334155;">${gross} units</div>
+              </div>
+              <div>
+                <div style="color: #64748b;">Import</div>
+                <div style="font-weight: 700; color: #3b82f6;">${imp} units</div>
+              </div>
+              <div>
+                <div style="color: #64748b;">Export</div>
+                <div style="font-weight: 700; color: #f59e0b;">${exp} units</div>
+              </div>
+            </div>
+            
+            <!-- Direct Solar Used -->
+            <div style="background: #fef3c7; padding: 0.5rem; border-radius: 6px; margin-bottom: 1rem; font-size: 0.85rem;">
+              <span style="color: #92400e;">☀️ Direct Solar Used:</span>
+              <span style="font-weight: 700; color: #78350f;">${direct} units</span>
+              <span style="color: #a16207; font-size: 0.75rem;">(Gross - Import)</span>
+            </div>
+            
+            <!-- Financial Comparison -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; font-size: 0.85rem; margin-bottom: 0.75rem;">
+              <div style="background: #fee2e2; padding: 0.75rem; border-radius: 6px; text-align: center;">
+                <div style="color: #991b1b; font-size: 0.7rem;">Without Solar</div>
+                <div style="font-weight: 700; color: #dc2626; font-size: 1.1rem;">₹${Math.round(withoutSolar)}</div>
+              </div>
+              <div style="background: #dcfce7; padding: 0.75rem; border-radius: 6px; text-align: center;">
+                <div style="color: #14532d; font-size: 0.7rem;">With Solar</div>
+                <div style="font-weight: 700; color: #16a34a; font-size: 1.1rem;">₹${Math.round(billAmt)}</div>
+              </div>
+            </div>
+            
+            <!-- Fixed Charges -->
+            <div style="background: #fef9c3; padding: 0.5rem; border-radius: 6px; font-size: 0.8rem; text-align: center;">
+              <span style="color: #854d0e;">Fixed Charges:</span>
+              <span style="font-weight: 700; color: #713f12;">₹${fixedCharges.toFixed(2)}</span>
+            </div>
+          </div>
+          `;
+        }).join('')}
       </div>
 
     </div>
