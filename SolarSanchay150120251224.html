@@ -5013,9 +5013,16 @@ function showMultiBillSummary() {
   const resultDiv = document.getElementById("result");
 
   /* ==============================
-     1. DERIVE SELECTED BILLS (FIX)
+     1. GET SELECTED BILLS FROM UI
      ============================== */
-  const selectedBills = userBills.filter(b => b.selected === true);
+
+  const selectedBills = [];
+
+  document.querySelectorAll(".bill-checkbox:checked").forEach(cb => {
+    const billNo = cb.dataset.billno;
+    const bill = userBills.find(b => b.billNo === billNo);
+    if (bill) selectedBills.push(bill);
+  });
 
   if (selectedBills.length === 0) {
     alert("Please select at least one bill.");
