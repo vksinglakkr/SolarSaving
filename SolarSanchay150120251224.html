@@ -6567,6 +6567,9 @@ function printSingleBillContent(title, content) {
 // MULTI-BILL PRINT - FIXED AUTO-PRINT
 // ==========================================
 
+// ==========================================
+// MULTI-BILL PRINT - FIXED AUTO-PRINT
+// ==========================================
 function printMultiBillContent(title, content) {
   const timestamp = new Date().toLocaleString('en-IN', {
     day: '2-digit',
@@ -6583,8 +6586,7 @@ function printMultiBillContent(title, content) {
     return;
   }
   
-  const htmlContent = `
-<!DOCTYPE html>
+  const htmlContent = `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
@@ -6606,7 +6608,6 @@ function printMultiBillContent(title, content) {
       font-size: 11pt;
     }
     
-    /* Header */
     .print-header {
       text-align: center;
       margin-bottom: 25px;
@@ -6638,7 +6639,6 @@ function printMultiBillContent(title, content) {
       margin-top: 8px;
     }
     
-    /* Headings */
     h2, h3, h4, h5, h6 {
       color: #1e40af;
       margin-top: 18px;
@@ -6649,7 +6649,6 @@ function printMultiBillContent(title, content) {
     
     h6 { font-size: 13pt; }
     
-    /* Preserve all colors and backgrounds */
     [style*="color"],
     [style*="background"],
     [style*="border"] {
@@ -6658,13 +6657,11 @@ function printMultiBillContent(title, content) {
       color-adjust: exact !important;
     }
     
-    /* Grid layouts */
     [style*="grid"],
     [style*="display: flex"] {
       page-break-inside: avoid;
     }
     
-    /* Boxes and cards */
     div[style*="border"],
     div[style*="padding"],
     div[style*="border-radius"] {
@@ -6672,7 +6669,6 @@ function printMultiBillContent(title, content) {
       margin-bottom: 10px;
     }
     
-    /* Lists */
     ul, ol {
       margin: 8px 0;
       padding-left: 20px;
@@ -6683,7 +6679,6 @@ function printMultiBillContent(title, content) {
       page-break-inside: avoid;
     }
     
-    /* Tables */
     table {
       width: 100%;
       border-collapse: collapse;
@@ -6703,7 +6698,6 @@ function printMultiBillContent(title, content) {
       font-weight: 600;
     }
     
-    /* Footer */
     .print-footer {
       margin-top: 30px;
       padding-top: 15px;
@@ -6718,7 +6712,6 @@ function printMultiBillContent(title, content) {
       color: #1e40af;
     }
     
-    /* Print-specific */
     @media print {
       body {
         margin: 0;
@@ -6743,7 +6736,6 @@ function printMultiBillContent(title, content) {
         display: none !important;
       }
       
-      /* Ensure colors print */
       div[style*="background: linear-gradient"],
       div[style*="background: #"] {
         -webkit-print-color-adjust: exact !important;
@@ -6753,7 +6745,6 @@ function printMultiBillContent(title, content) {
   </style>
 </head>
 <body>
-  <!-- Header -->
   <div class="print-header">
     <h1>📊 ${title}</h1>
     <div class="subtitle"><strong>SolarSanchay</strong> - Government of Haryana</div>
@@ -6761,12 +6752,10 @@ function printMultiBillContent(title, content) {
     <div class="timestamp">Generated: ${timestamp}</div>
   </div>
   
-  <!-- Main Content -->
   <div class="print-content">
     ${content}
   </div>
   
-  <!-- Footer -->
   <div class="print-footer">
     <p><strong>SolarSanchay</strong> - Solar Savings Calculator</p>
     <p>Developed by National Informatics Centre (NIC), Kurukshetra</p>
@@ -6778,25 +6767,22 @@ function printMultiBillContent(title, content) {
       🌐 vksinglakkr.github.io/SolarSaving
     </p>
   </div>
-  
-  <script>
-    window.onload = function() {
-      setTimeout(function() {
-        window.print();
-      }, 300);
-    };
-    
-    window.onafterprint = function() {
-      window.close();
-    };
-  </script>
 </body>
-</html>
-  `;
+</html>`;
   
   printWindow.document.open();
   printWindow.document.write(htmlContent);
   printWindow.document.close();
+  
+  // Wait for content to load, then print
+  printWindow.onload = function() {
+    setTimeout(function() {
+      printWindow.print();
+      printWindow.onafterprint = function() {
+        printWindow.close();
+      };
+    }, 500);
+  };
   
   console.log('✅ Multi-bill summary print window opened');
 }
