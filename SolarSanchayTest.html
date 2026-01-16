@@ -2282,36 +2282,25 @@ div[style*="background: linear-gradient(135deg, #e0f2fe"] {
     </div>
 </div>
   <!-- Mode Selection -->
-<!-- Mode Selection - RESPONSIVE LAYOUT -->
-<div class="mb-3 mode-selection-card">
-  
-  <div class="mode-layout-container">
-    
-    <!-- LEFT TEXT -->
-    <div id="modeTextLeft" class="mode-text mode-text-left">
-      <div class="mode-text-title">📊 Single Selection</div>
-      <div class="mode-text-desc">View, Edit, or Delete one bill</div>
+<div class="section-container">
+  <div class="toggle-row">
+    <span id="modeTextLeft" class="mode-label" style="opacity: 1;">
+      Single Consumer
+    </span>
+
+    <div class="form-check form-switch">
+      <input 
+        class="form-check-input" 
+        type="checkbox" 
+        id="modeToggle" 
+        onchange="handleModeToggle()" 
+        style="width: 3rem; height: 1.5rem; cursor: pointer;">
     </div>
-    
-    <!-- TOGGLE -->
-    <div class="mode-toggle-wrapper">
-      <input type="checkbox" id="modeToggle" class="mode-toggle-input" onchange="handleModeToggle()">
-      <label for="modeToggle" class="mode-toggle-label">
-        <span class="mode-toggle-slider">
-          <span class="mode-icon mode-icon-single">📊</span>
-          <span class="mode-icon mode-icon-summary">📈</span>
-        </span>
-      </label>
-    </div>
-    
-    <!-- RIGHT TEXT -->
-    <div id="modeTextRight" class="mode-text mode-text-right">
-      <div class="mode-text-title">📈 Multi-Bill Summary</div>
-      <div class="mode-text-desc">Aggregate statistics</div>
-    </div>
-    
+
+    <span id="modeTextRight" class="mode-label" style="opacity: 0.3;">
+      Summary Report
+    </span>
   </div>
-  
 </div>
 <!-- Mode Info Alert -->
 <div id="modeInfo" class="alert alert-info py-2 mb-3" style="font-size: 0.9rem;">
