@@ -1965,27 +1965,30 @@ div[style*="background: linear-gradient(135deg, #e0f2fe"] {
     </div>
 </div>
   <!-- Mode Selection -->
-<!-- Mode Selection - TOGGLE SWITCH -->
-<!-- Mode Selection - TOGGLE SWITCH (CENTERED) -->
-<div class="mb-3" style="display: flex; flex-direction: column; align-items: center; gap: 1rem; text-align: center;">
+<!-- Mode Selection - TOGGLE SWITCH (CARD STYLE) -->
+<div class="mb-3" style="background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%); 
+                         border: 2px solid #e2e8f0; border-radius: 12px; 
+                         padding: 1.25rem; text-align: center;">
   
   <!-- Toggle Switch Container -->
-  <div class="mode-toggle-wrapper">
-    <input type="checkbox" id="modeToggle" class="mode-toggle-input" onchange="handleModeToggle()">
-    <label for="modeToggle" class="mode-toggle-label">
-      <span class="mode-toggle-slider">
-        <span class="mode-icon mode-icon-single">📊</span>
-        <span class="mode-icon mode-icon-summary">📈</span>
-      </span>
-    </label>
+  <div style="display: flex; justify-content: center; margin-bottom: 1rem;">
+    <div class="mode-toggle-wrapper">
+      <input type="checkbox" id="modeToggle" class="mode-toggle-input" onchange="handleModeToggle()">
+      <label for="modeToggle" class="mode-toggle-label">
+        <span class="mode-toggle-slider">
+          <span class="mode-icon mode-icon-single">📊</span>
+          <span class="mode-icon mode-icon-summary">📈</span>
+        </span>
+      </label>
+    </div>
   </div>
   
   <!-- Mode Labels -->
   <div>
-    <div id="modeLabel" style="font-weight: 700; color: #1e3a8a; font-size: 1rem;">
+    <div id="modeLabel" style="font-weight: 700; color: #1e3a8a; font-size: 1.1rem; margin-bottom: 0.5rem;">
       📊 Single Selection Mode
     </div>
-    <div id="modeDescription" style="font-size: 0.85rem; color: #64748b; margin-top: 0.25rem;">
+    <div id="modeDescription" style="font-size: 0.85rem; color: #64748b;">
       Select one bill to View, Edit, or Delete
     </div>
   </div>
