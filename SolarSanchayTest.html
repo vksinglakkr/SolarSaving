@@ -5239,7 +5239,13 @@ function togglePolicyInfo() {
 let currentSelectionMode = 'single'; // 'single' or 'summary'
 
 // Switch between Single and Summary modes
+// ==========================================
+// SWITCH BETWEEN SINGLE AND SUMMARY MODES
+// ==========================================
 function switchMode(mode) {
+  console.log('=== SWITCHING MODE ===');
+  console.log('New mode:', mode);
+  
   currentSelectionMode = mode;
   
   // ✅ UPDATE TOGGLE SWITCH STATE
@@ -5248,55 +5254,39 @@ function switchMode(mode) {
     toggle.checked = (mode === 'summary');
   }
   
+  // Get action button containers
+  const singleActions = document.getElementById('singleModeActions');
+  const summaryActions = document.getElementById('summaryModeActions');
+  
+  // Get mode info alert
+  const modeInfo = document.getElementById('modeInfo');
+  
   if (mode === 'single') {
-    // Single mode styling
-    document.getElementById('singleModeBtn').classList.add('btn-primary');
-    document.getElementById('singleModeBtn').classList.remove('btn-outline-primary');
-    document.getElementById('summaryModeBtn').classList.remove('btn-primary');
-    document.getElementById('summaryModeBtn').classList.add('btn-outline-primary');
+    console.log('✅ Activating SINGLE mode');
     
-    // SHOW single buttons, HIDE summary buttons
-    const singleActions = document.getElementById('singleModeActions');
-    const summaryActions = document.getElementById('summaryModeActions');
-    
-    if (singleActions) singleActions.style.display = 'flex';
-    if (summaryActions) summaryActions.style.display = 'none';
-    
-    // Show radios, hide checkboxes
-    document.querySelectorAll('.single-selector').forEach(el => el.style.display = 'block');
-    document.querySelectorAll('.summary-selector').forEach(el => {
-      el.style.display = 'none';
-      el.checked = false;
-    });
-    
-    // Update info
-    const modeInfo = document.getElementById('modeInfo');
-    if (modeInfo) {
-      modeInfo.innerHTML = '<strong>Single Selection Mode:</strong> Select one bill to View, Edit, or Delete.';
+    // ✅ SHOW single buttons, HIDE summary buttons
+    if (singleActions) {
+      singleActions.style.display = 'flex';
+      console.log('  - Single actions: SHOWN');
+    }
+    if (summaryActions) {
+      summaryActions.style.display = 'none';
+      console.log('  - Summary actions: HIDDEN');
     }
     
-  } else if (mode === 'summary') {
-    // Summary mode styling
-    document.getElementById('summaryModeBtn').classList.add('btn-primary');
-    document.getElementById('summaryModeBtn').classList.remove('btn-outline-primary');
-    document.getElementById('singleModeBtn').classList.remove('btn-primary');
-    document.getElementById('singleModeBtn').classList.add('btn-outline-primary');
-    
-    // HIDE single buttons, SHOW summary buttons  ← THIS IS KEY!
-    const singleActions = document.getElementById('singleModeActions');
-    const summaryActions = document.getElementById('summaryModeActions');
-    
-    if (singleActions) singleActions.style.display = 'none';   // ← HIDE!
-    if (summaryActions) summaryActions.style.display = 'flex'; // ← SHOW!
-    
-    // Hide radios, show checkboxes
+    // ✅ SHOW radios, HIDE checkboxes
     document.querySelectorAll('.single-selector').forEach(el => {
-      el.style.display = 'none';
-      el.checked = false;
+      el.style.display = 'block';
+      el.checked = false; // Clear previous selection
     });
-    document.querySelectorAll('.summary-selector').forEach(el => el.style.display = 'block');
+    document.querySelectorAll('.summary-selector').forEach(el => {
+      el.style.display = 'none';
+      el.checked = false; // Clear checkboxes
+    });
     
-    // Disable single mode buttons
+    console.log('  - Radios: SHOWN, Checkboxes: HIDDEN');
+    
+    // ✅ DISABLE action buttons (nothing selected yet)
     const viewBtn = document.getElementById('viewBtn');
     const editBtn = document.getElementById('editBtn');
     const deleteBtn = document.getElementById('deleteBtn');
@@ -5305,16 +5295,77 @@ function switchMode(mode) {
     if (editBtn) editBtn.disabled = true;
     if (deleteBtn) deleteBtn.disabled = true;
     
+    console.log('  - Action buttons: DISABLED');
+    
+    // Reset selection
     selectedBillIndex = null;
     
-    // Update info
-    const modeInfo = document.getElementById('modeInfo');
+    // Clear visual selection
+    document.querySelectorAll('.bill-card').forEach(card => {
+      card.classList.remove('selected');
+    });
+    
+    // Update info text
     if (modeInfo) {
-      modeInfo.innerHTML = '<strong>Multi-Bill Summary Mode:</strong> Select multiple bills to see aggregate statistics.';
+      modeInfo.innerHTML = '<strong>Single Selection Mode:</strong> Select one bill to View, Edit, or Delete.';
+      modeInfo.className = 'alert alert-info py-2 mb-3';
     }
     
+  } else if (mode === 'summary') {
+    console.log('✅ Activating SUMMARY mode');
+    
+    // ✅ HIDE single buttons, SHOW summary buttons
+    if (singleActions) {
+      singleActions.style.display = 'none';
+      console.log('  - Single actions: HIDDEN');
+    }
+    if (summaryActions) {
+      summaryActions.style.display = 'flex';
+      console.log('  - Summary actions: SHOWN');
+    }
+    
+    // ✅ HIDE radios, SHOW checkboxes
+    document.querySelectorAll('.single-selector').forEach(el => {
+      el.style.display = 'none';
+      el.checked = false; // Clear radio
+    });
+    document.querySelectorAll('.summary-selector').forEach(el => {
+      el.style.display = 'block';
+      el.checked = false; // Start fresh
+    });
+    
+    console.log('  - Radios: HIDDEN, Checkboxes: SHOWN');
+    
+    // ✅ DISABLE single mode buttons
+    const viewBtn = document.getElementById('viewBtn');
+    const editBtn = document.getElementById('editBtn');
+    const deleteBtn = document.getElementById('deleteBtn');
+    
+    if (viewBtn) viewBtn.disabled = true;
+    if (editBtn) editBtn.disabled = true;
+    if (deleteBtn) deleteBtn.disabled = true;
+    
+    console.log('  - Single action buttons: DISABLED');
+    
+    // Reset selection
+    selectedBillIndex = null;
+    
+    // Clear visual selection
+    document.querySelectorAll('.bill-card').forEach(card => {
+      card.classList.remove('selected');
+    });
+    
+    // Update summary button
     updateSummarySelection();
+    
+    // Update info text
+    if (modeInfo) {
+      modeInfo.innerHTML = '<strong>Multi-Bill Summary Mode:</strong> Select multiple bills to see aggregate statistics.';
+      modeInfo.className = 'alert alert-success py-2 mb-3';
+    }
   }
+  
+  console.log('=== MODE SWITCH COMPLETE ===');
 }
 
 // Update selected count and button state
@@ -7351,6 +7402,8 @@ function handleModeToggle() {
   const toggle = document.getElementById('modeToggle');
   const mode = toggle.checked ? 'summary' : 'single';
   
+  console.log('🔄 Toggle switched to:', mode);
+  
   // Update labels
   const modeLabel = document.getElementById('modeLabel');
   const modeDescription = document.getElementById('modeDescription');
@@ -7363,7 +7416,7 @@ function handleModeToggle() {
     modeDescription.textContent = 'Select multiple bills to see aggregate statistics';
   }
   
-  // Call existing switchMode function
+  // Call switchMode to update UI
   switchMode(mode);
 }
 </script>
