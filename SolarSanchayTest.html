@@ -7726,38 +7726,18 @@ function openVerificationGuide() {
 // ==========================================
 function handleModeToggle() {
   const toggle = document.getElementById('modeToggle');
-  const mode = toggle.checked ? 'summary' : 'single';
-  
-  console.log('🔄 Toggle switched to:', mode);
-  
-  // Get text containers
   const leftText = document.getElementById('modeTextLeft');
   const rightText = document.getElementById('modeTextRight');
   
-  if (mode === 'single') {
-    // Highlight LEFT, fade RIGHT
-    if (leftText) {
-      leftText.style.opacity = '1';
-      leftText.style.transform = 'translateX(0)';
-    }
-    if (rightText) {
-      rightText.style.opacity = '0.3';
-      rightText.style.transform = 'translateX(0)';
-    }
+  if (toggle.checked) {
+    // Summary mode - highlight right
+    leftText.style.opacity = '0.3';
+    rightText.style.opacity = '1';
   } else {
-    // Highlight RIGHT, fade LEFT
-    if (leftText) {
-      leftText.style.opacity = '0.3';
-      leftText.style.transform = 'translateX(0)';
-    }
-    if (rightText) {
-      rightText.style.opacity = '1';
-      rightText.style.transform = 'translateX(0)';
-    }
+    // Single mode - highlight left
+    leftText.style.opacity = '1';
+    rightText.style.opacity = '0.3';
   }
-  
-  // Call switchMode to update UI
-  switchMode(mode);
 }
 </script>
  </div>
