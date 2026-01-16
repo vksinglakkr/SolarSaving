@@ -771,21 +771,28 @@ body {
 #modeTextRight {
   opacity: 0.3; /* Default: Summary mode inactive */
 }
+/* ADD THIS to fix alignment on mobile and desktop */
+.mode-layout-container {
+  display: flex !important;
+  flex-direction: row !important; /* Force side-by-side */
+  align-items: center;
+  justify-content: center; /* Centers them on desktop */
+  gap: 15px; /* Perfect gap, not too far, not too close */
+  width: 100%;
+}
 
-/* Mobile: Stack vertically */
-@media (max-width: 768px) {
-  .mb-3 > div {
-    flex-direction: column;
-    gap: 0.75rem;
+/* Ensure text doesn't wrap on very small screens */
+.mode-text-title {
+  white-space: nowrap; 
+}
+
+/* Optional: Make text slightly smaller on mobile to fit better */
+@media (max-width: 480px) {
+  .mode-text-title {
+    font-size: 0.85rem;
   }
-  
-  #modeTextLeft,
-  #modeTextRight {
-    text-align: center !important;
-  }
-  
-  .mode-toggle-wrapper {
-    order: -1; /* Toggle appears first on mobile */
+  .mode-layout-container {
+    gap: 10px; /* Smaller gap on small phones */
   }
 }
 /* Card container */
@@ -7707,26 +7714,44 @@ function openVerificationGuide() {
   window.open('assests/SolarSanchayDemo.jpg', '_blank');
 }
 
-// ==========================================
-// TOGGLE SWITCH HANDLER
-// ==========================================
-// ==========================================
-// TOGGLE SWITCH HANDLER (WITH SLIDING TEXT)
-// ==========================================
+/* === KEEP THIS ONE === */
+/* ==========================================
+   TOGGLE SWITCH HANDLER (Corrected)
+   ========================================== */
 function handleModeToggle() {
   const toggle = document.getElementById('modeToggle');
+  const mode = toggle.checked ? 'summary' : 'single';
+  
+  console.log('🔄 Toggle switched to:', mode);
+  
+  // Get text containers
   const leftText = document.getElementById('modeTextLeft');
   const rightText = document.getElementById('modeTextRight');
   
-  if (toggle.checked) {
-    // Summary mode - highlight right
-    leftText.style.opacity = '0.3';
-    rightText.style.opacity = '1';
+  if (mode === 'single') {
+    // Highlight LEFT, fade RIGHT
+    if (leftText) {
+      leftText.style.opacity = '1';
+      leftText.style.fontWeight = '700'; // Optional: make bold
+    }
+    if (rightText) {
+      rightText.style.opacity = '0.3';
+      rightText.style.fontWeight = '400';
+    }
   } else {
-    // Single mode - highlight left
-    leftText.style.opacity = '1';
-    rightText.style.opacity = '0.3';
+    // Highlight RIGHT, fade LEFT
+    if (leftText) {
+      leftText.style.opacity = '0.3';
+      leftText.style.fontWeight = '400';
+    }
+    if (rightText) {
+      rightText.style.opacity = '1';
+      rightText.style.fontWeight = '700'; // Optional: make bold
+    }
   }
+  
+  // IMPORTANT: This actually updates the dashboard buttons!
+  switchMode(mode);
 }
 </script>
  </div>
