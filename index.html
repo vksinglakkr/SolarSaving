@@ -78,7 +78,200 @@ body {
     font-size: 0.55em;
   }
 }
+/* ========================================
+   MODE SELECTION CARD
+   ======================================== */
+.mode-selection-card {
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+}
 
+/* ========================================
+   LAYOUT CONTAINER - RESPONSIVE
+   ======================================== */
+.mode-layout-container {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Changed from space-between */
+  gap: 1.5rem; /* Space between all elements */
+}
+
+/* ========================================
+   TEXT CONTAINERS
+   ======================================== */
+.mode-text {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mode-text-left {
+  text-align: right;
+  opacity: 1; /* Active by default */
+}
+
+.mode-text-right {
+  text-align: left;
+  opacity: 0.3; /* Inactive by default */
+}
+
+.mode-text-title {
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+  line-height: 1.2;
+}
+
+.mode-text-left .mode-text-title {
+  color: #1e3a8a;
+}
+
+.mode-text-right .mode-text-title {
+  color: #10b981;
+}
+
+.mode-text-desc {
+  font-size: 0.85rem;
+  color: #64748b;
+  line-height: 1.2;
+}
+
+/* ========================================
+   TOGGLE SWITCH
+   ======================================== */
+.mode-toggle-wrapper {
+  flex-shrink: 0;
+}
+
+.mode-toggle-input {
+  display: none;
+}
+
+.mode-toggle-label {
+  display: block;
+  width: 80px;
+  height: 40px;
+  background: linear-gradient(135deg, #e0e7ff 0%, #eef2ff 100%);
+  border: 2px solid #3b82f6;
+  border-radius: 20px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+}
+
+.mode-toggle-label:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.mode-toggle-slider {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 34px;
+  height: 32px;
+  background: white;
+  border-radius: 16px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.mode-icon {
+  font-size: 1.25rem;
+  position: absolute;
+  transition: all 0.3s ease;
+}
+
+.mode-icon-single {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.mode-icon-summary {
+  opacity: 0;
+  transform: scale(0.5);
+}
+
+/* Checked State (Summary Mode) */
+.mode-toggle-input:checked + .mode-toggle-label {
+  background: linear-gradient(135deg, #dcfce7 0%, #f0fdf4 100%);
+  border-color: #10b981;
+}
+
+.mode-toggle-input:checked + .mode-toggle-label .mode-toggle-slider {
+  transform: translateX(40px);
+}
+
+.mode-toggle-input:checked + .mode-toggle-label .mode-icon-single {
+  opacity: 0;
+  transform: scale(0.5);
+}
+
+.mode-toggle-input:checked + .mode-toggle-label .mode-icon-summary {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ========================================
+   MOBILE RESPONSIVE (≤768px)
+   ======================================== */
+@media (max-width: 768px) {
+  .mode-selection-card {
+    padding: 0.875rem 1rem;
+  }
+  
+  .mode-layout-container {
+    gap: 0.75rem; /* Tighter spacing on mobile */
+  }
+  
+  .mode-text-title {
+    font-size: 0.85rem;
+  }
+  
+  .mode-text-desc {
+    font-size: 0.75rem;
+  }
+  
+  .mode-toggle-label {
+    width: 70px;
+    height: 36px;
+  }
+  
+  .mode-toggle-slider {
+    width: 30px;
+    height: 28px;
+  }
+  
+  .mode-toggle-input:checked + .mode-toggle-label .mode-toggle-slider {
+    transform: translateX(34px);
+  }
+  
+  .mode-icon {
+    font-size: 1.1rem;
+  }
+}
+
+/* ========================================
+   EXTRA SMALL MOBILE (≤480px)
+   ======================================== */
+@media (max-width: 480px) {
+  .mode-layout-container {
+    gap: 0.5rem;
+  }
+  
+  .mode-text-title {
+    font-size: 0.8rem;
+  }
+  
+  .mode-text-desc {
+    font-size: 0.7rem;
+  }
+}
 /* ========================================
    SECTION HEADING
    ======================================== */
@@ -102,7 +295,20 @@ body {
     font-size: 0.95rem !important;
   }
 }
-
+/* Mobile adjustments for toggle */
+@media (max-width: 768px) {
+  .mode-toggle-wrapper {
+    transform: scale(1.1); /* Slightly bigger for easier tapping */
+  }
+  
+  #modeLabel {
+    font-size: 0.95rem !important;
+  }
+  
+  #modeDescription {
+    font-size: 0.8rem !important;
+  }
+}
 /* ========================================
    INTENT CARDS - CONSOLIDATED
    ======================================== */
@@ -546,6 +752,124 @@ body {
   
   .intent-desc {
     font-size: 0.7rem !important;
+  }
+}
+
+/* ========================================
+   DYNAMIC TEXT TRANSITIONS
+   ======================================== */
+
+#modeTextLeft,
+#modeTextRight {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#modeTextLeft {
+  opacity: 1; /* Default: Single mode active */
+}
+
+#modeTextRight {
+  opacity: 0.3; /* Default: Summary mode inactive */
+}
+/* ADD THIS to fix alignment on mobile and desktop */
+.mode-layout-container {
+  display: flex !important;
+  flex-direction: row !important; /* Force side-by-side */
+  align-items: center;
+  justify-content: center; /* Centers them on desktop */
+  gap: 15px; /* Perfect gap, not too far, not too close */
+  width: 100%;
+}
+
+/* Ensure text doesn't wrap on very small screens */
+.mode-text-title {
+  white-space: nowrap; 
+}
+
+/* Optional: Make text slightly smaller on mobile to fit better */
+@media (max-width: 480px) {
+  .mode-text-title {
+    font-size: 0.85rem;
+  }
+  .mode-layout-container {
+    gap: 10px; /* Smaller gap on small phones */
+  }
+}
+/* Card container */
+.mode-selection-card {
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+}
+
+/* Desktop layout */
+.mode-layout-desktop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+/* Text containers */
+.mode-text {
+  flex: 1;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mode-text-left {
+  text-align: left;
+  opacity: 1;
+}
+
+.mode-text-right {
+  text-align: right;
+  opacity: 0.3;
+}
+
+.mode-text-title {
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.mode-text-left .mode-text-title {
+  color: #1e3a8a;
+}
+
+.mode-text-right .mode-text-title {
+  color: #10b981;
+}
+
+.mode-text-desc {
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+/* Mobile: Stack vertically */
+@media (max-width: 768px) {
+  .mode-layout-desktop {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .mode-toggle-wrapper {
+    order: -1; /* Toggle first */
+  }
+  
+  .mode-text {
+    text-align: center !important;
+  }
+  
+  .mode-text-left,
+  .mode-text-right {
+    opacity: 1 !important; /* Show both on mobile */
+  }
+  
+  /* Hide inactive mode on mobile */
+  .mode-text-left.inactive,
+  .mode-text-right.inactive {
+    display: none;
   }
 }
 /* ========================================
@@ -1565,6 +1889,151 @@ div[style*="background: linear-gradient(135deg, #e0f2fe"] {
     flex: none !important;
   }
 }
+/* ========================================
+   TOGGLE SWITCH STYLES
+   ======================================== */
+
+.mode-toggle-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.mode-toggle-input {
+  display: none;
+}
+
+.mode-toggle-label {
+  display: block;
+  width: 80px;
+  height: 40px;
+  background: linear-gradient(135deg, #e0e7ff 0%, #eef2ff 100%);
+  border: 2px solid #3b82f6;
+  border-radius: 20px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+}
+
+.mode-toggle-label:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.mode-toggle-slider {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 34px;
+  height: 32px;
+  background: white;
+  border-radius: 16px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.mode-icon {
+  font-size: 1.25rem;
+  position: absolute;
+  transition: all 0.3s ease;
+}
+
+.mode-icon-single {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.mode-icon-summary {
+  opacity: 0;
+  transform: scale(0.5);
+}
+
+/* Checked State (Summary Mode) */
+.mode-toggle-input:checked + .mode-toggle-label {
+  background: linear-gradient(135deg, #dcfce7 0%, #f0fdf4 100%);
+  border-color: #10b981;
+}
+
+.mode-toggle-input:checked + .mode-toggle-label .mode-toggle-slider {
+  transform: translateX(40px);
+}
+
+.mode-toggle-input:checked + .mode-toggle-label .mode-icon-single {
+  opacity: 0;
+  transform: scale(0.5);
+}
+
+.mode-toggle-input:checked + .mode-toggle-label .mode-icon-summary {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .mode-toggle-label {
+    width: 70px;
+    height: 36px;
+  }
+  
+  .mode-toggle-slider {
+    width: 30px;
+    height: 28px;
+  }
+  
+  .mode-toggle-input:checked + .mode-toggle-label .mode-toggle-slider {
+    transform: translateX(34px);
+  }
+  
+  .mode-icon {
+    font-size: 1.1rem;
+  }
+}
+/* iOS Segmented Control Styling */
+.mode-selector-wrapper {
+  display: flex;
+  justify-content: center; /* Centers it on screen */
+  margin: 25px 0;
+  width: 100%;
+}
+
+.ios-segmented-control {
+  display: flex;
+  background: #e2e8f0; /* Light grey background */
+  padding: 4px;
+  border-radius: 12px;
+  width: fit-content;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.segment-btn {
+  border: none;
+  background: transparent;
+  padding: 10px 24px;
+  border-radius: 9px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+}
+
+.segment-btn.active {
+  background: #ffffff;
+  color: #1e40af; /* Your primary blue */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Ensure side-by-side on mobile */
+@media (max-width: 480px) {
+  .segment-btn {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+  }
+}
 </style>
 </head>
 <body>
@@ -1863,13 +2332,21 @@ div[style*="background: linear-gradient(135deg, #e0f2fe"] {
     </div>
 </div>
   <!-- Mode Selection -->
-<div class="mb-3 d-flex gap-2">
-  <button id="singleModeBtn" class="btn btn-primary" onclick="switchMode('single')">
-    📊 Single Selection
-  </button>
-  <button id="summaryModeBtn" class="btn btn-outline-primary" onclick="switchMode('summary')">
-    📈 Multi-Bill Summary
-  </button>
+<div class="mode-selector-wrapper">
+  <div class="ios-segmented-control" id="modeSelector">
+    <button type="button" 
+            id="singleModeBtn" 
+            class="segment-btn active" 
+            onclick="handleSelection('single')">
+      📊 Single Bill Analysis/Edit/Delete
+    </button>
+    <button type="button" 
+            id="summaryModeBtn" 
+            class="segment-btn" 
+            onclick="handleSelection('summary')">
+      📈 Multi-Bill Summary
+    </button>
+  </div>
 </div>
 <!-- Mode Info Alert -->
 <div id="modeInfo" class="alert alert-info py-2 mb-3" style="font-size: 0.9rem;">
@@ -5120,58 +5597,54 @@ function togglePolicyInfo() {
 let currentSelectionMode = 'single'; // 'single' or 'summary'
 
 // Switch between Single and Summary modes
+// ==========================================
+// SWITCH BETWEEN SINGLE AND SUMMARY MODES
+// ==========================================
 function switchMode(mode) {
+  console.log('=== SWITCHING MODE ===');
+  console.log('New mode:', mode);
+  
   currentSelectionMode = mode;
   
+  // ✅ UPDATE TOGGLE SWITCH STATE
+  const toggle = document.getElementById('modeToggle');
+  if (toggle) {
+    toggle.checked = (mode === 'summary');
+  }
+  
+  // Get action button containers
+  const singleActions = document.getElementById('singleModeActions');
+  const summaryActions = document.getElementById('summaryModeActions');
+  
+  // Get mode info alert
+  const modeInfo = document.getElementById('modeInfo');
+  
   if (mode === 'single') {
-    // Single mode styling
-    document.getElementById('singleModeBtn').classList.add('btn-primary');
-    document.getElementById('singleModeBtn').classList.remove('btn-outline-primary');
-    document.getElementById('summaryModeBtn').classList.remove('btn-primary');
-    document.getElementById('summaryModeBtn').classList.add('btn-outline-primary');
+    console.log('✅ Activating SINGLE mode');
     
-    // SHOW single buttons, HIDE summary buttons
-    const singleActions = document.getElementById('singleModeActions');
-    const summaryActions = document.getElementById('summaryModeActions');
-    
-    if (singleActions) singleActions.style.display = 'flex';
-    if (summaryActions) summaryActions.style.display = 'none';
-    
-    // Show radios, hide checkboxes
-    document.querySelectorAll('.single-selector').forEach(el => el.style.display = 'block');
-    document.querySelectorAll('.summary-selector').forEach(el => {
-      el.style.display = 'none';
-      el.checked = false;
-    });
-    
-    // Update info
-    const modeInfo = document.getElementById('modeInfo');
-    if (modeInfo) {
-      modeInfo.innerHTML = '<strong>Single Selection Mode:</strong> Select one bill to View, Edit, or Delete.';
+    // ✅ SHOW single buttons, HIDE summary buttons
+    if (singleActions) {
+      singleActions.style.display = 'flex';
+      console.log('  - Single actions: SHOWN');
+    }
+    if (summaryActions) {
+      summaryActions.style.display = 'none';
+      console.log('  - Summary actions: HIDDEN');
     }
     
-  } else if (mode === 'summary') {
-    // Summary mode styling
-    document.getElementById('summaryModeBtn').classList.add('btn-primary');
-    document.getElementById('summaryModeBtn').classList.remove('btn-outline-primary');
-    document.getElementById('singleModeBtn').classList.remove('btn-primary');
-    document.getElementById('singleModeBtn').classList.add('btn-outline-primary');
-    
-    // HIDE single buttons, SHOW summary buttons  ← THIS IS KEY!
-    const singleActions = document.getElementById('singleModeActions');
-    const summaryActions = document.getElementById('summaryModeActions');
-    
-    if (singleActions) singleActions.style.display = 'none';   // ← HIDE!
-    if (summaryActions) summaryActions.style.display = 'flex'; // ← SHOW!
-    
-    // Hide radios, show checkboxes
+    // ✅ SHOW radios, HIDE checkboxes
     document.querySelectorAll('.single-selector').forEach(el => {
-      el.style.display = 'none';
-      el.checked = false;
+      el.style.display = 'block';
+      el.checked = false; // Clear previous selection
     });
-    document.querySelectorAll('.summary-selector').forEach(el => el.style.display = 'block');
+    document.querySelectorAll('.summary-selector').forEach(el => {
+      el.style.display = 'none';
+      el.checked = false; // Clear checkboxes
+    });
     
-    // Disable single mode buttons
+    console.log('  - Radios: SHOWN, Checkboxes: HIDDEN');
+    
+    // ✅ DISABLE action buttons (nothing selected yet)
     const viewBtn = document.getElementById('viewBtn');
     const editBtn = document.getElementById('editBtn');
     const deleteBtn = document.getElementById('deleteBtn');
@@ -5180,16 +5653,77 @@ function switchMode(mode) {
     if (editBtn) editBtn.disabled = true;
     if (deleteBtn) deleteBtn.disabled = true;
     
+    console.log('  - Action buttons: DISABLED');
+    
+    // Reset selection
     selectedBillIndex = null;
     
-    // Update info
-    const modeInfo = document.getElementById('modeInfo');
+    // Clear visual selection
+    document.querySelectorAll('.bill-card').forEach(card => {
+      card.classList.remove('selected');
+    });
+    
+    // Update info text
     if (modeInfo) {
-      modeInfo.innerHTML = '<strong>Multi-Bill Summary Mode:</strong> Select multiple bills to see aggregate statistics.';
+      modeInfo.innerHTML = '<strong>Single Selection Mode:</strong> Select one bill to View, Edit, or Delete.';
+      modeInfo.className = 'alert alert-info py-2 mb-3';
     }
     
+  } else if (mode === 'summary') {
+    console.log('✅ Activating SUMMARY mode');
+    
+    // ✅ HIDE single buttons, SHOW summary buttons
+    if (singleActions) {
+      singleActions.style.display = 'none';
+      console.log('  - Single actions: HIDDEN');
+    }
+    if (summaryActions) {
+      summaryActions.style.display = 'flex';
+      console.log('  - Summary actions: SHOWN');
+    }
+    
+    // ✅ HIDE radios, SHOW checkboxes
+    document.querySelectorAll('.single-selector').forEach(el => {
+      el.style.display = 'none';
+      el.checked = false; // Clear radio
+    });
+    document.querySelectorAll('.summary-selector').forEach(el => {
+      el.style.display = 'block';
+      el.checked = false; // Start fresh
+    });
+    
+    console.log('  - Radios: HIDDEN, Checkboxes: SHOWN');
+    
+    // ✅ DISABLE single mode buttons
+    const viewBtn = document.getElementById('viewBtn');
+    const editBtn = document.getElementById('editBtn');
+    const deleteBtn = document.getElementById('deleteBtn');
+    
+    if (viewBtn) viewBtn.disabled = true;
+    if (editBtn) editBtn.disabled = true;
+    if (deleteBtn) deleteBtn.disabled = true;
+    
+    console.log('  - Single action buttons: DISABLED');
+    
+    // Reset selection
+    selectedBillIndex = null;
+    
+    // Clear visual selection
+    document.querySelectorAll('.bill-card').forEach(card => {
+      card.classList.remove('selected');
+    });
+    
+    // Update summary button
     updateSummarySelection();
+    
+    // Update info text
+    if (modeInfo) {
+      modeInfo.innerHTML = '<strong>Multi-Bill Summary Mode:</strong> Select multiple bills to see aggregate statistics.';
+      modeInfo.className = 'alert alert-success py-2 mb-3';
+    }
   }
+  
+  console.log('=== MODE SWITCH COMPLETE ===');
 }
 
 // Update selected count and button state
@@ -5545,7 +6079,7 @@ function displaySummaryModal(summary, bills) {
       <!-- ENERGY FLOW - HORIZONTAL BARS -->
       <div style="background: #f8fafc; border-radius: 10px; padding: 0.75rem; margin-bottom: 1rem; border: 1px solid #e2e8f0;">
         <h6 style="margin: 0 0 0.75rem 0; color: #334155; font-weight: 700; font-size: 0.9rem;">
-          ⚡ Energy Flow Analysis
+          ⚡ Solar Energy Utilization Analysis
         </h6>
         
         <div style="margin-bottom: 0.5rem;">
@@ -5583,7 +6117,7 @@ function displaySummaryModal(summary, bills) {
       <div style="background: linear-gradient(135deg, #fef3c7 0%, #fef9c3 100%); 
                   border-radius: 10px; padding: 0.75rem; margin-bottom: 1rem; border-left: 4px solid #f59e0b;">
         <h6 style="margin: 0 0 0.5rem 0; color: #92400e; font-weight: 700; font-size: 0.9rem;">
-          💡 Expert Recommendation
+          💡 System Optimization Recommendation
         </h6>
         <p style="margin: 0; color: #78350f; font-size: 0.85rem; line-height: 1.4;">
           ${panelRecommendation}
@@ -7217,6 +7751,65 @@ function closeBillScanner() {
     });
 function openVerificationGuide() {
   window.open('assests/SolarSanchayDemo.jpg', '_blank');
+}
+
+/* === KEEP THIS ONE === */
+/* ==========================================
+   TOGGLE SWITCH HANDLER (Corrected)
+   ========================================== */
+function handleModeToggle() {
+  const toggle = document.getElementById('modeToggle');
+  const mode = toggle.checked ? 'summary' : 'single';
+  
+  console.log('🔄 Toggle switched to:', mode);
+  
+  // Get text containers
+  const leftText = document.getElementById('modeTextLeft');
+  const rightText = document.getElementById('modeTextRight');
+  
+  if (mode === 'single') {
+    // Highlight LEFT, fade RIGHT
+    if (leftText) {
+      leftText.style.opacity = '1';
+      leftText.style.fontWeight = '700'; // Optional: make bold
+    }
+    if (rightText) {
+      rightText.style.opacity = '0.3';
+      rightText.style.fontWeight = '400';
+    }
+  } else {
+    // Highlight RIGHT, fade LEFT
+    if (leftText) {
+      leftText.style.opacity = '0.3';
+      leftText.style.fontWeight = '400';
+    }
+    if (rightText) {
+      rightText.style.opacity = '1';
+      rightText.style.fontWeight = '700'; // Optional: make bold
+    }
+  }
+  
+  // IMPORTANT: This actually updates the dashboard buttons!
+  switchMode(mode);
+}
+function handleSelection(mode) {
+  const singleBtn = document.getElementById('singleModeBtn');
+  const summaryBtn = document.getElementById('summaryModeBtn');
+
+  if (mode === 'single') {
+    singleBtn.classList.add('active');
+    summaryBtn.classList.remove('active');
+  } else {
+    summaryBtn.classList.add('active');
+    singleBtn.classList.remove('active');
+  }
+
+  console.log('🔄 Mode switched to:', mode);
+  
+  // Call your existing function to update the dashboard
+  if (typeof switchMode === "function") {
+    switchMode(mode);
+  }
 }
 </script>
  </div>
