@@ -102,7 +102,20 @@ body {
     font-size: 0.95rem !important;
   }
 }
-
+/* Mobile adjustments for toggle */
+@media (max-width: 768px) {
+  .mode-toggle-wrapper {
+    transform: scale(1.1); /* Slightly bigger for easier tapping */
+  }
+  
+  #modeLabel {
+    font-size: 0.95rem !important;
+  }
+  
+  #modeDescription {
+    font-size: 0.8rem !important;
+  }
+}
 /* ========================================
    INTENT CARDS - CONSOLIDATED
    ======================================== */
@@ -546,6 +559,40 @@ body {
   
   .intent-desc {
     font-size: 0.7rem !important;
+  }
+}
+
+/* ========================================
+   DYNAMIC TEXT TRANSITIONS
+   ======================================== */
+
+#modeTextLeft,
+#modeTextRight {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#modeTextLeft {
+  opacity: 1; /* Default: Single mode active */
+}
+
+#modeTextRight {
+  opacity: 0.3; /* Default: Summary mode inactive */
+}
+
+/* Mobile: Stack vertically */
+@media (max-width: 768px) {
+  .mb-3 > div {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  #modeTextLeft,
+  #modeTextRight {
+    text-align: center !important;
+  }
+  
+  .mode-toggle-wrapper {
+    order: -1; /* Toggle appears first on mobile */
   }
 }
 /* ========================================
@@ -1965,14 +2012,25 @@ div[style*="background: linear-gradient(135deg, #e0f2fe"] {
     </div>
 </div>
   <!-- Mode Selection -->
-<!-- Mode Selection - TOGGLE SWITCH (CARD STYLE) -->
+<!-- Mode Selection - TOGGLE SWITCH (DYNAMIC TEXT) -->
 <div class="mb-3" style="background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%); 
                          border: 2px solid #e2e8f0; border-radius: 12px; 
-                         padding: 1.25rem; text-align: center;">
+                         padding: 1rem 1.25rem;">
   
-  <!-- Toggle Switch Container -->
-  <div style="display: flex; justify-content: center; margin-bottom: 1rem;">
-    <div class="mode-toggle-wrapper">
+  <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+    
+    <!-- LEFT TEXT (Single Mode) - Visible when toggle is OFF -->
+    <div id="modeTextLeft" style="flex: 1; text-align: left; transition: opacity 0.3s ease;">
+      <div style="font-weight: 700; color: #1e3a8a; font-size: 1rem;">
+        📊 Single Selection
+      </div>
+      <div style="font-size: 0.85rem; color: #64748b; margin-top: 0.25rem;">
+        View, Edit, or Delete one bill
+      </div>
+    </div>
+    
+    <!-- TOGGLE SWITCH (CENTER) -->
+    <div class="mode-toggle-wrapper" style="flex-shrink: 0;">
       <input type="checkbox" id="modeToggle" class="mode-toggle-input" onchange="handleModeToggle()">
       <label for="modeToggle" class="mode-toggle-label">
         <span class="mode-toggle-slider">
@@ -1981,16 +2039,17 @@ div[style*="background: linear-gradient(135deg, #e0f2fe"] {
         </span>
       </label>
     </div>
-  </div>
-  
-  <!-- Mode Labels -->
-  <div>
-    <div id="modeLabel" style="font-weight: 700; color: #1e3a8a; font-size: 1.1rem; margin-bottom: 0.5rem;">
-      📊 Single Selection Mode
+    
+    <!-- RIGHT TEXT (Summary Mode) - Visible when toggle is ON -->
+    <div id="modeTextRight" style="flex: 1; text-align: right; opacity: 0.3; transition: opacity 0.3s ease;">
+      <div style="font-weight: 700; color: #10b981; font-size: 1rem;">
+        📈 Multi-Bill Summary
+      </div>
+      <div style="font-size: 0.85rem; color: #64748b; margin-top: 0.25rem;">
+        Aggregate statistics
+      </div>
     </div>
-    <div id="modeDescription" style="font-size: 0.85rem; color: #64748b;">
-      Select one bill to View, Edit, or Delete
-    </div>
+    
   </div>
   
 </div>
@@ -7402,22 +7461,39 @@ function openVerificationGuide() {
 // ==========================================
 // TOGGLE SWITCH HANDLER
 // ==========================================
+// ==========================================
+// TOGGLE SWITCH HANDLER (WITH SLIDING TEXT)
+// ==========================================
 function handleModeToggle() {
   const toggle = document.getElementById('modeToggle');
   const mode = toggle.checked ? 'summary' : 'single';
   
   console.log('🔄 Toggle switched to:', mode);
   
-  // Update labels
-  const modeLabel = document.getElementById('modeLabel');
-  const modeDescription = document.getElementById('modeDescription');
+  // Get text containers
+  const leftText = document.getElementById('modeTextLeft');
+  const rightText = document.getElementById('modeTextRight');
   
   if (mode === 'single') {
-    modeLabel.innerHTML = '📊 Single Selection Mode';
-    modeDescription.textContent = 'Select one bill to View, Edit, or Delete';
+    // Highlight LEFT, fade RIGHT
+    if (leftText) {
+      leftText.style.opacity = '1';
+      leftText.style.transform = 'translateX(0)';
+    }
+    if (rightText) {
+      rightText.style.opacity = '0.3';
+      rightText.style.transform = 'translateX(0)';
+    }
   } else {
-    modeLabel.innerHTML = '📈 Multi-Bill Summary Mode';
-    modeDescription.textContent = 'Select multiple bills to see aggregate statistics';
+    // Highlight RIGHT, fade LEFT
+    if (leftText) {
+      leftText.style.opacity = '0.3';
+      leftText.style.transform = 'translateX(0)';
+    }
+    if (rightText) {
+      rightText.style.opacity = '1';
+      rightText.style.transform = 'translateX(0)';
+    }
   }
   
   // Call switchMode to update UI
