@@ -1991,6 +1991,49 @@ div[style*="background: linear-gradient(135deg, #e0f2fe"] {
     font-size: 1.1rem;
   }
 }
+/* iOS Segmented Control Styling */
+.mode-selector-wrapper {
+  display: flex;
+  justify-content: center; /* Centers it on screen */
+  margin: 25px 0;
+  width: 100%;
+}
+
+.ios-segmented-control {
+  display: flex;
+  background: #e2e8f0; /* Light grey background */
+  padding: 4px;
+  border-radius: 12px;
+  width: fit-content;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.segment-btn {
+  border: none;
+  background: transparent;
+  padding: 10px 24px;
+  border-radius: 9px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+}
+
+.segment-btn.active {
+  background: #ffffff;
+  color: #1e40af; /* Your primary blue */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Ensure side-by-side on mobile */
+@media (max-width: 480px) {
+  .segment-btn {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+  }
+}
 </style>
 </head>
 <body>
@@ -2289,16 +2332,21 @@ div[style*="background: linear-gradient(135deg, #e0f2fe"] {
     </div>
 </div>
   <!-- Mode Selection -->
-<div class="section-container">
- <div class="mode-layout-container">
-  <span id="modeTextLeft" class="mode-text-title">Single Consumer</span>
-  
-  <div class="form-check form-switch">
-    <input class="form-check-input" type="checkbox" id="modeToggle" onchange="handleModeToggle()">
+<div class="mode-selector-wrapper">
+  <div class="ios-segmented-control" id="modeSelector">
+    <button type="button" 
+            id="singleModeBtn" 
+            class="segment-btn active" 
+            onclick="handleSelection('single')">
+      📊 Single Selection
+    </button>
+    <button type="button" 
+            id="summaryModeBtn" 
+            class="segment-btn" 
+            onclick="handleSelection('summary')">
+      📈 Multi-Bill Summary
+    </button>
   </div>
-  
-  <span id="modeTextRight" class="mode-text-title" style="opacity: 0.3;">Summary Report</span>
-</div>
 </div>
 <!-- Mode Info Alert -->
 <div id="modeInfo" class="alert alert-info py-2 mb-3" style="font-size: 0.9rem;">
@@ -7743,6 +7791,25 @@ function handleModeToggle() {
   
   // IMPORTANT: This actually updates the dashboard buttons!
   switchMode(mode);
+}
+function handleSelection(mode) {
+  const singleBtn = document.getElementById('singleModeBtn');
+  const summaryBtn = document.getElementById('summaryModeBtn');
+
+  if (mode === 'single') {
+    singleBtn.classList.add('active');
+    summaryBtn.classList.remove('active');
+  } else {
+    summaryBtn.classList.add('active');
+    singleBtn.classList.remove('active');
+  }
+
+  console.log('🔄 Mode switched to:', mode);
+  
+  // Call your existing function to update the dashboard
+  if (typeof switchMode === "function") {
+    switchMode(mode);
+  }
 }
 </script>
  </div>
